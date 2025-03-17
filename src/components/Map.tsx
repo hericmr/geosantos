@@ -7,6 +7,7 @@ import { FeatureCollection } from 'geojson';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+import bandeira2Url from '../assets/images/bandeira2.png';
 
 import { MapProps } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
@@ -25,6 +26,15 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl,
   iconUrl,
   shadowUrl,
+});
+
+// Create custom icon for bandeira2
+const bandeira2Icon = new L.Icon({
+  iconUrl: bandeira2Url,
+  iconSize: [70, 70],
+  iconAnchor: [30, 60],
+  popupAnchor: [0, -50],
+  className: 'bandeira-marker'
 });
 
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
@@ -113,9 +123,12 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         const distance = calculateDistance(latlng, targetNeighborhoodCenter);
         const clickDuration = (Date.now() - clickStartTime) / 1000;
         
+        const clickedNeighborhood = clickedFeature?.properties?.NOME;
+        const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
+        
         updateGameState({
           clickTime: clickDuration,
-          arrowPath: [latlng, targetNeighborhoodCenter],
+          arrowPath: isCorrectNeighborhood ? null : [latlng, targetNeighborhoodCenter],
           score: gameState.score + calculateScore(distance, gameState.timeLeft).total
         });
         
@@ -137,13 +150,13 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             
             if (timeElapsed >= duration) {
               clearInterval(progressTimer);
-              startNextRound();
+              startNextRound(geoJsonData);
             }
           }, interval);
           
           feedbackTimerRef.current = setTimeout(() => {
             clearInterval(progressTimer);
-            startNextRound();
+            startNextRound(geoJsonData);
           }, duration);
         }, 500);
         
@@ -185,6 +198,51 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       height: '100vh',
       overflow: 'hidden'
     }}>
+      <style>
+        {`
+          .bandeira-marker {
+            animation: plantBandeira 0.5s ease-out;
+            transform-origin: bottom center;
+          }
+          
+          @keyframes plantBandeira {
+            0% {
+              transform: scale(0.1) translateY(100px);
+              opacity: 0;
+            }
+            50% {
+              transform: scale(1.2) translateY(-10px);
+              opacity: 1;
+            }
+            100% {
+              transform: scale(1) translateY(0);
+              opacity: 1;
+            }
+          }
+
+          .arrow-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawArrow 1s ease-out forwards;
+            animation-delay: 0.5s;
+          }
+
+          @keyframes drawArrow {
+            to {
+              stroke-dashoffset: 0;
+            }
+          }
+
+          /* Forçar cursor crosshair em todos os elementos do mapa */
+          .leaflet-container,
+          .leaflet-container *,
+          .leaflet-interactive,
+          .leaflet-interactive * {
+            cursor: crosshair !important;
+          }
+        `}
+      </style>
+      
       <audio ref={audioRef} src="/src/assets/audio/musica.ogg" />
       
       <AudioControls
@@ -202,7 +260,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           height: '100%',
           position: 'absolute',
           top: 0,
-          left: 0
+          left: 0,
+          cursor: 'crosshair'
         }}
       >
         <MapEvents onClick={handleMapClick} />
@@ -219,7 +278,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           />
         )}
         {gameState.clickedPosition && (
-          <Marker position={gameState.clickedPosition} />
+          <Marker 
+            position={gameState.clickedPosition}
+            icon={bandeira2Icon}
+          />
         )}
         {gameState.arrowPath && (
           <Polyline
@@ -230,7 +292,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               opacity: 0.8,
               dashArray: '10, 10',
               lineCap: 'round',
-              lineJoin: 'round'
+              lineJoin: 'round',
+              className: 'arrow-path'
             }}
           />
         )}
@@ -286,6 +349,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         calculateDistance={calculateDistance}
         calculateScore={calculateScore}
         getProgressBarColor={getProgressBarColor}
+        geoJsonData={geoJsonData}
       />
     </div>
   );

@@ -53,17 +53,26 @@ export const useGameState = () => {
       score: 0,
       gameOver: false,
       timeLeft: ROUND_TIME,
-      isCountingDown: true
+      isCountingDown: true,
+      revealedNeighborhoods: new Set()
     }));
   };
 
-  const startNextRound = () => {
+  const startNextRound = (geoJsonData: any) => {
+    const features = geoJsonData.features;
+    const randomIndex = Math.floor(Math.random() * features.length);
+    const neighborhood = features[randomIndex].properties?.NOME;
+
     setGameState(prev => ({
       ...prev,
       clickedPosition: null,
       arrowPath: null,
       showFeedback: false,
-      feedbackProgress: 0
+      feedbackProgress: 0,
+      timeLeft: ROUND_TIME,
+      isCountingDown: true,
+      currentNeighborhood: neighborhood,
+      revealedNeighborhoods: new Set()
     }));
   };
 

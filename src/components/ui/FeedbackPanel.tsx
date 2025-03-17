@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FeedbackPanelProps } from '../../types/game';
 import { getFeedbackMessage } from '../../utils/gameConstants';
 
@@ -11,12 +11,41 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   onNextRound,
   calculateDistance,
   calculateScore,
-  getProgressBarColor
+  getProgressBarColor,
+  geoJsonData
 }) => {
-  if (!showFeedback || !clickedPosition || !arrowPath) return null;
+  const [displayedDistance, setDisplayedDistance] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  const distance = calculateDistance(clickedPosition, arrowPath[1]);
-  const scores = calculateScore(distance, 45); // Using default time for display
+  useEffect(() => {
+    if (showFeedback && clickedPosition && arrowPath && geoJsonData) {
+      const actualDistance = calculateDistance(clickedPosition, arrowPath[1]);
+      setIsAnimating(true);
+      setDisplayedDistance(0);
+
+      const duration = 2000; // 2 seconds animation
+      const steps = 60; // 60 steps for smooth animation
+      const stepDuration = duration / steps;
+      const distanceStep = actualDistance / steps;
+
+      let currentStep = 0;
+      const interval = setInterval(() => {
+        currentStep++;
+        setDisplayedDistance(prev => Math.min(prev + distanceStep, actualDistance));
+        
+        if (currentStep >= steps) {
+          clearInterval(interval);
+          setIsAnimating(false);
+        }
+      }, stepDuration);
+
+      return () => clearInterval(interval);
+    }
+  }, [showFeedback, clickedPosition, arrowPath, geoJsonData]);
+
+  if (!showFeedback || !clickedPosition || !arrowPath || !geoJsonData) return null;
+
+  const scores = calculateScore(displayedDistance, 45);
 
   return (
     <div style={{
@@ -35,7 +64,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       transition: 'opacity 0.5s ease-in-out'
     }}>
       <h2 style={{ color: '#32CD32', marginBottom: '10px', fontSize: '1.2em' }}>
-        {getFeedbackMessage(distance)}
+        {getFeedbackMessage(displayedDistance)}
       </h2>
       <div style={{
         display: 'flex',
@@ -44,8 +73,16 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         marginBottom: '15px'
       }}>
         <div>
-          <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#333' }}>
-            {Math.round(distance)}
+          <div style={{ 
+            fontSize: '20px', 
+            fontWeight: 'bold', 
+            color: '#333',
+            fontFamily: 'monospace',
+            letterSpacing: '2px',
+            textShadow: isAnimating ? '0 0 5px #32CD32' : 'none',
+            transition: 'text-shadow 0.1s ease-in-out'
+          }}>
+            {Math.round(displayedDistance).toString().padStart(5, '0')}
           </div>
           <div style={{ color: '#666', fontSize: '0.9em' }}>metros</div>
         </div>
@@ -119,7 +156,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       </div>
 
       <button
-        onClick={onNextRound}
+        onClick={() => onNextRound(geoJsonData)}
         style={{
           padding: '6px 16px',
           fontSize: '0.9em',

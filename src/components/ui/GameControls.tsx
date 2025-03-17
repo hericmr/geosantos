@@ -28,7 +28,6 @@ export const GameControls: React.FC<GameControlsProps> = ({
         <div>
           <h2>O Caiçara</h2>
           <p>Aprenda a geografia de Santos. Encontre os bairros da cidade!</p>
-          <p>Quanto mais perto você clicar do bairro e quanto mais rápido for, mais pontos você ganha!</p>
           <button 
             onClick={onStartGame}
             style={{
@@ -45,21 +44,40 @@ export const GameControls: React.FC<GameControlsProps> = ({
         </div>
       ) : (
         <div>
-          <h2>Encontre o bairro: {currentNeighborhood}!</h2>
           <div style={{
             width: '100%',
-            height: '20px',
+            height: '60px',
             background: '#444',
             borderRadius: '10px',
             overflow: 'hidden',
-            marginBottom: '10px'
+            marginBottom: '10px',
+            position: 'relative'
           }}>
             <div style={{
               width: `${(timeLeft / 45) * 100}%`,
               height: '100%',
               background: getProgressBarColor(timeLeft),
-              transition: 'width 0.1s linear, background-color 0.5s ease'
+              transition: 'width 0.1s linear, background-color 0.5s ease',
+              position: 'absolute',
+              left: 0,
+              top: 0
             }} />
+            <span style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              color: '#000000',
+              fontWeight: 'bold',
+              fontSize: '2.2em',
+              textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
+              zIndex: 2,
+              width: '100%',
+              textAlign: 'center',
+              textTransform: 'uppercase'
+            }}>
+              {currentNeighborhood}!
+            </span>
           </div>
           <p>Tempo restante: {Math.round(timeLeft * 10) / 10}s</p>
           <p>Pontuação: {Math.round(score)}</p>

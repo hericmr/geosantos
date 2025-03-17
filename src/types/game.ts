@@ -56,10 +56,11 @@ export interface FeedbackPanelProps {
   arrowPath: [LatLng, LatLng] | null;
   clickTime: number;
   feedbackProgress: number;
-  onNextRound: () => void;
+  onNextRound: (geoJsonData: FeatureCollection) => void;
   calculateDistance: (point1: LatLng, point2: LatLng) => number;
   calculateScore: (distance: number, timeLeft: number) => ScoreCalculation;
   getProgressBarColor: (timeLeft: number) => string;
+  geoJsonData: FeatureCollection | null;
 }
 
 export interface MapEventsProps {

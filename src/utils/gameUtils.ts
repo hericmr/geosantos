@@ -2,8 +2,24 @@ import { LatLng } from 'leaflet';
 import { ROUND_TIME, MAX_DISTANCE_METERS } from './gameConstants';
 import { ScoreCalculation } from '../types/game';
 
+// Earth's radius in meters
+const EARTH_RADIUS = 6371000;
+
 export const calculateDistance = (point1: LatLng, point2: LatLng): number => {
-  return point1.distanceTo(point2);
+  // Convert latitude and longitude to radians
+  const lat1 = point1.lat * Math.PI / 180;
+  const lat2 = point2.lat * Math.PI / 180;
+  const deltaLat = (point2.lat - point1.lat) * Math.PI / 180;
+  const deltaLng = (point2.lng - point1.lng) * Math.PI / 180;
+
+  // Haversine formula
+  const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+            Math.cos(lat1) * Math.cos(lat2) *
+            Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  
+  // Calculate distance in meters
+  return EARTH_RADIUS * c;
 };
 
 export const calculateScore = (distance: number, timeLeft: number): ScoreCalculation => {
