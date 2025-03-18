@@ -73,8 +73,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         <h2 style={{ 
           color: 'white', 
           marginBottom: '20px', 
-          fontSize: '2em',
-          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
+          fontSize: window.innerWidth < 768 ? '1.5em' : '2em',
+          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+          padding: window.innerWidth < 768 ? '0 10px' : '0'
         }}>
           {feedbackMessage === "Tempo esgotado!" 
             ? "Acabou o tempo! Tá mais devagar que lesma com artrite!"
@@ -139,7 +140,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       {clickedPosition && arrowPath && (
         <div style={{ 
-          fontSize: '24px', 
+          fontSize: window.innerWidth < 768 ? '20px' : '24px', 
           color: gameOver ? '#FF4444' : '#FFD700',
           marginBottom: '15px',
           fontWeight: 'bold'
@@ -150,7 +151,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       <div style={{
         display: 'flex',
-        gap: '10px',
+        gap: window.innerWidth < 768 ? '5px' : '10px',
         justifyContent: 'center',
         marginBottom: '15px'
       }}>
@@ -158,8 +159,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           <button
             onClick={onPauseGame}
             style={{
-              padding: '8px 20px',
-              fontSize: '1em',
+              padding: window.innerWidth < 768 ? '6px 15px' : '8px 20px',
+              fontSize: window.innerWidth < 768 ? '0.9em' : '1em',
               background: '#FFA500',
               color: 'white',
               border: 'none',
@@ -183,8 +184,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             }
           }}
           style={{
-            padding: '8px 20px',
-            fontSize: '1em',
+            padding: window.innerWidth < 768 ? '6px 15px' : '8px 20px',
+            fontSize: window.innerWidth < 768 ? '0.9em' : '1em',
             background: gameOver ? '#FF4444' : '#32CD32',
             color: 'white',
             border: 'none',
