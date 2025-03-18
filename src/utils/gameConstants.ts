@@ -1,4 +1,5 @@
 export const ROUND_TIME = 10; // 10 seconds per round
+export const PHASE_TWO_TIME = 5; // 5 seconds per round in phase 2
 export const TIME_BONUS = 1.5; // Time bonus for correct neighborhood
 export const MAX_DISTANCE_METERS = 2000; // Maximum distance considered for scoring
 

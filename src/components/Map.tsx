@@ -11,7 +11,7 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import { MapProps } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
 import { calculateDistance, calculateScore } from '../utils/gameUtils';
-import { getProgressBarColor, getFeedbackMessage, FASE_1_BAIRROS } from '../utils/gameConstants';
+import { getProgressBarColor, getFeedbackMessage, FASE_1_BAIRROS, PHASE_TWO_TIME } from '../utils/gameConstants';
 
 import { AudioControls } from './ui/AudioControls';
 import { GameControls } from './ui/GameControls';
@@ -49,7 +49,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [isPhaseTwo, setIsPhaseTwo] = useState(false);
   const [showPhaseTwoIntro, setShowPhaseTwoIntro] = useState(false);
   const PHASE_TWO_SCORE = 5000;
-  const PHASE_TWO_TIME = 6;
   
   const {
     gameState,
@@ -557,7 +556,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             textAlign: 'left',
             maxWidth: '500px'
           }}>
-            <li style={{ marginBottom: '10px' }}>⚡ Tempo reduzido para 6 segundos</li>
+            <li style={{ marginBottom: '10px' }}>⚡ Tempo reduzido para {PHASE_TWO_TIME} segundos</li>
             <li style={{ marginBottom: '10px' }}>🎯 Todos os bairros de Santos agora!</li>
             <li style={{ marginBottom: '10px' }}>⚠️ Game over com 40 pontos negativos</li>
           </ul>
