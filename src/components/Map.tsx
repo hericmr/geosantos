@@ -193,10 +193,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           feedbackMessage: (isCorrectNeighborhood || isNearCenter) 
             ? "Acertou em cheio! Você é um verdadeiro caiçara!" 
             : getFeedbackMessage(calculateDistance(latlng, targetNeighborhoodCenter)),
-          gameOver: newScore < -50 || newNegativeSum > 40
+          gameOver: newNegativeSum > 40
         });
 
-        if (newScore < -50 || newNegativeSum > 40) {
+        if (newNegativeSum > 40) {
           // Se for game over, não inicia próxima rodada
           return;
         }
