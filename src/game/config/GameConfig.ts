@@ -3,9 +3,13 @@ import { MainScene } from '../scenes/MainScene';
 
 export const GameConfig: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    width: 1319,
-    height: 680,
-    parent: 'game-container',
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        parent: 'game-container',
+        width: '100%',
+        height: '100%',
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     backgroundColor: '#000000',
     physics: {
         default: 'arcade',

@@ -256,7 +256,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       bottom: 0,
       width: '100vw',
       height: '100vh',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      touchAction: 'none'
     }}>
       <style>
         {`
@@ -299,6 +300,18 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           .leaflet-interactive,
           .leaflet-interactive * {
             cursor: crosshair !important;
+            touch-action: none !important;
+          }
+
+          /* Ajustes para dispositivos móveis */
+          @media (max-width: 768px) {
+            .leaflet-container {
+              touch-action: none !important;
+            }
+
+            .leaflet-control-container {
+              display: none;
+            }
           }
         `}
       </style>
@@ -321,7 +334,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           position: 'absolute',
           top: 0,
           left: 0,
-          cursor: 'crosshair'
+          cursor: 'crosshair',
+          touchAction: 'none'
         }}
       >
         <MapEvents onClick={handleMapClick} />
@@ -366,17 +380,17 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
       <div style={{
         position: 'absolute',
-        top: '20px',
+        top: 'clamp(10px, 2vw, 20px)',
         left: '50%',
         transform: 'translateX(-50%)',
         background: 'rgba(0, 0, 0, 0.8)',
         color: 'white',
-        padding: '10px 20px',
+        padding: 'clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px)',
         borderRadius: '10px',
         textAlign: 'center',
         zIndex: 1000
       }}>
-        <h1 style={{ margin: 0, fontSize: '24px' }}>O Caiçara</h1>
+        <h1 style={{ margin: 0, fontSize: 'clamp(1.2rem, 3vw, 1.8rem)' }}>O Caiçara</h1>
       </div>
 
       {gameState.gameStarted && !gameState.gameOver && (

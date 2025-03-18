@@ -10,16 +10,17 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
   return (
     <div style={{
       position: 'absolute',
-      top: '20px',
-      left: '20px',
+      top: 'clamp(10px, 2vw, 20px)',
+      left: 'clamp(10px, 2vw, 20px)',
       background: 'rgba(0, 0, 0, 0.8)',
       color: 'white',
-      padding: '10px',
+      padding: 'clamp(8px, 1.5vw, 12px)',
       borderRadius: '10px',
       display: 'flex',
       alignItems: 'center',
-      gap: '10px',
-      zIndex: 1000
+      gap: 'clamp(5px, 1vw, 10px)',
+      zIndex: 1000,
+      touchAction: 'manipulation'
     }}>
       <button
         onClick={onToggleMute}
@@ -28,19 +29,20 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
           border: 'none',
           color: 'white',
           cursor: 'pointer',
-          padding: '5px',
+          padding: 'clamp(3px, 1vw, 5px)',
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          touchAction: 'manipulation'
         }}
       >
         {isMuted ? (
-          <span style={{ fontSize: '24px' }}>🔇</span>
+          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔇</span>
         ) : volume > 0.5 ? (
-          <span style={{ fontSize: '24px' }}>🔊</span>
+          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔊</span>
         ) : volume > 0 ? (
-          <span style={{ fontSize: '24px' }}>🔉</span>
+          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔉</span>
         ) : (
-          <span style={{ fontSize: '24px' }}>🔈</span>
+          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔈</span>
         )}
       </button>
       <input
@@ -51,8 +53,9 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
         value={isMuted ? 0 : volume}
         onChange={onVolumeChange}
         style={{
-          width: '100px',
-          accentColor: '#32CD32'
+          width: 'clamp(60px, 15vw, 100px)',
+          accentColor: '#32CD32',
+          touchAction: 'manipulation'
         }}
       />
     </div>

@@ -17,26 +17,36 @@ export const GameControls: React.FC<GameControlsProps> = ({
       transform: 'translateX(-50%)',
       background: 'rgba(0, 0, 0, 0.8)',
       color: 'white',
-      padding: '20px',
+      padding: 'clamp(10px, 2vw, 20px)',
       borderRadius: '10px',
       textAlign: 'center',
-      width: '80%',
+      width: '90%',
       maxWidth: '600px',
       zIndex: 1000
     }}>
       {!gameStarted ? (
         <div>
-          <h2>O Caiçara</h2>
-          <p>Aprenda a geografia de Santos. Encontre os bairros da cidade!</p>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', marginBottom: '1rem' }}>O Caiçara</h2>
+          <p style={{ fontSize: 'clamp(0.9rem, 2vw, 1rem)', marginBottom: '1rem' }}>
+            Aprenda a geografia de Santos. Encontre os bairros da cidade!
+          </p>
           <button 
             onClick={onStartGame}
             style={{
-              padding: '10px 20px',
-              fontSize: '1.2em',
+              padding: 'clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px)',
+              fontSize: 'clamp(1rem, 3vw, 1.2rem)',
               background: '#32CD32',
               border: 'none',
               borderRadius: '5px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'transform 0.2s',
+              touchAction: 'manipulation'
+            }}
+            onTouchStart={(e) => {
+              e.currentTarget.style.transform = 'scale(0.95)';
+            }}
+            onTouchEnd={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
             }}
           >
             Iniciar Jogo
@@ -46,11 +56,11 @@ export const GameControls: React.FC<GameControlsProps> = ({
         <div>
           <div style={{
             width: '100%',
-            height: '60px',
+            height: 'clamp(40px, 8vw, 60px)',
             background: '#444',
             borderRadius: '10px',
             overflow: 'hidden',
-            marginBottom: '10px',
+            marginBottom: 'clamp(8px, 2vw, 12px)',
             position: 'relative'
           }}>
             <div style={{
@@ -69,7 +79,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
               transform: 'translate(-50%, -50%)',
               color: '#000000',
               fontWeight: 'bold',
-              fontSize: '2.2em',
+              fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
               textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
               zIndex: 2,
               width: '100%',
@@ -79,8 +89,12 @@ export const GameControls: React.FC<GameControlsProps> = ({
               {currentNeighborhood}!
             </span>
           </div>
-          <p>Tempo restante: {Math.round(timeLeft * 10) / 10}s</p>
-          <p>Pontuação: {Math.round(score)}</p>
+          <p style={{ fontSize: 'clamp(0.9rem, 2vw, 1rem)', marginBottom: '0.5rem' }}>
+            Tempo restante: {Math.round(timeLeft * 10) / 10}s
+          </p>
+          <p style={{ fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
+            Pontuação: {Math.round(score)}
+          </p>
         </div>
       )}
     </div>
