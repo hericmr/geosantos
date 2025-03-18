@@ -18,8 +18,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    if (showFeedback && clickedPosition && arrowPath && geoJsonData) {
-      const actualDistance = calculateDistance(clickedPosition, arrowPath[1]);
+    if (showFeedback && clickedPosition && geoJsonData) {
+      const actualDistance = arrowPath ? calculateDistance(clickedPosition, arrowPath[1]) : 0;
       setIsAnimating(true);
       setDisplayedDistance(0);
 
@@ -41,9 +41,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       return () => clearInterval(interval);
     }
-  }, [showFeedback, clickedPosition, arrowPath, geoJsonData]);
+  }, [showFeedback, clickedPosition, geoJsonData]);
 
-  if (!showFeedback || !clickedPosition || !arrowPath || !geoJsonData) return null;
+  if (!showFeedback || !clickedPosition || !geoJsonData) return null;
 
   const scores = calculateScore(displayedDistance, 45);
 

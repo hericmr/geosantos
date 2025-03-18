@@ -72,5 +72,5 @@ export interface GeoJSONLayerProps {
   revealedNeighborhoods: Set<string>;
   currentNeighborhood: string;
   onMapClick: (latlng: LatLng) => void;
-  geoJsonRef: React.RefObject<typeof ReactGeoJSON>;
+  geoJsonRef: React.RefObject<L.GeoJSON>;
 } 

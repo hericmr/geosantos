@@ -23,7 +23,7 @@ export const GeoJSONLayer: React.FC<GeoJSONLayerProps> = ({
         mouseover: (e: L.LeafletEvent) => {
           const layer = e.target as L.Path;
           const feature = (layer as any).feature;
-          if (revealedNeighborhoods.has(feature.properties?.NOME)) {
+          if (feature && revealedNeighborhoods.has(feature.properties?.NOME)) {
             layer.setStyle({
               ...getNeighborhoodStyle(feature, revealedNeighborhoods, currentNeighborhood),
               fillOpacity: 0.7
@@ -33,7 +33,9 @@ export const GeoJSONLayer: React.FC<GeoJSONLayerProps> = ({
         mouseout: (e: L.LeafletEvent) => {
           const layer = e.target as L.Path;
           const feature = (layer as any).feature;
-          layer.setStyle(getNeighborhoodStyle(feature, revealedNeighborhoods, currentNeighborhood));
+          if (feature) {
+            layer.setStyle(getNeighborhoodStyle(feature, revealedNeighborhoods, currentNeighborhood));
+          }
         }
       }}
       ref={geoJsonRef}

@@ -38,8 +38,9 @@ const bandeira2Icon = new L.Icon({
 });
 
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
-  const geoJsonRef = useRef<typeof ReactGeoJSON>(null);
+  const geoJsonRef = useRef<L.GeoJSON>(null) as React.RefObject<L.GeoJSON>;
   const audioRef = useRef<HTMLAudioElement>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
   
   const {
@@ -101,61 +102,91 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     if (geoJsonRef.current) {
       let targetNeighborhoodCenter: L.LatLng | null = null;
       let clickedFeature: any = null;
+      let clickedNeighborhood: string | null = null;
 
-      geoJsonRef.current.eachLayer((layer: L.Layer) => {
+      // Primeiro, encontramos o bairro alvo e seu centro
+      const layers = geoJsonRef.current.getLayers();
+      layers.forEach((layer: L.Layer) => {
+        const feature = (layer as any).feature;
+        const polygon = layer as L.Polygon;
+        
+        try {
+          if (feature.properties?.NOME === gameState.currentNeighborhood) {
+            targetNeighborhoodCenter = polygon.getBounds().getCenter();
+          }
+        } catch (error) {
+          console.error('Error checking target neighborhood:', error);
+        }
+      });
+
+      // Depois, verificamos se o clique foi dentro de algum bairro
+      layers.forEach((layer: L.Layer) => {
         const feature = (layer as any).feature;
         const polygon = layer as L.Polygon;
         
         try {
           if (polygon.getBounds().contains(latlng)) {
             clickedFeature = feature;
-          }
-          
-          if (feature.properties?.NOME === gameState.currentNeighborhood) {
-            targetNeighborhoodCenter = polygon.getBounds().getCenter();
+            clickedNeighborhood = feature.properties?.NOME;
           }
         } catch (error) {
-          console.error('Error checking polygon:', error);
+          console.error('Error checking clicked neighborhood:', error);
         }
       });
 
+      // Se encontramos o centro do bairro alvo, calculamos a distância e atualizamos o estado
       if (targetNeighborhoodCenter) {
         const distance = calculateDistance(latlng, targetNeighborhoodCenter);
         const clickDuration = (Date.now() - clickStartTime) / 1000;
         
-        const clickedNeighborhood = clickedFeature?.properties?.NOME;
+        // Se o clique estiver muito próximo ao centro (menos de 100 metros), considera como acerto
+        const isNearCenter = distance < 100;
         const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
+        
+        // Se acertou o bairro correto ou está muito próximo ao centro, dá pontuação máxima
+        const score = (isCorrectNeighborhood || isNearCenter)
+          ? (isNearCenter ? 2000 : 1000) // Pontuação extra por acertar muito próximo ao centro
+          : calculateScore(distance, gameState.timeLeft).total;
         
         updateGameState({
           clickTime: clickDuration,
-          arrowPath: isCorrectNeighborhood ? null : [latlng, targetNeighborhoodCenter],
-          score: gameState.score + calculateScore(distance, gameState.timeLeft).total
+          arrowPath: (isCorrectNeighborhood || isNearCenter) ? null : [latlng, targetNeighborhoodCenter],
+          score: gameState.score + score,
+          showFeedback: true,
+          feedbackOpacity: 1,
+          feedbackProgress: 100,
+          feedbackMessage: isNearCenter ? 'Na mosca! 🎯' : (isCorrectNeighborhood ? 'Acertou o bairro!' : 'Tente novamente!')
         });
         
         setTimeout(() => {
-          updateGameState({
-            showFeedback: true,
-            feedbackOpacity: 1,
-            feedbackProgress: 100
-          });
-          
           const duration = 6000;
           const interval = 100;
           let timeElapsed = 0;
           
-          const progressTimer = setInterval(() => {
+          // Limpa qualquer intervalo anterior
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+          }
+          
+          progressIntervalRef.current = setInterval(() => {
             timeElapsed += interval;
             const remainingProgress = Math.max(0, 100 * (1 - timeElapsed / duration));
             updateGameState({ feedbackProgress: remainingProgress });
             
             if (timeElapsed >= duration) {
-              clearInterval(progressTimer);
+              if (progressIntervalRef.current) {
+                clearInterval(progressIntervalRef.current);
+                progressIntervalRef.current = null;
+              }
               startNextRound(geoJsonData);
             }
           }, interval);
           
           feedbackTimerRef.current = setTimeout(() => {
-            clearInterval(progressTimer);
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current);
+              progressIntervalRef.current = null;
+            }
             startNextRound(geoJsonData);
           }, duration);
         }, 500);
@@ -185,6 +216,36 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   const handleToggleMute = () => {
     updateGameState({ isMuted: !gameState.isMuted });
+  };
+
+  const handleNextRound = (geoJsonData: FeatureCollection) => {
+    // Limpa o timer de feedback se existir
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+
+    // Limpa o intervalo da barra de progresso se existir
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+
+    // Reseta o estado do feedback
+    updateGameState({
+      showFeedback: false,
+      feedbackOpacity: 0,
+      feedbackProgress: 0,
+      clickedPosition: null,
+      arrowPath: null,
+      isCountingDown: false
+    });
+
+    // Pequeno delay para garantir que o estado foi limpo
+    setTimeout(() => {
+      // Inicia a próxima rodada
+      startNextRound(geoJsonData);
+    }, 100);
   };
 
   return (
@@ -277,25 +338,21 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             geoJsonRef={geoJsonRef}
           />
         )}
-        {gameState.clickedPosition && (
-          <Marker 
-            position={gameState.clickedPosition}
-            icon={bandeira2Icon}
-          />
-        )}
-        {gameState.arrowPath && (
-          <Polyline
-            positions={gameState.arrowPath}
-            pathOptions={{
-              color: '#FFA500',
-              weight: 3,
-              opacity: 0.8,
-              dashArray: '10, 10',
-              lineCap: 'round',
-              lineJoin: 'round',
-              className: 'arrow-path'
-            }}
-          />
+        {gameState.clickedPosition && gameState.arrowPath && (
+          <>
+            <Marker
+              position={gameState.clickedPosition}
+              icon={bandeira2Icon}
+            />
+            <Polyline
+              positions={gameState.arrowPath}
+              color="#FF0000"
+              weight={3}
+              opacity={0.8}
+              dashArray="10, 10"
+              className="arrow-path"
+            />
+          </>
         )}
       </MapContainer>
       
@@ -339,18 +396,20 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         </div>
       )}
 
-      <FeedbackPanel
-        showFeedback={gameState.showFeedback}
-        clickedPosition={gameState.clickedPosition}
-        arrowPath={gameState.arrowPath}
-        clickTime={gameState.clickTime}
-        feedbackProgress={gameState.feedbackProgress}
-        onNextRound={startNextRound}
-        calculateDistance={calculateDistance}
-        calculateScore={calculateScore}
-        getProgressBarColor={getProgressBarColor}
-        geoJsonData={geoJsonData}
-      />
+      {gameState.showFeedback && (
+        <FeedbackPanel
+          showFeedback={gameState.showFeedback}
+          clickedPosition={gameState.clickedPosition}
+          arrowPath={gameState.arrowPath}
+          clickTime={gameState.clickTime}
+          feedbackProgress={gameState.feedbackProgress}
+          onNextRound={handleNextRound}
+          calculateDistance={calculateDistance}
+          calculateScore={calculateScore}
+          getProgressBarColor={getProgressBarColor}
+          geoJsonData={geoJsonData}
+        />
+      )}
     </div>
   );
 };
