@@ -101,7 +101,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const handleMapClick = (latlng: L.LatLng) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
 
-    const clickStartTime = Date.now();
+    const clickDuration = 10 - gameState.timeLeft; // Tempo total (10s) menos o tempo restante
     updateGameState({ clickedPosition: latlng });
 
     if (geoJsonRef.current) {
@@ -142,7 +142,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       // Se encontramos o centro do bairro alvo, calculamos a distância e atualizamos o estado
       if (targetNeighborhoodCenter) {
         const distance = calculateDistance(latlng, targetNeighborhoodCenter);
-        const clickDuration = (Date.now() - clickStartTime) / 1000;
         
         // Se o clique estiver muito próximo ao centro (menos de 100 metros), considera como acerto
         const isNearCenter = distance < 100;
