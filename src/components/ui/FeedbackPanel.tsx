@@ -77,39 +77,23 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
         }}>
           {feedbackMessage === "Tempo esgotado!" 
-            ? "Acabou o tempo! Tá devagar!"
-            : "Tá mais perdido que saci andando de skate na palmares!"}
+            ? "Acabou o tempo! Tá mais devagar que lesma com artrite!"
+            : "Mais de 40 pontos negativos acumulados? Tá mais perdido que cego em tiroteio!"}
         </h2>
       )}
 
-      {feedbackMessage && !gameOver && (
-        <div style={{ 
-          fontSize: feedbackMessage.includes("fase 2") ? '2em' : '1.5em',
-          color: feedbackMessage.includes("fase 2") ? '#32CD32' : '#FFD700',
-          marginBottom: '15px',
-          textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
-          padding: '10px',
-          background: 'rgba(0, 0, 0, 0.3)',
-          borderRadius: '10px',
-          fontWeight: 'bold',
-          animation: feedbackMessage.includes("fase 2") ? 'pulseText 1s infinite' : 'none'
-        }}>
-          {feedbackMessage}
-        </div>
-      )}
-      
       <div style={{
         display: 'flex',
         justifyContent: 'space-around',
-        gap: '30px',
+        alignItems: 'center',
+        gap: '20px',
         marginBottom: '15px',
         padding: '10px',
-        background: 'rgba(0, 0, 0, 0.3)',
         borderRadius: '10px'
       }}>
         <div>
           <div style={{ 
-            fontSize: '32px', 
+            fontSize: window.innerWidth < 768 ? '24px' : '32px', 
             fontWeight: 'bold', 
             color: '#32CD32',
             fontFamily: 'monospace',
@@ -119,11 +103,27 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           }}>
             {Math.round(displayedDistance).toString().padStart(5, '0')}
           </div>
-          <div style={{ color: '#32CD32', fontSize: '1em', marginTop: '5px' }}>metros</div>
+          <div style={{ color: '#32CD32', fontSize: window.innerWidth < 768 ? '0.8em' : '1em', marginTop: '5px' }}>metros</div>
         </div>
+
+        {feedbackMessage && !gameOver && (
+          <div style={{ 
+            fontSize: window.innerWidth < 768 ? '1em' : (feedbackMessage.includes("fase 2") ? '2em' : '1.5em'),
+            color: feedbackMessage.includes("fase 2") ? '#32CD32' : '#FFD700',
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
+            fontWeight: 'bold',
+            animation: feedbackMessage.includes("fase 2") ? 'pulseText 1s infinite' : 'none',
+            flex: '1',
+            maxWidth: window.innerWidth < 768 ? '40%' : '50%',
+            textAlign: 'center'
+          }}>
+            {feedbackMessage}
+          </div>
+        )}
+
         <div>
           <div style={{ 
-            fontSize: '32px', 
+            fontSize: window.innerWidth < 768 ? '24px' : '32px', 
             fontWeight: 'bold', 
             color: '#FFA500',
             fontFamily: 'monospace',
@@ -133,7 +133,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           }}>
             {displayedTime.toFixed(2)}
           </div>
-          <div style={{ color: '#FFA500', fontSize: '1em', marginTop: '5px' }}>segundos</div>
+          <div style={{ color: '#FFA500', fontSize: window.innerWidth < 768 ? '0.8em' : '1em', marginTop: '5px' }}>segundos</div>
         </div>
       </div>
 
