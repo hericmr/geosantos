@@ -25,11 +25,11 @@ export const calculateDistance = (point1: LatLng, point2: LatLng): number => {
 export const calculateScore = (distance: number, timeLeft: number): ScoreCalculation => {
   // Se a distância for maior que 2000m, aplica penalidade
   if (distance > 2000) {
-    const penalty = Math.round((distance - 2000) / 100); // -1 ponto a cada 100m além dos 2000m
+    const penalty = Math.round((distance - 2000) / 50); // -1 ponto a cada 50m além dos 2000m
     return {
       total: -penalty,
       distancePoints: -penalty,
-      timePoints: 0
+      timePoints: 0 // Sem pontos por tempo em erros grandes
     };
   }
 
@@ -37,6 +37,7 @@ export const calculateScore = (distance: number, timeLeft: number): ScoreCalcula
   const distanceScore = Math.max(0, 1 - (distance / MAX_DISTANCE_METERS));
   const distancePoints = Math.round(distanceScore * 700);
   
+  // Só calcula pontos por tempo se a distância for menor que 2000m
   const timeScore = timeLeft / ROUND_TIME;
   const timePoints = Math.round(timeScore * 600 * distanceScore);
   
