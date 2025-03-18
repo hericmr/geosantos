@@ -19,5 +19,5 @@ export const getFeedbackMessage = (distance: number): string => {
   if (distance < 1000) return "Tá quase lá! Mais um pouquinho de praia e você chega!";
   if (distance < 1500) return "Eita! Tá mais perdido que turista de São Paulo!";
   if (distance < 2000) return "Vish! Tá mais perdido que doido na Ponta da Praia!";
-  return "Olha... Santos é um ovo! Como você erra tanto assim? Vai dar uma volta de bonde pra conhecer melhor a cidade!";
+  return "Olha... Santos é um ovo! Vai dar uma volta de bonde pra conhecer melhor a cidade!";
 }; 

@@ -64,7 +64,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
             position: 'relative'
           }}>
             <div style={{
-              width: `${(timeLeft / 45) * 100}%`,
+              width: `${(timeLeft / 10) * 100}%`,
               height: '100%',
               background: getProgressBarColor(timeLeft),
               transition: 'width 0.1s linear, background-color 0.5s ease',
