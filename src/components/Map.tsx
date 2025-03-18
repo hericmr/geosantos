@@ -48,6 +48,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [negativeScoreSum, setNegativeScoreSum] = useState(0);
   const [isPhaseTwo, setIsPhaseTwo] = useState(false);
   const [showPhaseTwoIntro, setShowPhaseTwoIntro] = useState(false);
+  const [showPhaseOneIntro, setShowPhaseOneIntro] = useState(true);
   const PHASE_TWO_SCORE = 5000;
   
   const {
@@ -122,6 +123,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       startGame();
       selectRandomNeighborhood(geoJsonData);
       setIsPhaseTwo(false);
+      setShowPhaseOneIntro(false);
     }
   };
 
@@ -582,6 +584,73 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
             Começar Fase 2
+          </button>
+        </div>
+      )}
+
+      {showPhaseOneIntro && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.9)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 2000,
+          padding: '20px',
+          textAlign: 'center',
+          color: 'white'
+        }}>
+          <h1 style={{
+            fontSize: window.innerWidth < 768 ? '2em' : '3em',
+            color: '#32CD32',
+            marginBottom: '20px',
+            animation: 'pulseText 1s infinite'
+          }}>
+            Bem-vindo ao Jogo Caiçara!
+          </h1>
+          <p style={{
+            fontSize: window.innerWidth < 768 ? '1.2em' : '1.5em',
+            marginBottom: '30px',
+            maxWidth: '600px',
+            lineHeight: '1.4'
+          }}>
+            Mostre que você conhece Santos! Na fase 1, vamos começar com os bairros mais famosos...
+          </p>
+          <ul style={{
+            fontSize: window.innerWidth < 768 ? '1em' : '1.2em',
+            marginBottom: '30px',
+            textAlign: 'left',
+            maxWidth: '500px'
+          }}>
+            <li style={{ marginBottom: '10px' }}>⏱️ 10 segundos para encontrar cada bairro</li>
+            <li style={{ marginBottom: '10px' }}>🎯 24 bairros mais conhecidos</li>
+            <li style={{ marginBottom: '10px' }}>🏆 Faça 5000 pontos para desbloquear a fase 2</li>
+            <li style={{ marginBottom: '10px' }}>⚠️ Game over com 40 pontos negativos</li>
+          </ul>
+          <button
+            onClick={handleStartGame}
+            style={{
+              padding: '15px 30px',
+              fontSize: window.innerWidth < 768 ? '1.2em' : '1.5em',
+              background: '#32CD32',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              fontWeight: 'bold'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            Começar Fase 1
           </button>
         </div>
       )}
