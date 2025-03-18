@@ -29,7 +29,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       setIsAnimating(true);
       setDisplayedDistance(0);
       setDisplayedTime(0);
-      setFeedbackMessage(getFeedbackMessage(distance, score.total));
+      setFeedbackMessage(getFeedbackMessage(distance));
 
       const duration = 2000; // 2 segundos de animação
       const steps = 60; // 60 passos para animação suave
@@ -85,7 +85,11 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           fontSize: '1.5em',
           color: '#FFD700',
           marginBottom: '15px',
-          textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)'
+          textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
+          padding: '10px',
+          background: 'rgba(0, 0, 0, 0.3)',
+          borderRadius: '10px',
+          fontWeight: 'bold'
         }}>
           {feedbackMessage}
         </div>
@@ -168,7 +172,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           </button>
         )}
         <button
-          onClick={() => gameOver ? window.location.reload() : onNextRound(geoJsonData)}
+          onClick={() => {
+            if (gameOver) {
+              window.location.reload();
+            } else if (geoJsonData) {
+              onNextRound(geoJsonData);
+            }
+          }}
           style={{
             padding: '8px 20px',
             fontSize: '1em',

@@ -168,12 +168,14 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         
         updateGameState({
           clickTime: clickDuration,
-          arrowPath: (isCorrectNeighborhood || isNearCenter) ? null : [latlng, targetNeighborhoodCenter],
+          arrowPath: (isCorrectNeighborhood || isNearCenter) ? [latlng, targetNeighborhoodCenter] : [latlng, targetNeighborhoodCenter],
           score: newScore,
           showFeedback: true,
           feedbackOpacity: 1,
           feedbackProgress: 100,
-          feedbackMessage: getFeedbackMessage(calculateDistance(latlng, targetNeighborhoodCenter), newScore),
+          feedbackMessage: (isCorrectNeighborhood || isNearCenter) 
+            ? "Acertou em cheio! Você é um verdadeiro caiçara!" 
+            : getFeedbackMessage(calculateDistance(latlng, targetNeighborhoodCenter)),
           gameOver: newScore < -50
         });
 
