@@ -76,9 +76,15 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           fontSize: '2em',
           textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
         }}>
-          {feedbackMessage === "Tempo esgotado!" 
-            ? "Acabou o tempo! Tá mais devagar que lesma com artrite!" 
-            : "Mais de 40 pontos negativos acumulados? Tá mais perdido que cego em tiroteio!"}
+          {(() => {
+            if (feedbackMessage === "Tempo esgotado!") {
+              return "Acabou o tempo! Tá mais devagar que lesma com artrite!";
+            } else if (clickedPosition && arrowPath && calculateScore(calculateDistance(clickedPosition, arrowPath[1]), clickTime).total < -50) {
+              return "Menos 50 pontos? Tá mais perdido que turista procurando praia em São Paulo!";
+            } else {
+              return "Mais de 40 pontos negativos acumulados? Tá mais perdido que cego em tiroteio!";
+            }
+          })()}
         </h2>
       )}
 
