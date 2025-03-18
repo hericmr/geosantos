@@ -62,7 +62,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       bottom: 0,
       left: 0,
       width: '100%',
-      background: gameOver ? 'rgba(255, 0, 0, 0.95)' : 'rgba(0, 25, 0, 0.9)',
+      background: 'rgba(0, 25, 0, 0.9)',
       backdropFilter: 'blur(10px)',
       WebkitBackdropFilter: 'blur(10px)',
       color: 'white',
