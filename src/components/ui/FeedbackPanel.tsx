@@ -16,10 +16,12 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 }) => {
   const [displayedDistance, setDisplayedDistance] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [finalDistance, setFinalDistance] = useState(0);
 
   useEffect(() => {
     if (showFeedback && clickedPosition && geoJsonData) {
       const actualDistance = arrowPath ? calculateDistance(clickedPosition, arrowPath[1]) : 0;
+      setFinalDistance(actualDistance);
       setIsAnimating(true);
       setDisplayedDistance(0);
 
@@ -64,7 +66,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       transition: 'opacity 0.5s ease-in-out'
     }}>
       <h2 style={{ color: '#32CD32', marginBottom: '10px', fontSize: '1.2em' }}>
-        {getFeedbackMessage(displayedDistance)}
+        {getFeedbackMessage(finalDistance)}
       </h2>
       <div style={{
         display: 'flex',
