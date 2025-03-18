@@ -46,6 +46,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [negativeScoreSum, setNegativeScoreSum] = useState(0);
+  const [isPhaseTwo, setIsPhaseTwo] = useState(false);
+  const PHASE_TWO_SCORE = 5000;
+  const PHASE_TWO_TIME = 6;
   
   const {
     gameState,
@@ -109,6 +112,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     if (geoJsonData) {
       startGame();
       selectRandomNeighborhood(geoJsonData);
+      setIsPhaseTwo(false);
     }
   };
 
@@ -178,6 +182,17 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           : calculateScore(distance, gameState.timeLeft).total;
         
         const newScore = gameState.score + score;
+        
+        // Verifica se o jogador atingiu a pontuação para a fase 2
+        if (newScore >= PHASE_TWO_SCORE && !isPhaseTwo) {
+          setIsPhaseTwo(true);
+          updateGameState({
+            showFeedback: true,
+            feedbackOpacity: 1,
+            feedbackProgress: 100,
+            feedbackMessage: "Você desbloqueou a fase 2! Agora o tempo é menor!"
+          });
+        }
         
         // Atualiza a soma de pontos negativos se o score for negativo
         const newNegativeSum = score < 0 ? negativeScoreSum + Math.abs(score) : negativeScoreSum;
@@ -302,7 +317,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       feedbackProgress: 0,
       clickedPosition: null,
       arrowPath: null,
-      isCountingDown: false
+      isCountingDown: false,
+      timeLeft: isPhaseTwo ? PHASE_TWO_TIME : 10 // Define o tempo baseado na fase
     });
 
     // Pequeno delay para garantir que o estado foi limpo

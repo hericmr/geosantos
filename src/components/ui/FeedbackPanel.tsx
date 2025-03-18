@@ -77,21 +77,22 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
         }}>
           {feedbackMessage === "Tempo esgotado!" 
-            ? "Acabou o tempo! Tá mais devagar que lesma com artrite!"
-            : "Mais de 40 pontos negativos acumulados? Tá mais perdido que cego em tiroteio!"}
+            ? "Acabou o tempo! Tá devagar!"
+            : "Tá mais perdido que saci andando de skate na palmares!"}
         </h2>
       )}
 
       {feedbackMessage && !gameOver && (
         <div style={{ 
-          fontSize: '1.5em',
-          color: '#FFD700',
+          fontSize: feedbackMessage.includes("fase 2") ? '2em' : '1.5em',
+          color: feedbackMessage.includes("fase 2") ? '#32CD32' : '#FFD700',
           marginBottom: '15px',
           textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
           padding: '10px',
           background: 'rgba(0, 0, 0, 0.3)',
           borderRadius: '10px',
-          fontWeight: 'bold'
+          fontWeight: 'bold',
+          animation: feedbackMessage.includes("fase 2") ? 'pulseText 1s infinite' : 'none'
         }}>
           {feedbackMessage}
         </div>
@@ -216,6 +217,16 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           top: 0
         }} />
       </div>
+
+      <style>
+        {`
+          @keyframes pulseText {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+          }
+        `}
+      </style>
     </div>
   );
 }; 
