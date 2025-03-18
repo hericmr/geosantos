@@ -47,6 +47,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [negativeScoreSum, setNegativeScoreSum] = useState(0);
   const [isPhaseTwo, setIsPhaseTwo] = useState(false);
+  const [showPhaseTwoIntro, setShowPhaseTwoIntro] = useState(false);
   const PHASE_TWO_SCORE = 5000;
   const PHASE_TWO_TIME = 6;
   
@@ -186,11 +187,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         // Verifica se o jogador atingiu a pontuação para a fase 2
         if (newScore >= PHASE_TWO_SCORE && !isPhaseTwo) {
           setIsPhaseTwo(true);
+          setShowPhaseTwoIntro(true);
           updateGameState({
-            showFeedback: true,
-            feedbackOpacity: 1,
-            feedbackProgress: 100,
-            feedbackMessage: "Você desbloqueou a fase 2! Agora o tempo é menor!"
+            showFeedback: false,
+            feedbackOpacity: 0,
+            feedbackProgress: 0
           });
         }
         
@@ -504,6 +505,77 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           onPauseGame={handlePauseGame}
           score={gameState.score}
         />
+      )}
+
+      {showPhaseTwoIntro && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.9)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 2000,
+          padding: '20px',
+          textAlign: 'center',
+          color: 'white'
+        }}>
+          <h1 style={{
+            fontSize: window.innerWidth < 768 ? '2em' : '3em',
+            color: '#32CD32',
+            marginBottom: '20px',
+            animation: 'pulseText 1s infinite'
+          }}>
+            Fase 2 Desbloqueada!
+          </h1>
+          <p style={{
+            fontSize: window.innerWidth < 768 ? '1.2em' : '1.5em',
+            marginBottom: '30px',
+            maxWidth: '600px',
+            lineHeight: '1.4'
+          }}>
+            Parabéns, você é um verdadeiro caiçara! Agora as coisas vão ficar mais difíceis...
+          </p>
+          <ul style={{
+            fontSize: window.innerWidth < 768 ? '1em' : '1.2em',
+            marginBottom: '30px',
+            textAlign: 'left',
+            maxWidth: '500px'
+          }}>
+            <li style={{ marginBottom: '10px' }}>⚡ Tempo reduzido para 6 segundos</li>
+            <li style={{ marginBottom: '10px' }}>🎯 Mesma pontuação por acertos</li>
+            <li style={{ marginBottom: '10px' }}>⚠️ Game over com 40 pontos negativos</li>
+          </ul>
+          <button
+            onClick={() => {
+              setShowPhaseTwoIntro(false);
+              if (geoJsonData) {
+                handleNextRound(geoJsonData);
+              }
+            }}
+            style={{
+              padding: '15px 30px',
+              fontSize: window.innerWidth < 768 ? '1.2em' : '1.5em',
+              background: '#32CD32',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              fontWeight: 'bold'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            Começar Fase 2
+          </button>
+        </div>
       )}
     </div>
   );
