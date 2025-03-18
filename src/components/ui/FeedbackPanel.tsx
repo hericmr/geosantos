@@ -14,7 +14,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   getProgressBarColor,
   geoJsonData,
   gameOver,
-  onPauseGame
+  onPauseGame,
+  score
 }) => {
   const [displayedDistance, setDisplayedDistance] = useState(0);
   const [displayedTime, setDisplayedTime] = useState(0);
@@ -69,6 +70,19 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       zIndex: 1001,
       padding: '15px'
     }}>
+      {!gameOver && clickedPosition && arrowPath && (
+        <div style={{
+          fontSize: window.innerWidth < 768 ? '0.8em' : '1em',
+          color: '#FFD700',
+          marginBottom: '10px',
+          opacity: 0.8
+        }}>
+          {calculateScore(calculateDistance(clickedPosition, arrowPath[1]), clickTime).total >= 0 
+            ? `Faltam ${Math.max(0, 5000 - score)} pontos para a fase 2` 
+            : null}
+        </div>
+      )}
+
       {gameOver && (
         <h2 style={{ 
           color: 'white', 

@@ -63,6 +63,7 @@ export interface FeedbackPanelProps {
   geoJsonData: FeatureCollection | null;
   gameOver: boolean;
   onPauseGame: () => void;
+  score: number;
 }
 
 export interface MapEventsProps {

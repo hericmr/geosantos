@@ -502,6 +502,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           geoJsonData={geoJsonData}
           gameOver={gameState.gameOver}
           onPauseGame={handlePauseGame}
+          score={gameState.score}
         />
       )}
     </div>
