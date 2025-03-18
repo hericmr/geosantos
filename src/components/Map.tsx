@@ -86,6 +86,18 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     }
   }, [gameState.gameStarted, gameState.gameOver]);
 
+  useEffect(() => {
+    if (gameState.gameStarted && !gameState.gameOver && gameState.timeLeft <= 0) {
+      updateGameState({
+        gameOver: true,
+        showFeedback: true,
+        feedbackOpacity: 1,
+        feedbackProgress: 100,
+        feedbackMessage: "Tempo esgotado!"
+      });
+    }
+  }, [gameState.timeLeft, gameState.gameStarted, gameState.gameOver]);
+
   const selectRandomNeighborhood = (data: FeatureCollection) => {
     const features = data.features;
     const randomIndex = Math.floor(Math.random() * features.length);
