@@ -7,7 +7,6 @@ import { FeatureCollection } from 'geojson';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-import bandeira2Url from '../assets/images/bandeira2.png';
 
 import { MapProps } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
@@ -30,7 +29,7 @@ L.Icon.Default.mergeOptions({
 
 // Create custom icon for bandeira2
 const bandeira2Icon = new L.Icon({
-  iconUrl: bandeira2Url,
+  iconUrl: 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/images/bandeira2.png',
   iconSize: [70, 70],
   iconAnchor: [30, 60],
   popupAnchor: [0, -50],
@@ -53,7 +52,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   } = useGameState();
 
   useEffect(() => {
-    fetch('/data/bairros.geojson')
+    fetch('https://raw.githubusercontent.com/hericmr/jogocaicara/refs/heads/main/public/data/bairros.geojson')
       .then(response => response.json())
       .then(data => {
         setGeoJsonData(data);
@@ -304,7 +303,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         `}
       </style>
       
-      <audio ref={audioRef} src="/assets/audio/musica.ogg" preload="auto" />
+      <audio ref={audioRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/musica.ogg" preload="auto" />
       
       <AudioControls
         isMuted={gameState.isMuted}
