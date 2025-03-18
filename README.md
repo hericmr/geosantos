@@ -1,54 +1,77 @@
-# React + TypeScript + Vite
+# O Caiçara - Aprenda os Bairros de Santos 🎮
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## O Caiçara 1.0 - Versão Web
 
-Currently, two official plugins are available:
+[🎮 Jogue Agora!](https://hericmr.github.io/jogocaicara/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Visão Geral
 
-## Expanding the ESLint configuration
+Embarque em uma jornada eletrizante pelas ruas de Santos, São Paulo! "O Caiçara" te coloca na pele de um verdadeiro santista, testando ao máximo seu conhecimento geográfico da cidade. Agora em uma versão totalmente web, mais acessível e moderna!
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Características
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+🗺️ **Aprendizado Ativo:** Aprenda de forma ativa, visual e envolvente sobre a localização, tamanho e formato dos bairros.
+
+⏱️ **Se vira nos trinta:** Corra contra o tempo para encontrar os bairros corretos! Quanto mais rápido você for, mais pontos ganhará.
+
+🎯 **Sistema de Pontuação:** 
+- Acerte na mosca (menos de 100m do centro): 2000 pontos
+- Acerte o bairro: 1000 pontos
+- Pontos extras por velocidade!
+
+## 💻 Tecnologias Utilizadas
+
+- React
+- TypeScript
+- Vite
+- Leaflet (para o mapa interativo)
+- GeoJSON (para os dados dos bairros)
+
+## 🛠️ Desenvolvimento Local
+
+Se você quiser rodar o jogo localmente ou contribuir com o desenvolvimento:
+
+1. Clone este repositório:
+```bash
+git clone https://github.com/hericmr/jogocaicara.git
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+2. Navegue até o diretório do projeto:
+```bash
+cd jogocaicara
 ```
+
+3. Instale as dependências:
+```bash
+npm install
+```
+
+4. Inicie o servidor de desenvolvimento:
+```bash
+npm run dev
+```
+
+5. Abra [http://localhost:5173](http://localhost:5173) no seu navegador
+
+## 🤝 Contribuições
+
+O jogo está em constante evolução! Sugestões e contribuições são mais que bem-vindas! Encontrou um problema ou tem uma ideia para melhorar o jogo? Abra uma issue ou envie uma pull request.
+
+Esse é um jogo de código aberto e a sua ajuda é fundamental para tornar "O Caiçara" ainda melhor!
+
+### 🎮 Possibilidades de Expansão
+
+A lógica desse jogo pode ser adaptada para criar experiências educacionais em diversas áreas:
+- Anatomia
+- Biologia
+- Astronomia
+- Geografia de outras cidades/países
+- E muito mais!
+
+## 👤 Autor
+
+Este jogo foi desenvolvido por Héric Moura.
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
