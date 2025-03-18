@@ -79,7 +79,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             fontSize: '2.5em',
             textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
           }}>
-            Vish! Tá mais perdido que cebola em pé de alface!
+            Menos 50 pontos? Tá mais perdido que turista procurando praia em São Paulo!
           </h2>
           <button
             onClick={() => window.location.reload()}

@@ -173,10 +173,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           feedbackOpacity: 1,
           feedbackProgress: 100,
           feedbackMessage: isNearCenter ? 'Na mosca!' : (isCorrectNeighborhood ? 'Acertou o bairro!' : 'Tente novamente!'),
-          gameOver: newScore < 0 // Game over se a pontuação ficar negativa
+          gameOver: newScore < -50 // Game over se a pontuação ficar menor que -50
         });
 
-        if (newScore < 0) {
+        if (newScore < -50) {
           // Se for game over, não inicia próxima rodada
           return;
         }
