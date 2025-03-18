@@ -21,3 +21,16 @@ export const getFeedbackMessage = (distance: number): string => {
   if (distance < 2000) return "Vish! Tá mais perdido que doido na Ponta da Praia!";
   return "Olha... errou só por mais de dois quilômetros, sabe nada!";
 };
+
+export const FASE_1_BAIRROS = [
+  "Gonzaga",
+  "Ponta da Praia",
+  "José Menino",
+  "Embaré",
+  "Aparecida",
+  "Boqueirão",
+  "Vila Mathias",
+  "Campo Grande",
+  "Marapé",
+  "Vila Belmiro"
+];

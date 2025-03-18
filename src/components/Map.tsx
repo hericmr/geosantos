@@ -11,7 +11,7 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import { MapProps } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
 import { calculateDistance, calculateScore } from '../utils/gameUtils';
-import { getProgressBarColor, getFeedbackMessage } from '../utils/gameConstants';
+import { getProgressBarColor, getFeedbackMessage, FASE_1_BAIRROS } from '../utils/gameConstants';
 
 import { AudioControls } from './ui/AudioControls';
 import { GameControls } from './ui/GameControls';
@@ -104,8 +104,17 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   const selectRandomNeighborhood = (data: FeatureCollection) => {
     const features = data.features;
-    const randomIndex = Math.floor(Math.random() * features.length);
-    const neighborhood = features[randomIndex].properties?.NOME;
+    let availableFeatures = features;
+
+    // Se não estiver na fase 2, filtra apenas os bairros da fase 1
+    if (!isPhaseTwo) {
+      availableFeatures = features.filter(feature => 
+        FASE_1_BAIRROS.includes(feature.properties?.NOME)
+      );
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableFeatures.length);
+    const neighborhood = availableFeatures[randomIndex].properties?.NOME;
     updateGameState({ currentNeighborhood: neighborhood });
   };
 
@@ -549,7 +558,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             maxWidth: '500px'
           }}>
             <li style={{ marginBottom: '10px' }}>⚡ Tempo reduzido para 6 segundos</li>
-            <li style={{ marginBottom: '10px' }}>🎯 Mesma pontuação por acertos</li>
+            <li style={{ marginBottom: '10px' }}>🎯 Todos os bairros de Santos agora!</li>
             <li style={{ marginBottom: '10px' }}>⚠️ Game over com 40 pontos negativos</li>
           </ul>
           <button
