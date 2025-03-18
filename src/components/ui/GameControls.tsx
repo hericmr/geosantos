@@ -12,18 +12,16 @@ export const GameControls: React.FC<GameControlsProps> = ({
   return (
     <div style={{
       position: 'absolute',
-      bottom: '20px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      background: 'rgba(0, 0, 0, 0.85)',
+      bottom: 0,
+      left: 0,
+      width: '100%',
+      background: 'rgba(0, 25, 0, 0.9)',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
       color: 'white',
       padding: 'clamp(15px, 3vw, 25px)',
-      borderRadius: '15px',
       textAlign: 'center',
-      width: '92%',
-      maxWidth: '800px',
-      zIndex: 1000,
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+      zIndex: 1000
     }}>
       {!gameStarted ? (
         <div>
@@ -49,17 +47,14 @@ export const GameControls: React.FC<GameControlsProps> = ({
               borderRadius: '8px',
               color: 'white',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 4px 15px rgba(46, 189, 65, 0.3)',
+              transition: 'transform 0.2s ease',
               touchAction: 'manipulation'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(46, 189, 65, 0.4)';
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(46, 189, 65, 0.3)';
             }}
             onTouchStart={(e) => {
               e.currentTarget.style.transform = 'scale(0.95)';
@@ -77,11 +72,8 @@ export const GameControls: React.FC<GameControlsProps> = ({
             width: '100%',
             height: 'clamp(60px, 12vw, 80px)',
             background: '#2A2A2A',
-            borderRadius: '12px',
             overflow: 'hidden',
-            marginBottom: 'clamp(12px, 3vw, 18px)',
-            position: 'relative',
-            boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.3)'
+            position: 'relative'
           }}>
             <div style={{
               width: `${(timeLeft / 10) * 100}%`,
@@ -90,47 +82,43 @@ export const GameControls: React.FC<GameControlsProps> = ({
               transition: 'width 0.1s linear, background-color 0.5s ease',
               position: 'absolute',
               left: 0,
-              top: 0,
-              boxShadow: '2px 0 10px rgba(255, 255, 255, 0.1)'
+              top: 0
             }} />
-            <span style={{
+            <div style={{
               position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: 'clamp(1.4rem, 3.5vw, 2.4rem)',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-              zIndex: 2,
+              left: 0,
+              top: 0,
               width: '100%',
-              textAlign: 'center',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0 20px',
+              zIndex: 2
             }}>
-              {currentNeighborhood}!
-            </span>
-          </div>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '0 10px'
-          }}>
-            <p style={{ 
-              fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
-              fontWeight: 'bold',
-              color: '#FFD700'
-            }}>
-              Tempo: {Math.round(timeLeft * 10) / 10}s
-            </p>
-            <p style={{ 
-              fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
-              fontWeight: 'bold',
-              color: '#FFD700'
-            }}>
-              Pontos: {Math.round(score)}
-            </p>
+              <span style={{ 
+                fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
+                color: '#FFD700'
+              }}>
+                {Math.round(timeLeft * 10) / 10}s
+              </span>
+              <span style={{
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: 'clamp(1.4rem, 3.5vw, 2.4rem)',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}>
+                {currentNeighborhood}!
+              </span>
+              <span style={{ 
+                fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
+                color: '#FFD700'
+              }}>
+                {Math.round(score)} pts
+              </span>
+            </div>
           </div>
         </div>
       )}

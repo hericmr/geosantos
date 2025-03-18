@@ -11,7 +11,7 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import { MapProps } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
 import { calculateDistance, calculateScore } from '../utils/gameUtils';
-import { getProgressBarColor } from '../utils/gameConstants';
+import { getProgressBarColor, getFeedbackMessage } from '../utils/gameConstants';
 
 import { AudioControls } from './ui/AudioControls';
 import { GameControls } from './ui/GameControls';
@@ -44,6 +44,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   
   const {
     gameState,
@@ -172,8 +173,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           showFeedback: true,
           feedbackOpacity: 1,
           feedbackProgress: 100,
-          feedbackMessage: isNearCenter ? 'Na mosca!' : (isCorrectNeighborhood ? 'Acertou o bairro!' : 'Tente novamente!'),
-          gameOver: newScore < -50 // Game over se a pontuação ficar menor que -50
+          feedbackMessage: getFeedbackMessage(calculateDistance(latlng, targetNeighborhoodCenter), newScore),
+          gameOver: newScore < -50
         });
 
         if (newScore < -50) {
@@ -241,7 +242,28 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     updateGameState({ isMuted: !gameState.isMuted });
   };
 
+  const handlePauseGame = () => {
+    setIsPaused(true);
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  };
+
   const handleNextRound = (geoJsonData: FeatureCollection) => {
+    // Reseta o estado de pausa ao iniciar nova rodada
+    setIsPaused(false);
+    if (audioRef.current && gameState.gameStarted && !gameState.gameOver && !gameState.isMuted) {
+      audioRef.current.play().catch(e => console.log('Erro ao tocar música:', e));
+    }
+
     // Limpa o timer de feedback se existir
     if (feedbackTimerRef.current) {
       clearTimeout(feedbackTimerRef.current);
@@ -272,17 +294,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   };
 
   return (
-    <div style={{ 
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      width: '100vw',
-      height: '100vh',
-      overflow: 'hidden',
-      touchAction: 'none'
-    }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <style>
         {`
           .bandeira-marker {
@@ -385,30 +397,15 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         </div>
       )}
 
-      <AudioControls
-        isMuted={gameState.isMuted}
-        volume={gameState.volume}
-        onVolumeChange={handleVolumeChange}
-        onToggleMute={handleToggleMute}
-      />
-
       <MapContainer
-        center={center as L.LatLngExpression}
+        center={center}
         zoom={zoom}
-        style={{ 
-          width: '100%',
-          height: '100%',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          cursor: 'crosshair',
-          touchAction: 'none'
-        }}
+        style={{ width: '100%', height: '100%' }}
+        zoomControl={false}
+        attributionControl={false}
       >
         <MapEvents onClick={handleMapClick} />
-        <TileLayer
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        />
+        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
         {geoJsonData && (
           <GeoJSONLayer
             geoJsonData={geoJsonData}
@@ -435,30 +432,25 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           </>
         )}
       </MapContainer>
-      
-      <GameControls
-        gameStarted={gameState.gameStarted}
-        currentNeighborhood={gameState.currentNeighborhood}
-        timeLeft={gameState.timeLeft}
-        score={gameState.score}
-        onStartGame={handleStartGame}
-        getProgressBarColor={getProgressBarColor}
-      />
 
-      {gameState.gameStarted && !gameState.gameOver && (
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          background: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          padding: '10px 20px',
-          borderRadius: '10px',
-          textAlign: 'center',
-          zIndex: 1000
-        }}>
-          <p style={{ margin: 0, fontSize: '18px' }}>Pontuação: {Math.round(gameState.score)}</p>
-        </div>
+      {gameState.gameStarted && (
+        <AudioControls
+          isMuted={gameState.isMuted}
+          volume={gameState.volume}
+          onVolumeChange={handleVolumeChange}
+          onToggleMute={handleToggleMute}
+        />
+      )}
+
+      {!gameState.showFeedback && (
+        <GameControls
+          gameStarted={gameState.gameStarted}
+          currentNeighborhood={gameState.currentNeighborhood}
+          timeLeft={gameState.timeLeft}
+          score={gameState.score}
+          onStartGame={handleStartGame}
+          getProgressBarColor={getProgressBarColor}
+        />
       )}
 
       {gameState.showFeedback && (
@@ -474,6 +466,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           getProgressBarColor={getProgressBarColor}
           geoJsonData={geoJsonData}
           gameOver={gameState.gameOver}
+          onPauseGame={handlePauseGame}
         />
       )}
     </div>

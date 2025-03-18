@@ -62,6 +62,7 @@ export interface FeedbackPanelProps {
   getProgressBarColor: (timeLeft: number) => string;
   geoJsonData: FeatureCollection | null;
   gameOver: boolean;
+  onPauseGame: () => void;
 }
 
 export interface MapEventsProps {
