@@ -18,7 +18,6 @@ import { GameControls } from './ui/GameControls';
 import { FeedbackPanel } from './ui/FeedbackPanel';
 import { MapEvents } from './game/MapEvents';
 import { GeoJSONLayer } from './game/GeoJSONLayer';
-import { Tutorial } from './ui/Tutorial';
 
 // Fix for default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -45,7 +44,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showTutorial, setShowTutorial] = useState(true);
   
   const {
     gameState,
@@ -469,10 +467,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           getProgressBarColor={getProgressBarColor}
           geoJsonData={geoJsonData}
         />
-      )}
-
-      {showTutorial && (
-        <Tutorial onClose={() => setShowTutorial(false)} />
       )}
     </div>
   );
