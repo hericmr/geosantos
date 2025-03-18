@@ -76,7 +76,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           fontSize: '2em',
           textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
         }}>
-          Menos 50 pontos? Tá mais perdido que turista procurando praia em São Paulo!
+          Mais de 40 pontos negativos acumulados? Tá mais perdido que cego em tiroteio!
         </h2>
       )}
 

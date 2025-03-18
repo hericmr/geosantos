@@ -45,6 +45,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [negativeScoreSum, setNegativeScoreSum] = useState(0);
   
   const {
     gameState,
@@ -166,6 +167,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         
         const newScore = gameState.score + score;
         
+        // Atualiza a soma de pontos negativos se o score for negativo
+        const newNegativeSum = score < 0 ? negativeScoreSum + Math.abs(score) : negativeScoreSum;
+        setNegativeScoreSum(newNegativeSum);
+        
         updateGameState({
           clickTime: clickDuration,
           arrowPath: (isCorrectNeighborhood || isNearCenter) ? [latlng, targetNeighborhoodCenter] : [latlng, targetNeighborhoodCenter],
@@ -176,10 +181,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           feedbackMessage: (isCorrectNeighborhood || isNearCenter) 
             ? "Acertou em cheio! Você é um verdadeiro caiçara!" 
             : getFeedbackMessage(calculateDistance(latlng, targetNeighborhoodCenter)),
-          gameOver: newScore < -50
+          gameOver: newScore < -50 || newNegativeSum > 40
         });
 
-        if (newScore < -50) {
+        if (newScore < -50 || newNegativeSum > 40) {
           // Se for game over, não inicia próxima rodada
           return;
         }
