@@ -9,7 +9,7 @@ export default defineConfig({
     open: true
   },
   publicDir: 'public',
-  base: './',
+  base: '/jogocaicara/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
