@@ -57,37 +57,68 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   return (
     <div style={{
       position: 'absolute',
-      top: '80px',
-      right: '20px',
+      top: gameOver ? '50%' : '80px',
+      right: gameOver ? '50%' : '20px',
+      transform: gameOver ? 'translate(50%, -50%)' : 'none',
       background: gameOver ? 'rgba(255, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)',
       padding: '20px',
       borderRadius: '15px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      boxShadow: gameOver ? '0 0 50px rgba(255, 0, 0, 0.5)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
       textAlign: 'center',
       zIndex: 2000,
-      minWidth: '300px',
-      maxWidth: '350px',
+      minWidth: gameOver ? '80%' : '300px',
+      maxWidth: gameOver ? '600px' : '350px',
       opacity: 1,
       transition: 'all 0.5s ease-in-out'
     }}>
-      <h2 style={{ 
-        color: gameOver ? 'white' : '#32CD32', 
-        marginBottom: '15px', 
-        fontSize: gameOver ? '1.5em' : '1.3em',
-        textShadow: gameOver ? '2px 2px 4px rgba(0, 0, 0, 0.3)' : 'none'
-      }}>
-        {gameOver ? 'GAME OVER!' : getFeedbackMessage(finalDistance)}
-      </h2>
       {gameOver ? (
-        <div style={{
-          fontSize: '1.2em',
-          color: 'white',
-          marginBottom: '20px'
-        }}>
-          Você errou por mais de 2km e sua pontuação ficou negativa!
-        </div>
+        <>
+          <h2 style={{ 
+            color: 'white', 
+            marginBottom: '20px', 
+            fontSize: '2.5em',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
+          }}>
+            Vish! Tá mais perdido que cebola em pé de alface!
+          </h2>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '15px 30px',
+              fontSize: '1.2em',
+              background: '#FF4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 15px rgba(255, 0, 0, 0.3)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 0, 0, 0.4)';
+              e.currentTarget.style.background = '#FF0000';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 0, 0, 0.3)';
+              e.currentTarget.style.background = '#FF4444';
+            }}
+          >
+            Tentar de Novo
+          </button>
+        </>
       ) : (
         <>
+          <h2 style={{ 
+            color: '#32CD32', 
+            marginBottom: '15px', 
+            fontSize: '1.3em',
+            textShadow: 'none'
+          }}>
+            {getFeedbackMessage(finalDistance)}
+          </h2>
           <div style={{
             display: 'flex',
             justifyContent: 'space-around',

@@ -10,10 +10,10 @@ export const getProgressBarColor = (timeLeft: number): string => {
 };
 
 export const getFeedbackMessage = (distance: number): string => {
-  if (distance < 10) return "Perfeição! Você é o Chorão dos bairros! Já pode montar a banca de surfista!";
+  if (distance < 10) return "Perfeito! Você é entende dos bairros!";
   if (distance < 30) return "Impressionante! Você é tão santista que até o peixe te respeita!";
-  if (distance < 50) return "Brabo! Você é mais santista que pastel de vento na feira!";
-  if (distance < 100) return "Incrível! Caiçara raiz, anda mais que o caminhão de peixe!";
+  if (distance < 50) return "Brabo! Você é mais santista que pastel de vento da feira!";
+  if (distance < 100) return "Muito bom!";
   if (distance < 300) return "Muito bom! Você já é praticamente um guia turístico de Santos!";
   if (distance < 500) return "Legal! Manja mais muita gente!";
   if (distance < 1000) return "Tá quase lá! Mais um pouco e você já vira morador de Santos!";
