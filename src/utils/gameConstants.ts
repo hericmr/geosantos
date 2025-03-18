@@ -11,7 +11,10 @@ export const getProgressBarColor = (timeLeft: number): string => {
 
 export const getFeedbackMessage = (distance: number): string => {
   if (distance < 100) return "Incrível! Você é um verdadeiro Caiçara!";
-  if (distance < 500) return "Muito bom! Você conhece bem Santos!";
-  if (distance < 1000) return "Legal! Continue explorando a cidade!";
-  return "Continue tentando! Você está aprendendo!";
+  if (distance < 300) return "Muito bom! Você conhece bem Santos!";
+  if (distance < 500) return "Legal! Você manja dos paranauê!";
+  if (distance < 1000) return "Tá quase lá! Mais um pouquinho de praia e você chega!";
+  if (distance < 1500) return "Eita! Tá mais perdido que turista no canal 1!";
+  if (distance < 2000) return "Vish! Tá mais perdido que baiano na Ponta da Praia!";
+  return "Meu filho... Santos é um ovo! Como você erra tanto assim? Vai dar uma volta de bonde pra conhecer melhor a cidade!";
 }; 
