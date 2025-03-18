@@ -378,21 +378,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         getProgressBarColor={getProgressBarColor}
       />
 
-      <div style={{
-        position: 'absolute',
-        top: 'clamp(10px, 2vw, 20px)',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        background: 'rgba(0, 0, 0, 0.8)',
-        color: 'white',
-        padding: 'clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px)',
-        borderRadius: '10px',
-        textAlign: 'center',
-        zIndex: 1000
-      }}>
-        <h1 style={{ margin: 0, fontSize: 'clamp(1.2rem, 3vw, 1.8rem)' }}>O Caiçara</h1>
-      </div>
-
       {gameState.gameStarted && !gameState.gameOver && (
         <div style={{
           position: 'absolute',
