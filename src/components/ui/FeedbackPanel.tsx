@@ -93,7 +93,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         }}>
           {feedbackMessage === "Tempo esgotado!" 
             ? "Acabou o tempo! Tá mals!"
-            : "vocẽ perdeu Tá mais perdido que saci andando de skate na palmares!"}
+            : "Vocẽ perdeu... Tá mais perdido que saci andando de skate na Palmares!"}
         </h2>
       )}
 

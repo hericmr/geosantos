@@ -120,12 +120,12 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   const handleStartGame = () => {
     if (geoJsonData) {
-      startGame();
-      selectRandomNeighborhood(geoJsonData);
-      setIsPhaseTwo(false);
       setShowPhaseOneMessage(true);
       setTimeout(() => {
         setShowPhaseOneMessage(false);
+        startGame();
+        selectRandomNeighborhood(geoJsonData);
+        setIsPhaseTwo(false);
       }, 3000); // Mensagem some após 3 segundos
     }
   };
