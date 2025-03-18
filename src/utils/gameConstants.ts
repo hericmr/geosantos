@@ -23,14 +23,37 @@ export const getFeedbackMessage = (distance: number): string => {
 };
 
 export const FASE_1_BAIRROS = [
+  // Orla
   "Gonzaga",
   "Ponta da Praia",
   "José Menino",
   "Embaré",
   "Aparecida",
   "Boqueirão",
+  
+  // Região Central e Histórica
+  "Centro",
+  "Valongo",
+  "Paquetá",
+  "Vila Nova",
+  
+  // Região Intermediária
   "Vila Mathias",
   "Campo Grande",
   "Marapé",
-  "Vila Belmiro"
+  "Vila Belmiro",
+  "Encruzilhada",
+  "Macuco",
+  "Estuário",
+  
+  // Zona Noroeste mais conhecida
+  "Rádio Clube",
+  "Castelo",
+  "Areia Branca",
+  
+  // Morros mais conhecidos
+  "Morro do José Menino",
+  "Morro da Nova Cintra",
+  "Morro do Marapé",
+  "Morro da Penha"
 ];
