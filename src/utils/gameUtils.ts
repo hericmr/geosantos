@@ -29,9 +29,9 @@ export const calculateScore = (distance: number, timeLeft: number): ScoreCalcula
   // Calculate points by distance (max 700)
   const distancePoints = Math.round(distanceScore * 700);
   
-  // Calculate points by time (max 300), multiplied by click accuracy
+  // Calculate points by time (max 600), multiplied by click accuracy
   const timeScore = timeLeft / ROUND_TIME;
-  const timePoints = Math.round(timeScore * 300 * distanceScore);
+  const timePoints = Math.round(timeScore * 600 * distanceScore);
   
   return {
     total: distancePoints + timePoints,
