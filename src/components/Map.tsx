@@ -163,15 +163,23 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           ? (isNearCenter ? 2000 : 1000) // Pontuação extra por acertar muito próximo ao centro
           : calculateScore(distance, gameState.timeLeft).total;
         
+        const newScore = gameState.score + score;
+        
         updateGameState({
           clickTime: clickDuration,
           arrowPath: (isCorrectNeighborhood || isNearCenter) ? null : [latlng, targetNeighborhoodCenter],
-          score: gameState.score + score,
+          score: newScore,
           showFeedback: true,
           feedbackOpacity: 1,
           feedbackProgress: 100,
-          feedbackMessage: isNearCenter ? 'Na mosca! 🎯' : (isCorrectNeighborhood ? 'Acertou o bairro!' : 'Tente novamente!')
+          feedbackMessage: isNearCenter ? 'Na mosca!' : (isCorrectNeighborhood ? 'Acertou o bairro!' : 'Tente novamente!'),
+          gameOver: newScore < 0 // Game over se a pontuação ficar negativa
         });
+
+        if (newScore < 0) {
+          // Se for game over, não inicia próxima rodada
+          return;
+        }
         
         setTimeout(() => {
           const duration = 6000;
@@ -465,6 +473,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           calculateScore={calculateScore}
           getProgressBarColor={getProgressBarColor}
           geoJsonData={geoJsonData}
+          gameOver={gameState.gameOver}
         />
       )}
     </div>

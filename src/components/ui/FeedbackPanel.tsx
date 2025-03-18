@@ -12,7 +12,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   calculateDistance,
   calculateScore,
   getProgressBarColor,
-  geoJsonData
+  geoJsonData,
+  gameOver
 }) => {
   const [displayedDistance, setDisplayedDistance] = useState(0);
   const [displayedTime, setDisplayedTime] = useState(0);
@@ -58,7 +59,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       position: 'absolute',
       top: '80px',
       right: '20px',
-      background: 'rgba(255, 255, 255, 0.95)',
+      background: gameOver ? 'rgba(255, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)',
       padding: '20px',
       borderRadius: '15px',
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
@@ -67,117 +68,137 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       minWidth: '300px',
       maxWidth: '350px',
       opacity: 1,
-      transition: 'opacity 0.5s ease-in-out'
+      transition: 'all 0.5s ease-in-out'
     }}>
-      <h2 style={{ color: '#32CD32', marginBottom: '15px', fontSize: '1.3em' }}>
-        {getFeedbackMessage(finalDistance)}
+      <h2 style={{ 
+        color: gameOver ? 'white' : '#32CD32', 
+        marginBottom: '15px', 
+        fontSize: gameOver ? '1.5em' : '1.3em',
+        textShadow: gameOver ? '2px 2px 4px rgba(0, 0, 0, 0.3)' : 'none'
+      }}>
+        {gameOver ? 'GAME OVER!' : getFeedbackMessage(finalDistance)}
       </h2>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-around',
-        gap: '30px',
-        marginBottom: '20px',
-        padding: '10px',
-        background: 'rgba(0, 0, 0, 0.05)',
-        borderRadius: '10px'
-      }}>
-        <div>
-          <div style={{ 
-            fontSize: '32px', 
-            fontWeight: 'bold', 
-            color: '#333',
-            fontFamily: 'monospace',
-            letterSpacing: '2px',
-            textShadow: isAnimating ? '0 0 5px #32CD32' : 'none',
-            transition: 'text-shadow 0.1s ease-in-out'
-          }}>
-            {Math.round(displayedDistance).toString().padStart(5, '0')}
-          </div>
-          <div style={{ color: '#666', fontSize: '1em', marginTop: '5px' }}>metros</div>
-        </div>
-        <div>
-          <div style={{ 
-            fontSize: '32px', 
-            fontWeight: 'bold', 
-            color: '#333',
-            fontFamily: 'monospace',
-            letterSpacing: '2px',
-            textShadow: isAnimating ? '0 0 5px #FFA500' : 'none',
-            transition: 'text-shadow 0.1s ease-in-out'
-          }}>
-            {displayedTime.toFixed(2)}
-          </div>
-          <div style={{ color: '#666', fontSize: '1em', marginTop: '5px' }}>segundos</div>
-        </div>
-      </div>
-      
-      <div style={{ marginBottom: '20px' }}>
-        <div style={{ 
-          fontSize: '16px', 
-          color: '#4CAF50', 
-          marginBottom: '8px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span>Por distância:</span>
-          <span style={{ fontWeight: 'bold', fontSize: '20px' }}>
-            +{scores.distancePoints}
-          </span>
-        </div>
-        <div style={{ 
-          fontSize: '16px', 
-          color: '#FFA500',
-          marginBottom: '8px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span>Por tempo:</span>
-          <span style={{ fontWeight: 'bold', fontSize: '20px' }}>
-            +{scores.timePoints}
-          </span>
-        </div>
-        <div style={{ 
-          fontSize: '18px', 
-          color: '#333',
-          fontWeight: 'bold',
-          borderTop: '1px solid #ddd',
-          paddingTop: '8px',
-          marginTop: '8px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span>Total:</span>
-          <span style={{ color: '#FF6B6B', fontSize: '24px' }}>
-            +{scores.total}
-          </span>
-        </div>
-      </div>
-      
-      <div style={{
-        width: '100%',
-        height: '4px',
-        background: '#ddd',
-        borderRadius: '2px',
-        marginBottom: '15px'
-      }}>
+      {gameOver ? (
         <div style={{
-          width: `${feedbackProgress}%`,
-          height: '100%',
-          background: getProgressBarColor(feedbackProgress / 100 * 45),
-          borderRadius: '2px',
-          transition: 'width 0.1s linear, background-color 0.3s ease'
-        }} />
-      </div>
+          fontSize: '1.2em',
+          color: 'white',
+          marginBottom: '20px'
+        }}>
+          Você errou por mais de 2km e sua pontuação ficou negativa!
+        </div>
+      ) : (
+        <>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-around',
+            gap: '30px',
+            marginBottom: '20px',
+            padding: '10px',
+            background: 'rgba(0, 0, 0, 0.05)',
+            borderRadius: '10px'
+          }}>
+            <div>
+              <div style={{ 
+                fontSize: '32px', 
+                fontWeight: 'bold', 
+                color: '#333',
+                fontFamily: 'monospace',
+                letterSpacing: '2px',
+                textShadow: isAnimating ? '0 0 5px #32CD32' : 'none',
+                transition: 'text-shadow 0.1s ease-in-out'
+              }}>
+                {Math.round(displayedDistance).toString().padStart(5, '0')}
+              </div>
+              <div style={{ color: '#666', fontSize: '1em', marginTop: '5px' }}>metros</div>
+            </div>
+            <div>
+              <div style={{ 
+                fontSize: '32px', 
+                fontWeight: 'bold', 
+                color: '#333',
+                fontFamily: 'monospace',
+                letterSpacing: '2px',
+                textShadow: isAnimating ? '0 0 5px #FFA500' : 'none',
+                transition: 'text-shadow 0.1s ease-in-out'
+              }}>
+                {displayedTime.toFixed(2)}
+              </div>
+              <div style={{ color: '#666', fontSize: '1em', marginTop: '5px' }}>segundos</div>
+            </div>
+          </div>
+          
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ 
+              fontSize: '16px', 
+              color: '#4CAF50', 
+              marginBottom: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>Por distância:</span>
+              <span style={{ fontWeight: 'bold', fontSize: '20px' }}>
+                {scores.distancePoints >= 0 ? '+' : ''}{scores.distancePoints}
+              </span>
+            </div>
+            <div style={{ 
+              fontSize: '16px', 
+              color: '#FFA500',
+              marginBottom: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>Por tempo:</span>
+              <span style={{ fontWeight: 'bold', fontSize: '20px' }}>
+                {scores.timePoints >= 0 ? '+' : ''}{scores.timePoints}
+              </span>
+            </div>
+            <div style={{ 
+              fontSize: '18px', 
+              color: '#333',
+              fontWeight: 'bold',
+              borderTop: '1px solid #ddd',
+              paddingTop: '8px',
+              marginTop: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>Total:</span>
+              <span style={{ 
+                color: scores.total >= 0 ? '#FF6B6B' : '#FF0000', 
+                fontSize: '24px'
+              }}>
+                {scores.total >= 0 ? '+' : ''}{scores.total}
+              </span>
+            </div>
+          </div>
+          
+          <div style={{
+            width: '100%',
+            height: '4px',
+            background: '#ddd',
+            borderRadius: '2px',
+            marginBottom: '15px'
+          }}>
+            <div style={{
+              width: `${feedbackProgress}%`,
+              height: '100%',
+              background: getProgressBarColor(feedbackProgress / 100 * 45),
+              borderRadius: '2px',
+              transition: 'width 0.1s linear, background-color 0.3s ease'
+            }} />
+          </div>
+        </>
+      )}
 
       <button
-        onClick={() => onNextRound(geoJsonData)}
+        onClick={() => gameOver ? window.location.reload() : onNextRound(geoJsonData)}
         style={{
           padding: '8px 20px',
           fontSize: '1em',
-          background: '#32CD32',
+          background: gameOver ? '#FF4444' : '#32CD32',
           color: 'white',
           border: 'none',
           borderRadius: '5px',
@@ -185,10 +206,10 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           transition: 'background-color 0.2s',
           fontWeight: 'bold'
         }}
-        onMouseOver={(e) => e.currentTarget.style.background = '#28a745'}
-        onMouseOut={(e) => e.currentTarget.style.background = '#32CD32'}
+        onMouseOver={(e) => e.currentTarget.style.background = gameOver ? '#FF0000' : '#28a745'}
+        onMouseOut={(e) => e.currentTarget.style.background = gameOver ? '#FF4444' : '#32CD32'}
       >
-        Próximo
+        {gameOver ? 'Jogar Novamente' : 'Próximo'}
       </button>
     </div>
   );

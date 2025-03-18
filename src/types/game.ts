@@ -61,6 +61,7 @@ export interface FeedbackPanelProps {
   calculateScore: (distance: number, timeLeft: number) => ScoreCalculation;
   getProgressBarColor: (timeLeft: number) => string;
   geoJsonData: FeatureCollection | null;
+  gameOver: boolean;
 }
 
 export interface MapEventsProps {
