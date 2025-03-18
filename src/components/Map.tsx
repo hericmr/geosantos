@@ -304,7 +304,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         `}
       </style>
       
-      <audio ref={audioRef} src="/src/assets/audio/musica.ogg" />
+      <audio ref={audioRef} src="/assets/audio/musica.ogg" preload="auto" />
       
       <AudioControls
         isMuted={gameState.isMuted}
