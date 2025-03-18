@@ -18,6 +18,7 @@ import { GameControls } from './ui/GameControls';
 import { FeedbackPanel } from './ui/FeedbackPanel';
 import { MapEvents } from './game/MapEvents';
 import { GeoJSONLayer } from './game/GeoJSONLayer';
+import { Tutorial } from './ui/Tutorial';
 
 // Fix for default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -39,8 +40,12 @@ const bandeira2Icon = new L.Icon({
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const geoJsonRef = useRef<L.GeoJSON>(null) as React.RefObject<L.GeoJSON>;
   const audioRef = useRef<HTMLAudioElement>(null);
+  const successSoundRef = useRef<HTMLAudioElement>(null);
+  const errorSoundRef = useRef<HTMLAudioElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(true);
   
   const {
     gameState,
@@ -52,13 +57,16 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   } = useGameState();
 
   useEffect(() => {
+    setIsLoading(true);
     fetch('https://raw.githubusercontent.com/hericmr/jogocaicara/refs/heads/main/public/data/bairros.geojson')
       .then(response => response.json())
       .then(data => {
         setGeoJsonData(data);
+        setIsLoading(false);
       })
       .catch(error => {
         console.error('Error loading GeoJSON:', error);
+        setIsLoading(false);
       });
   }, []);
 
@@ -141,6 +149,17 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         // Se o clique estiver muito próximo ao centro (menos de 100 metros), considera como acerto
         const isNearCenter = distance < 100;
         const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
+        
+        // Toca o som de feedback apropriado
+        if (successSoundRef.current && errorSoundRef.current) {
+          if (isCorrectNeighborhood || isNearCenter) {
+            successSoundRef.current.currentTime = 0;
+            successSoundRef.current.play().catch(e => console.log('Erro ao tocar som de sucesso:', e));
+          } else {
+            errorSoundRef.current.currentTime = 0;
+            errorSoundRef.current.play().catch(e => console.log('Erro ao tocar som de erro:', e));
+          }
+        }
         
         // Se acertou o bairro correto ou está muito próximo ao centro, dá pontuação máxima
         const score = (isCorrectNeighborhood || isNearCenter)
@@ -313,11 +332,54 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               display: none;
             }
           }
+
+          /* Melhorias de acessibilidade */
+          @media (prefers-reduced-motion: reduce) {
+            * {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+              scroll-behavior: auto !important;
+            }
+          }
+
+          /* Melhor contraste para textos */
+          .game-text {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+          }
+
+          /* Indicador de foco melhorado */
+          *:focus {
+            outline: 3px solid #32CD32;
+            outline-offset: 2px;
+          }
+
+          /* Loading spinner */
+          .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+          }
         `}
       </style>
       
       <audio ref={audioRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/musica.ogg" preload="auto" />
+      <audio ref={successSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/success.mp3" preload="auto" />
+      <audio ref={errorSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/error.mp3" preload="auto" />
       
+      {isLoading && (
+        <div className="loading-spinner" role="alert">
+          <p>Carregando o jogo...</p>
+        </div>
+      )}
+
       <AudioControls
         isMuted={gameState.isMuted}
         volume={gameState.volume}
@@ -407,6 +469,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           getProgressBarColor={getProgressBarColor}
           geoJsonData={geoJsonData}
         />
+      )}
+
+      {showTutorial && (
+        <Tutorial onClose={() => setShowTutorial(false)} />
       )}
     </div>
   );
