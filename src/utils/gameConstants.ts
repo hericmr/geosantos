@@ -4,9 +4,9 @@ export const MAX_DISTANCE_METERS = 2000; // Maximum distance considered for scor
 
 export const getProgressBarColor = (timeLeft: number): string => {
   const percentage = (timeLeft / ROUND_TIME) * 100;
-  if (percentage > 60) return '#4CAF50';
-  if (percentage > 30) return '#FFA500';
-  return '#FF0000';
+  if (percentage > 60) return '#00FF66';
+  if (percentage > 30) return '#FFD700';
+  return '#FF4444';
 };
 
 export const getFeedbackMessage = (distance: number): string => {
