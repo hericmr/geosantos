@@ -10,14 +10,14 @@ export const getProgressBarColor = (timeLeft: number): string => {
 };
 
 export const getFeedbackMessage = (distance: number): string => {
-  if (distance < 10) return "Perfeição! Você é o Chorão dos bairros! 🎸";
-  if (distance < 30) return "Impressionante! Você nasceu e cresceu em Santos! 🌊";
-  if (distance < 50) return "Brabo! Você é mais santista que pastel de camarão! 🦐";
-  if (distance < 100) return "Incrível! Você é um verdadeiro Caiçara! 🏖️";
-  if (distance < 300) return "Muito bom! Você conhece bem Santos! 🏊‍♂️";
-  if (distance < 500) return "Legal! Você manja dos paranauê! 🏄‍♂️";
-  if (distance < 1000) return "Tá quase lá! Mais um pouquinho de praia e você chega! 🌅";
-  if (distance < 1500) return "Eita! Tá mais perdido que turista de São Paulo! 🚶‍♂️";
-  if (distance < 2000) return "Vish! Tá mais perdido que doido na Ponta da Praia! 🏃‍♂️";
-  return "Olha... Santos é um ovo! Como você erra tanto assim? Vai dar uma volta de bonde pra conhecer melhor a cidade! 🚋";
+  if (distance < 10) return "Perfeição! Você é o Chorão dos bairros!";
+  if (distance < 30) return "Impressionante! Você nasceu e cresceu em Santos!";
+  if (distance < 50) return "Brabo! Você é mais santista que pastel de vento!";
+  if (distance < 100) return "Incrível! Você é um verdadeiro Caiçara!";
+  if (distance < 300) return "Muito bom! Você conhece bem Santos!";
+  if (distance < 500) return "Legal! Você manja dos paranauê!";
+  if (distance < 1000) return "Tá quase lá! Mais um pouquinho de praia e você chega!";
+  if (distance < 1500) return "Eita! Tá mais perdido que turista de São Paulo!";
+  if (distance < 2000) return "Vish! Tá mais perdido que doido na Ponta da Praia!";
+  return "Olha... Santos é um ovo! Como você erra tanto assim? Vai dar uma volta de bonde pra conhecer melhor a cidade!";
 }; 
