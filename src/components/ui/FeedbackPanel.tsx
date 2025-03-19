@@ -683,7 +683,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 
                 if (navigator.share) {
                   navigator.share({
-                    title: 'O Caiçara - Jogo de Geografia de Santos',
+                    title: 'O Caiçara',
                     text: shareText,
                     url: 'https://caicara.app'
                   }).catch(console.error);
@@ -713,30 +713,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               onMouseOut={(e) => e.currentTarget.style.background = '#FFD700'}
             >
               <span>📱</span> Compartilhar
-            </button>
-
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
-                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                background: '#FF0000',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 700,
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.background = '#CC0000'}
-              onMouseOut={(e) => e.currentTarget.style.background = '#FF0000'}
-            >
-              <span>🔄</span> Jogar Novamente
             </button>
           </div>
         </div>
