@@ -134,6 +134,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
 
     const clickDuration = 10 - gameState.timeLeft;
+
+    // Primeiro, apenas atualiza a posição da bandeira
     updateGameState({ clickedPosition: latlng });
 
     if (geoJsonRef.current) {
@@ -242,67 +244,59 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         } else {
           feedbackMessage = getFeedbackMessage(distance);
         }
-        
-        updateGameState({
-          clickTime: clickDuration,
-          arrowPath: arrowPathToShow,
-          score: newScore,
-          showFeedback: true,
-          feedbackOpacity: 1,
-          feedbackProgress: 100,
-          feedbackMessage: feedbackMessage,
-          gameOver: newNegativeSum > 40
-        });
 
-        if (newNegativeSum > 40) {
-          // Se for game over, não inicia próxima rodada
-          return;
-        }
-        
+        // Atualiza o resto do estado após um pequeno delay
         setTimeout(() => {
-          const duration = 4000;
-          const interval = 100;
-          let timeElapsed = 0;
-          
-          // Limpa qualquer intervalo anterior
-          if (progressIntervalRef.current) {
-            clearInterval(progressIntervalRef.current);
+          updateGameState({
+            arrowPath: arrowPathToShow,
+            clickTime: clickDuration,
+            score: newScore,
+            showFeedback: true,
+            feedbackOpacity: 1,
+            feedbackProgress: 100,
+            feedbackMessage: feedbackMessage,
+            gameOver: newNegativeSum > 40,
+            revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood])
+          });
+
+          if (newNegativeSum > 40) {
+            // Se for game over, não inicia próxima rodada
+            return;
           }
           
-          progressIntervalRef.current = setInterval(() => {
-            timeElapsed += interval;
-            const remainingProgress = Math.max(0, 100 * (1 - timeElapsed / duration));
-            updateGameState({ feedbackProgress: remainingProgress });
+          setTimeout(() => {
+            const duration = 4000;
+            const interval = 100;
+            let timeElapsed = 0;
             
-            if (timeElapsed >= duration) {
+            // Limpa qualquer intervalo anterior
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current);
+            }
+            
+            progressIntervalRef.current = setInterval(() => {
+              timeElapsed += interval;
+              const remainingProgress = Math.max(0, 100 * (1 - timeElapsed / duration));
+              updateGameState({ feedbackProgress: remainingProgress });
+              
+              if (timeElapsed >= duration) {
+                if (progressIntervalRef.current) {
+                  clearInterval(progressIntervalRef.current);
+                  progressIntervalRef.current = null;
+                }
+                startNextRound(geoJsonData);
+              }
+            }, interval);
+            
+            feedbackTimerRef.current = setTimeout(() => {
               if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current);
                 progressIntervalRef.current = null;
               }
               startNextRound(geoJsonData);
-            }
-          }, interval);
-          
-          feedbackTimerRef.current = setTimeout(() => {
-            if (progressIntervalRef.current) {
-              clearInterval(progressIntervalRef.current);
-              progressIntervalRef.current = null;
-            }
-            startNextRound(geoJsonData);
-          }, duration);
-        }, 300);
-        
-        if (clickedFeature) {
-          updateGameState({
-            revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, clickedFeature.properties?.NOME])
-          });
-        }
-
-        updateGameState({
-          revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood])
-        });
-
-        updateGameState({ isCountingDown: false });
+            }, duration);
+          }, 300);
+        }, 100);
       }
     }
   };
@@ -382,17 +376,18 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       <style>
         {`
           .bandeira-marker {
-            animation: plantBandeira 0.5s ease-out;
+            animation: plantBandeira 0.3s ease-out;
             transform-origin: bottom center;
+            z-index: 1000;
           }
           
           @keyframes plantBandeira {
             0% {
-              transform: scale(0.1) translateY(100px);
+              transform: scale(0.1) translateY(50px);
               opacity: 0;
             }
             50% {
-              transform: scale(1.2) translateY(-10px);
+              transform: scale(1.2) translateY(-5px);
               opacity: 1;
             }
             100% {
@@ -406,6 +401,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             stroke-dashoffset: 1000;
             animation: drawArrow 1s ease-out forwards;
             animation-delay: 0.5s;
+            z-index: 999;
           }
 
           @keyframes drawArrow {
@@ -501,6 +497,22 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       >
         <MapEvents onClick={handleMapClick} />
         <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+        {gameState.clickedPosition && (
+          <Marker
+            position={gameState.clickedPosition}
+            icon={bandeira2Icon}
+          />
+        )}
+        {gameState.arrowPath && (
+          <Polyline
+            positions={gameState.arrowPath}
+            color="#FF0000"
+            weight={3}
+            opacity={0.8}
+            dashArray="10, 10"
+            className="arrow-path"
+          />
+        )}
         {geoJsonData && (
           <GeoJSONLayer
             geoJsonData={geoJsonData}
@@ -509,24 +521,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             onMapClick={handleMapClick}
             geoJsonRef={geoJsonRef}
           />
-        )}
-        {gameState.clickedPosition && (
-          <>
-            <Marker
-              position={gameState.clickedPosition}
-              icon={bandeira2Icon}
-            />
-            {gameState.arrowPath && (
-              <Polyline
-                positions={gameState.arrowPath}
-                color="#FF0000"
-                weight={3}
-                opacity={0.8}
-                dashArray="10, 10"
-                className="arrow-path"
-              />
-            )}
-          </>
         )}
       </MapContainer>
 

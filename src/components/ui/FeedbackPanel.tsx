@@ -255,24 +255,24 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   return (
     <div style={{
       position: 'fixed',
-      top: gameOver ? '50%' : window.innerWidth <= 768 ? 'auto' : popupPosition.top,
-      bottom: window.innerWidth <= 768 ? 0 : 'auto',
-      left: gameOver ? '50%' : window.innerWidth <= 768 ? 0 : popupPosition.left,
+      top: gameOver ? 'auto' : window.innerWidth <= 768 ? 'auto' : popupPosition.top,
+      bottom: window.innerWidth <= 768 ? 0 : gameOver ? 0 : 'auto',
+      left: gameOver ? 0 : window.innerWidth <= 768 ? 0 : popupPosition.left,
       right: window.innerWidth <= 768 ? 0 : 'auto',
-      transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'none' : 'translate(-50%, -50%)',
+      transform: gameOver ? 'none' : window.innerWidth <= 768 ? 'none' : 'translate(-50%, -50%)',
       width: window.innerWidth <= 768 ? '100%' : '90%',
-      maxWidth: gameOver ? '800px' : '600px',
+      maxWidth: gameOver ? '100%' : '600px',
       background: 'rgba(0, 25, 0, 0.95)',
       backdropFilter: 'blur(8px)',
       WebkitBackdropFilter: 'blur(8px)',
       color: 'white',
       zIndex: 9999,
-      padding: gameOver ? 'clamp(35px, 7vw, 45px)' : 'clamp(25px, 5vw, 35px)',
+      padding: gameOver ? 'clamp(25px, 5vw, 35px)' : 'clamp(25px, 5vw, 35px)',
       borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '24px',
       boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
       border: 'none',
       margin: window.innerWidth <= 768 ? '0' : '10px',
-      animation: gameOver ? 'fadeInScale 0.3s ease-out' : window.innerWidth <= 768 ? 'slideUp 0.3s ease-out' : 'slideIn 0.3s ease-out',
+      animation: gameOver ? 'slideUp 0.3s ease-out' : window.innerWidth <= 768 ? 'slideUp 0.3s ease-out' : 'slideIn 0.3s ease-out',
       maxHeight: window.innerWidth <= 768 ? '90vh' : 'auto',
       overflowY: window.innerWidth <= 768 ? 'auto' : 'visible'
     }}>
@@ -581,163 +581,79 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 'clamp(25px, 5vw, 35px)',
+          gap: 'clamp(12px, 2vw, 20px)',
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
-          <h2 style={{ 
-            color: 'white', 
-            marginBottom: '10px', 
-            fontSize: 'clamp(1.5rem, 4vw, 2.2rem)',
+          <div style={{
             textAlign: 'center',
+            color: '#fff',
+            fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
             fontFamily: "'Inter', sans-serif",
-            fontWeight: 700,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2px',
             opacity: 0.95,
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-            lineHeight: 1.2
+            marginBottom: '4px'
           }}>
-            {score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
-             score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
-             score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
-             score >= 8000 ? "MESTRE DOS BAIRROS! 🧠 Você é um GPS ambulante!" :
-             score >= 5000 ? "IMPRESSIONANTE! 🌟 Quase um GPS humano!!" :
-             score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
-             score >= 3000 ? "SANTISTA DE CORAÇÃO! ❤️ Você manja dos bairros!" :
-             score >= 2000 ? "MUITO BOM! 👏 Você é deve ter ido em algumas aulas de geografia!" :
-             score >= 1000 ? "BOM JOGO! 👍 Mas ainda precisa andar mais na zona noroeste!" :
-             score >= 500 ? "QUASE LÁ! 🎯 Dá um role no bondinho pra pegar mais dicas!" :
-             score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
-             "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!"}
-          </h2>
-          
-          {score >= 20000 && (
-            <h3 style={{ 
-              color: 'white', 
-              marginBottom: 'clamp(15px, 3vw, 25px)', 
-              fontSize: 'clamp(1.2rem, 3vw, 1.6rem)',
+            <div style={{ 
+              fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
+              color: '#FFD700', 
+              fontWeight: 700,
               textAlign: 'center',
-              fontFamily: "'Inter', sans-serif",
-              fontWeight: 600,
-              opacity: 0.9,
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-              lineHeight: 1.2
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
             }}>
-              Todos se curvam ao mestre.
-            </h3>
-          )}
+              {score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
+               score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
+               score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
+               score >= 8000 ? "MESTRE DOS BAIRROS! 🧠 Você é um GPS ambulante!" :
+               score >= 5000 ? "IMPRESSIONANTE! 🌟 Quase um GPS humano!!" :
+               score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
+               score >= 3000 ? "SANTISTA DE CORAÇÃO! ❤️ Você manja dos bairros!" :
+               score >= 2000 ? "MUITO BOM! 👏 Você é deve ter ido em algumas aulas de geografia!" :
+               score >= 1000 ? "BOM JOGO! 👍 Mas ainda precisa andar mais na zona noroeste!" :
+               score >= 500 ? "QUASE LÁ! 🎯 Dá um role no bondinho pra pegar mais dicas!" :
+               score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
+               "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!"}
+            </div>
+          </div>
 
           <div style={{
             display: 'flex',
-            flexDirection: 'column',
+            gap: 'clamp(10px, 2vw, 20px)',
             alignItems: 'center',
-            gap: 'clamp(15px, 3vw, 20px)',
-            background: 'rgba(0, 0, 0, 0.4)',
-            padding: 'clamp(25px, 5vw, 35px)',
-            borderRadius: '15px',
-            border: '2px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-            width: '100%',
-            maxWidth: '400px'
+            justifyContent: 'center',
+            flexWrap: 'wrap'
           }}>
             <div style={{
               display: 'flex',
-              flexDirection: 'column',
+              gap: '2px',
               alignItems: 'center',
-              width: '100%'
+              justifyContent: 'center',
+              flexWrap: 'wrap'
             }}>
-              <span style={{
-                fontSize: 'clamp(1.1rem, 3vw, 1.3rem)',
-                color: '#FFD700',
-                fontWeight: 600,
-                textAlign: 'center',
+              <div style={{ 
+                fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                 fontFamily: "'Inter', sans-serif",
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-              }}>
-                Pontuação Final
-              </span>
-              <span style={{
-                fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
-                color: '#32CD32',
+                marginRight: 'clamp(2px, 0.5vw, 4px)',
+                opacity: 0.9
+              }}>🏆</div>
+              <div style={{ 
+                fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
+                fontFamily: "'Inter', sans-serif",
                 fontWeight: 700,
-                textAlign: 'center',
+                color: '#fff',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+              }}>
+                {score.toLocaleString()}
+              </div>
+              <div style={{ 
+                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
                 fontFamily: "'Inter', sans-serif",
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                animation: 'pulseScore 2s infinite'
-              }}>
-                {score}
-              </span>
-            </div>
-
-            <div style={{ width: '100%', height: '1px', background: 'rgba(255, 255, 255, 0.2)', margin: '10px 0' }}></div>
-
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '100%'
-            }}>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }}>
-                <span style={{
-                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                  color: '#FFD700',
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  fontFamily: "'Inter', sans-serif"
-                }}>
-                  Seu Nível Final
-                </span>
-                <span style={{
-                  fontSize: 'clamp(1.8rem, 4vw, 2.2rem)',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  textAlign: 'center',
-                  fontFamily: "'Inter', sans-serif",
-                  marginTop: '5px'
-                }}>
-                  {score >= 20000 ? 12 :
-                   score >= 16000 ? 10 :
-                   score >= 12000 ? 8 :
-                   score >= 8000 ? 6 :
-                   score >= 5000 ? 4 :
-                   score >= 3000 ? 3 :
-                   score >= 1000 ? 2 : 1}
-                </span>
-              </div>
-
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }}>
-                <span style={{
-                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                  color: '#FFD700',
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  fontFamily: "'Inter', sans-serif"
-                }}>
-                  Sua Nota:
-                </span>
-                <span style={{
-                  fontSize: 'clamp(1.8rem, 4vw, 2.2rem)',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  textAlign: 'center',
-                  fontFamily: "'Inter', sans-serif",
-                  marginTop: '5px'
-                }}>
-                  {score >= 20000 ? 150 :
-                   score >= 16000 ? 135 :
-                   score >= 12000 ? 120 :
-                   score >= 8000 ? 110 :
-                   score >= 5000 ? 102 :
-                   score >= 3000 ? 95 :
-                   score >= 1000 ? 85 : 70}
-                </span>
-              </div>
+                fontWeight: 500,
+                marginLeft: 'clamp(1px, 0.3vw, 2px)',
+                opacity: 0.9
+              }}>pts</div>
             </div>
           </div>
 
@@ -746,11 +662,10 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             gap: 'clamp(15px, 3vw, 20px)',
             flexWrap: 'wrap',
             justifyContent: 'center',
-            marginTop: 'clamp(10px, 2vw, 15px)'
+            width: '100%'
           }}>
             <button
               onClick={() => {
-                // Obtém a mensagem personalizada com base na pontuação
                 const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
                   score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
                   score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
@@ -765,81 +680,63 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!";
                   
                 const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Jogue agora em https://caicara.app e veja quanto você consegue fazer!`;
-
+                
                 if (navigator.share) {
                   navigator.share({
-                    title: 'O Caiçara',
+                    title: 'O Caiçara - Jogo de Geografia de Santos',
                     text: shareText,
-                    url: window.location.href
+                    url: 'https://caicara.app'
                   }).catch(console.error);
                 } else {
-                  navigator.clipboard.writeText(shareText);
-                  alert('Texto copiado para a área de transferência!');
+                  navigator.clipboard.writeText(shareText).then(() => {
+                    alert('Texto copiado para a área de transferência!');
+                  }).catch(console.error);
                 }
               }}
               style={{
                 padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
                 fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                background: '#FFA500',
+                background: '#FFD700',
                 color: '#000000',
                 border: 'none',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontFamily: "'Inter', sans-serif",
                 fontWeight: 700,
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                transform: 'translateY(0)'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = '#FF8C00';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.2)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = '#FFA500';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-              }}
-            >
-              <span>📱</span> Compartilhar
-            </button>
-            
-            <button
-              onClick={() => {
-                window.open('https://hericmr.github.io/me', '_blank');
-              }}
-              style={{
-                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
-                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                background: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 700,
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = '#45a049';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.2)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = '#4CAF50';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-              }}
+              onMouseOver={(e) => e.currentTarget.style.background = '#FFC000'}
+              onMouseOut={(e) => e.currentTarget.style.background = '#FFD700'}
             >
-              <span>📝</span> Héric Moura
+              <span>📱</span> Compartilhar
+            </button>
+
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
+                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                background: '#FF0000',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = '#CC0000'}
+              onMouseOut={(e) => e.currentTarget.style.background = '#FF0000'}
+            >
+              <span>🔄</span> Jogar Novamente
             </button>
           </div>
         </div>
