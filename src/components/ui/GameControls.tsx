@@ -316,7 +316,6 @@ export const GameControls: React.FC<GameControlsProps> = ({
               fontFamily: "'Inter', sans-serif",
               fontWeight: 600,
               color: '#000000',
-              textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
               lineHeight: 1.2,
               margin: 0
             }}>
