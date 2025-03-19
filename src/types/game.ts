@@ -17,6 +17,7 @@ export interface GameState {
   gameOver: boolean;
   gameStarted: boolean;
   isCountingDown: boolean;
+  isPaused: boolean;
   clickedPosition: LatLng | null;
   lastClickTime: number;
   feedbackMessage: string;

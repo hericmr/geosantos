@@ -135,6 +135,12 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
     const clickDuration = 10 - gameState.timeLeft;
 
+    // Pausa a barra de tempo imediatamente após o clique
+    updateGameState({
+      isCountingDown: false,
+      isPaused: true
+    });
+
     // Primeiro, apenas atualiza a posição da bandeira
     updateGameState({ clickedPosition: latlng });
 
@@ -326,6 +332,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     if (audioRef.current) {
       audioRef.current.pause();
     }
+    // Pausa a barra de tempo
+    updateGameState({
+      isCountingDown: false,
+      isPaused: true
+    });
   };
 
   const handleNextRound = (geoJsonData: FeatureCollection) => {
@@ -351,7 +362,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     const newInitialTime = isPhaseTwo ? PHASE_TWO_TIME : 10;
     updateGameState({
       roundInitialTime: newInitialTime,
-      timeLeft: newInitialTime
+      timeLeft: newInitialTime,
+      isCountingDown: true,
+      isPaused: false
     });
 
     // Reseta o estado do feedback
@@ -361,7 +374,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       feedbackProgress: 0,
       clickedPosition: null,
       arrowPath: null,
-      isCountingDown: false
+      revealedNeighborhoods: new Set()
     });
 
     // Pequeno delay para garantir que o estado foi limpo
@@ -470,6 +483,45 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+          }
+
+          @keyframes popInOut {
+            0% { 
+              opacity: 0; 
+              transform: translate(-50%, -50%) scale(0.5);
+            }
+            20% { 
+              opacity: 1; 
+              transform: translate(-50%, -50%) scale(1.2);
+            }
+            40% { 
+              opacity: 1; 
+              transform: translate(-50%, -50%) scale(1);
+            }
+            60% { 
+              opacity: 1; 
+              transform: translate(-50%, -50%) scale(1);
+            }
+            80% { 
+              opacity: 0.8; 
+              transform: translate(-50%, -50%) scale(0.9);
+            }
+            100% { 
+              opacity: 0; 
+              transform: translate(-50%, -50%) scale(0.8);
+            }
+          }
+
+          @keyframes pulseText {
+            0% { 
+              transform: scale(1);
+            }
+            50% { 
+              transform: scale(1.03);
+            }
+            100% { 
+              transform: scale(1);
+            }
           }
         `}
       </style>
@@ -641,27 +693,23 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          background: 'rgba(0, 0, 0, 0.8)',
-          padding: '20px',
-          borderRadius: '10px',
-          zIndex: 2000,
           textAlign: 'center',
           color: 'white',
-          animation: 'fadeInOut 3s forwards'
+          animation: 'popInOut 2s forwards',
+          background: 'rgba(0, 0, 0, 0.9)',
+          padding: '30px',
+          borderRadius: '15px',
+          zIndex: 2000
         }}>
           <h2 style={{
-            fontSize: window.innerWidth < 768 ? '1.2em' : '1.5em',
+            fontSize: window.innerWidth < 768 ? '2.5em' : '3.5em',
             color: '#32CD32',
-            marginBottom: '10px'
+            marginBottom: '20px',
+            fontWeight: 700,
+            animation: 'pulseText 0.8s infinite'
           }}>
-            Fase 1: Bairros mais conhecidos
+            Nível 1: Bairros Conhecidos
           </h2>
-          <p style={{
-            fontSize: window.innerWidth < 768 ? '1em' : '1.2em',
-            margin: 0
-          }}>
-            Faça 10000 pontos para desbloquear a fase 2!
-          </p>
         </div>
       )}
     </div>

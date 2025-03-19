@@ -585,6 +585,17 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
+          <h2 style={{
+            fontSize: 'clamp(2rem, 5vw, 3rem)',
+            color: '#FF0000',
+            margin: '0',
+            fontWeight: 800,
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+            textTransform: 'uppercase',
+            letterSpacing: '2px'
+          }}>
+            Game Over
+          </h2>
           <div style={{
             textAlign: 'center',
             color: '#fff',
@@ -679,13 +690,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
                   "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!";
                   
-                const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Jogue agora em https://caicara.app e veja quanto você consegue fazer!`;
+                const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
                 
                 if (navigator.share) {
                   navigator.share({
                     title: 'O Caiçara',
                     text: shareText,
-                    url: 'https://caicara.app'
+                    url: 'https://hericmr.github.io/jogocaicara'
                   }).catch(console.error);
                 } else {
                   navigator.clipboard.writeText(shareText).then(() => {
@@ -723,7 +734,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         gap: 'clamp(8px, 2vw, 12px)',
         justifyContent: 'center',
         marginTop: 'clamp(12px, 3vw, 20px)',
-        flexWrap: 'wrap'
+        flexWrap: 'nowrap',
+        width: '100%'
       }}>
         {!gameOver && (
           <button
@@ -739,7 +751,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               transition: 'all 0.2s ease',
               fontFamily: "'Inter', sans-serif",
               fontWeight: 700,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+              flex: '1',
+              maxWidth: '45%'
             }}
             onMouseOver={(e) => e.currentTarget.style.background = '#FF8C00'}
             onMouseOut={(e) => e.currentTarget.style.background = '#FFA500'}
@@ -768,8 +782,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
             position: 'relative',
             overflow: 'hidden',
-            width: gameOver ? 'clamp(150px, 30vw, 180px)' : 'clamp(120px, 25vw, 150px)',
-            height: gameOver ? 'clamp(50px, 10vw, 60px)' : 'clamp(40px, 8vw, 50px)'
+            flex: '1',
+            maxWidth: gameOver ? '100%' : '45%',
+            height: 'auto'
           }}
           onMouseOver={(e) => e.currentTarget.style.background = gameOver ? '#CC0000' : '#28a745'}
           onMouseOut={(e) => e.currentTarget.style.background = gameOver ? '#FF0000' : '#32CD32'}

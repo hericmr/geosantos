@@ -14,6 +14,7 @@ export const useGameState = () => {
     gameOver: false,
     gameStarted: false,
     isCountingDown: false,
+    isPaused: false,
     clickedPosition: null,
     lastClickTime: 0,
     feedbackMessage: '',
@@ -32,7 +33,7 @@ export const useGameState = () => {
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (gameState.gameStarted && !gameState.gameOver && gameState.timeLeft > 0 && gameState.isCountingDown) {
+    if (gameState.gameStarted && !gameState.gameOver && gameState.timeLeft > 0 && gameState.isCountingDown && !gameState.isPaused) {
       const timer = setInterval(() => {
         setGameState(prev => {
           if (prev.timeLeft <= 0) {
@@ -48,7 +49,7 @@ export const useGameState = () => {
 
       return () => clearInterval(timer);
     }
-  }, [gameState.gameStarted, gameState.gameOver, gameState.isCountingDown]);
+  }, [gameState.gameStarted, gameState.gameOver, gameState.isCountingDown, gameState.isPaused]);
 
   const updateGameState = (updates: Partial<GameState>) => {
     setGameState(prev => ({ ...prev, ...updates }));
@@ -65,6 +66,7 @@ export const useGameState = () => {
       roundInitialTime: ROUND_TIME,
       roundNumber: 1,
       isCountingDown: false,
+      isPaused: false,
       revealedNeighborhoods: new Set()
     }));
 

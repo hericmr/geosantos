@@ -38,66 +38,125 @@ export const GameControls: React.FC<GameControlsProps> = ({
       zIndex: 1002,
       boxSizing: 'border-box'
     }}>
+      <style>
+        {`
+          @keyframes pulseText {
+            0% { 
+              transform: scale(1);
+            }
+            50% { 
+              transform: scale(1.05);
+            }
+            100% { 
+              transform: scale(1);
+            }
+          }
+
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .game-title {
+            animation: pulseText 2s infinite;
+          }
+
+          .game-description {
+            animation: fadeIn 0.8s ease-out;
+          }
+
+          .game-instructions {
+            animation: fadeIn 1s ease-out 0.3s both;
+          }
+
+          .start-button {
+            animation: fadeIn 0.8s ease-out 0.6s both;
+          }
+        `}
+      </style>
+      
       {!gameStarted ? (
         <div style={{
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 'clamp(8px, 1.5vw, 15px)',
-          padding: 'clamp(8px, 1.5vw, 12px)',
-          maxWidth: '600px',
+          justifyContent: 'center',
+          gap: 'clamp(8px, 2vw, 12px)',
+          padding: 'clamp(10px, 2vw, 15px)',
+          maxWidth: '800px',
           margin: '0 auto'
         }}>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'flex-start',
+            alignItems: 'center',
+            gap: 'clamp(4px, 1vw, 8px)',
+            textAlign: 'center',
+            width: '100%',
+            padding: '0 20px'
           }}>
-            <h2 style={{ 
-              fontSize: 'clamp(1.8rem, 4vw, 2.2rem)', 
+            <h2 className="game-title" style={{ 
+              fontSize: 'clamp(2rem, 4.5vw, 2.5rem)', 
               margin: '0',
-              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.4)',
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
               fontFamily: "'Inter', sans-serif",
               fontWeight: 700,
               color: '#32CD32',
-              lineHeight: 1.1
+              lineHeight: 1
             }}>
               O Caiçara
             </h2>
             
-            <p style={{ 
-              fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', 
-              margin: '3px 0 0 0',
+            <p className="game-description" style={{ 
+              fontSize: 'clamp(1.2rem, 2.2vw, 1.4rem)', 
+              margin: '0',
               fontFamily: "'Inter', sans-serif",
-              fontWeight: 600,
-              color: '#FFD700',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
-              lineHeight: 1.2
+              fontWeight: 500,
+              color: '#FFFFFF',
+              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
+              lineHeight: 1.3
             }}>
-              Quão bem você conhece a sua cidade?
+              Prepare-se!<br/>
+              Clique o mais próximo possível dos bairros no mapa. Velocidade importa, quanto mais rápido melhor!
             </p>
           </div>
           
           <button 
+            className="start-button"
             onClick={onStartGame}
             style={{
-              padding: 'clamp(6px, 1.5vw, 10px) clamp(12px, 3vw, 20px)',
-              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+              padding: 'clamp(12px, 2.5vw, 16px) clamp(40px, 6vw, 60px)',
+              fontSize: 'clamp(1.2rem, 2.5vw, 1.4rem)',
               background: '#32CD32',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '8px',
               color: 'white',
               cursor: 'pointer',
-              transition: 'background 0.2s ease',
+              transition: 'all 0.3s ease',
               fontWeight: 700,
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              position: 'relative',
+              overflow: 'hidden',
+              marginTop: '12px',
+              letterSpacing: '1px',
+              textTransform: 'uppercase'
             }}
             onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
               e.currentTarget.style.background = '#28a745';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.3)';
             }}
             onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.background = '#32CD32';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
             }}
           >
             Iniciar
