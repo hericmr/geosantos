@@ -185,21 +185,24 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   return (
     <div style={{
       position: 'fixed',
-      top: popupPosition.top,
-      left: popupPosition.left,
+      top: gameOver ? '50%' : popupPosition.top,
+      left: gameOver ? '50%' : popupPosition.left,
       transform: 'translate(-50%, -50%)',
       width: '90%',
-      maxWidth: '400px',
-      background: 'rgba(0, 25, 0, 0.95)',
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
+      maxWidth: gameOver ? '600px' : '400px',
+      background: gameOver ? 'rgba(0, 25, 0, 0.98)' : 'rgba(0, 25, 0, 0.95)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
       color: 'white',
-      zIndex: 1001,
-      padding: 'clamp(20px, 4vw, 30px)',
-      borderRadius: '15px',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      margin: '10px'
+      zIndex: gameOver ? 9999 : 1001,
+      padding: gameOver ? 'clamp(35px, 7vw, 45px)' : 'clamp(20px, 4vw, 30px)',
+      borderRadius: '20px',
+      boxShadow: gameOver ? 
+        '0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(50, 205, 50, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)' :
+        '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+      border: gameOver ? '2px solid rgba(50, 205, 50, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+      margin: '10px',
+      animation: gameOver ? 'fadeInScale 0.3s ease-out' : 'none'
     }}>
       {!gameOver && clickedPosition && (
         <div style={{
@@ -447,84 +450,164 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 'clamp(20px, 4vw, 30px)',
+          gap: 'clamp(25px, 5vw, 35px)',
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
           <h2 style={{ 
             color: 'white', 
             marginBottom: 'clamp(15px, 3vw, 25px)', 
-            fontSize: 'clamp(1.8rem, 4.5vw, 2.5rem)',
+            fontSize: 'clamp(1.5rem, 4vw, 2.2rem)',
             textAlign: 'center',
             fontFamily: "'Inter', sans-serif",
             fontWeight: 700,
-            opacity: 0.95
+            opacity: 0.95,
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+            lineHeight: 1.2
           }}>
-            {score >= 10000 ? "LENDÁRIO! 🏆" :
-             score >= 5000 ? "IMPRESSIONANTE! 🌟" :
-             score >= 2000 ? "MUITO BOM! 👏" :
-             score >= 1000 ? "BOM JOGO! 👍" :
-             "Game Over!"}
+            {score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
+             score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
+             score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
+             score >= 8000 ? "MESTRE DOS BAIRROS! 🧠 Você é um GPS ambulante!" :
+             score >= 5000 ? "IMPRESSIONANTE! 🌟 Quase um GPS humano!!" :
+             score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
+             score >= 3000 ? "SANTISTA DE CORAÇÃO! ❤️ Você manja dos bairros!" :
+             score >= 2000 ? "MUITO BOM! 👏 Você é deve ter ido em algumas aulas de geografia!" :
+             score >= 1000 ? "BOM JOGO! 👍 Mas ainda precisa andar mais na zona noroeste!" :
+             score >= 500 ? "QUASE LÁ! 🎯 Dá um role no bondinho pra pegar mais dicas!" :
+             score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
+             "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!"}
           </h2>
 
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 'clamp(10px, 2vw, 15px)',
-            background: 'rgba(0, 0, 0, 0.7)',
-            padding: 'clamp(20px, 4vw, 30px)',
-            borderRadius: '10px',
-            border: '2px solid #32CD32'
+            gap: 'clamp(15px, 3vw, 20px)',
+            background: 'rgba(0, 0, 0, 0.4)',
+            padding: 'clamp(25px, 5vw, 35px)',
+            borderRadius: '15px',
+            border: '2px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+            width: '100%',
+            maxWidth: '400px'
           }}>
-            <span style={{
-              fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
-              color: '#FFD700',
-              fontWeight: 600,
-              textAlign: 'center',
-              fontFamily: "'Inter', sans-serif"
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: '100%'
             }}>
-              Pontuação Final
-            </span>
-            <span style={{
-              fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
-              color: '#32CD32',
-              fontWeight: 700,
-              textAlign: 'center',
-              fontFamily: "'Inter', sans-serif",
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              <span style={{
+                fontSize: 'clamp(1.1rem, 3vw, 1.3rem)',
+                color: '#FFD700',
+                fontWeight: 600,
+                textAlign: 'center',
+                fontFamily: "'Inter', sans-serif",
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              }}>
+                Pontuação Final
+              </span>
+              <span style={{
+                fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
+                color: '#32CD32',
+                fontWeight: 700,
+                textAlign: 'center',
+                fontFamily: "'Inter', sans-serif",
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                animation: 'pulseScore 2s infinite'
+              }}>
+                {score}
+              </span>
+            </div>
+
+            <div style={{ width: '100%', height: '1px', background: 'rgba(255, 255, 255, 0.2)', margin: '10px 0' }}></div>
+
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              width: '100%'
             }}>
-              {score}
-            </span>
-            <span style={{
-              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-              color: '#FFD700',
-              fontWeight: 500,
-              textAlign: 'center',
-              fontFamily: "'Inter', sans-serif",
-              opacity: 0.9
-            }}>
-              {score >= 10000 ? "Você é um verdadeiro mestre do jogo! Conseguiu uma pontuação lendária!" :
-               score >= 5000 ? "Você dominou o jogo! Uma performance impressionante!" :
-               score >= 2000 ? "Você jogou muito bem! Continue praticando para melhorar ainda mais!" :
-               score >= 1000 ? "Você tem potencial! Tente novamente para melhorar sua pontuação!" :
-               "Não desanime! Pratique mais para melhorar sua pontuação!"}
-            </span>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+                <span style={{
+                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                  color: '#FFD700',
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  fontFamily: "'Inter', sans-serif"
+                }}>
+                  Seu Nível Final
+                </span>
+                <span style={{
+                  fontSize: 'clamp(1.8rem, 4vw, 2.2rem)',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  fontFamily: "'Inter', sans-serif",
+                  marginTop: '5px'
+                }}>
+                  {score >= 20000 ? 12 :
+                   score >= 16000 ? 10 :
+                   score >= 12000 ? 8 :
+                   score >= 8000 ? 6 :
+                   score >= 5000 ? 4 :
+                   score >= 3000 ? 3 :
+                   score >= 1000 ? 2 : 1}
+                </span>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+                <span style={{
+                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                  color: '#FFD700',
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  fontFamily: "'Inter', sans-serif"
+                }}>
+                  Seu QI de viajante:
+                </span>
+                <span style={{
+                  fontSize: 'clamp(1.8rem, 4vw, 2.2rem)',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  fontFamily: "'Inter', sans-serif",
+                  marginTop: '5px'
+                }}>
+                  {score >= 20000 ? 150 :
+                   score >= 16000 ? 135 :
+                   score >= 12000 ? 120 :
+                   score >= 8000 ? 110 :
+                   score >= 5000 ? 102 :
+                   score >= 3000 ? 95 :
+                   score >= 1000 ? 85 : 70}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div style={{
             display: 'flex',
-            gap: 'clamp(10px, 2vw, 15px)',
+            gap: 'clamp(15px, 3vw, 20px)',
             flexWrap: 'wrap',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            marginTop: 'clamp(10px, 2vw, 15px)'
           }}>
             <button
               onClick={() => {
                 const shareText = score >= 10000 ? 
-                  `🏆 LENDÁRIO! Joguei O Caiçara e fiz ${score} pontos! Quem consegue superar essa pontuação?` :
+                  `🏆 LENDÁRIO! Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Quem consegue superar essa pontuação?` :
                   score >= 5000 ?
-                  `🌟 IMPRESSIONANTE! Joguei O Caiçara e fiz ${score} pontos! Quanto você consegue fazer?` :
-                  `🎮 Joguei O Caiçara e fiz ${score} pontos! Quanto você consegue fazer?`;
+                  `🌟 IMPRESSIONANTE! Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Quanto você consegue fazer?` :
+                  `🎮 Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Quanto você consegue fazer?`;
 
                 if (navigator.share) {
                   navigator.share({
@@ -543,20 +626,64 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 background: '#FFA500',
                 color: '#000000',
                 border: 'none',
-                borderRadius: '5px',
+                borderRadius: '10px',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontFamily: "'Inter', sans-serif",
                 fontWeight: 700,
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 4px 15px rgba(255, 165, 0, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transform: 'translateY(0)',
+                animation: 'floatButton 2s infinite'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = '#FF8C00';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 165, 0, 0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = '#FFA500';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 165, 0, 0.3)';
+              }}
+            >
+              <span>📱</span> Compartilhar
+            </button>
+            
+            <button
+              onClick={() => {
+                window.open('https://blog.caicara.app', '_blank');
+              }}
+              style={{
+                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
+                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                background: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                boxShadow: '0 4px 15px rgba(76, 175, 80, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}
-              onMouseOver={(e) => e.currentTarget.style.background = '#FF8C00'}
-              onMouseOut={(e) => e.currentTarget.style.background = '#FFA500'}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = '#45a049';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(76, 175, 80, 0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = '#4CAF50';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(76, 175, 80, 0.3)';
+              }}
             >
-              <span>📱</span> Compartilhar
+              <span>📝</span> Blog Caiçara
             </button>
           </div>
         </div>
@@ -661,6 +788,26 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
+          }
+          @keyframes fadeInScale {
+            0% { 
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.95);
+            }
+            100% { 
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+          }
+          @keyframes pulseScore {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+          }
+          @keyframes floatButton {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
           }
         `}
       </style>
