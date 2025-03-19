@@ -248,20 +248,21 @@ export const GameControls: React.FC<GameControlsProps> = ({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              padding: '0 clamp(15px, 3vw, 25px)',
+              padding: '0',
               zIndex: 2,
               background: 'linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%)'
             }}>
               <div style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'clamp(20px, 4vw, 40px)',
-                justifyContent: 'center',
-                width: '100%',
-                maxWidth: '1200px',
-                margin: '0 auto'
+                justifyContent: 'center'
               }}>
                 <div style={{ 
+                  position: 'absolute',
+                  left: 'clamp(15px, 3vw, 25px)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -294,7 +295,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
                   fontFamily: "'Inter', sans-serif",
                   lineHeight: 1.2,
                   textAlign: 'center',
-                  flex: 1
+                  maxWidth: '80%'
                 }}>
                   {currentNeighborhood.charAt(0).toUpperCase() + currentNeighborhood.slice(1).toLowerCase()}!
                 </span>
