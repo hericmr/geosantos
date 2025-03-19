@@ -121,10 +121,12 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       } else if (score.total >= TIME_BONUS_THRESHOLDS.FAIR) {
         bonus = TIME_BONUS_AMOUNTS.FAIR;
       }
+      console.log('Pontuação:', score.total); // Debug
+      console.log('Bônus de tempo:', bonus); // Debug
       setTimeBonus(bonus);
 
-      const duration = 2000; // 2 segundos de animação
-      const steps = 60; // 60 passos para animação suave
+      const duration = 2000;
+      const steps = 60;
       const stepDuration = duration / steps;
       const distanceStep = distance / steps;
       const timeStep = clickTime / steps;
@@ -166,73 +168,74 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         const dx = arrowPath ? targetX - clickX : 0;
         const dy = arrowPath ? targetY - clickY : 0;
         
-        // Deslocamento padrão para a direita e para cima
-        const offsetX = 100; // pixels para a direita
-        const offsetY = -150; // pixels para cima
+        // Dimensões do popup
+        const popupHeight = 300; // altura estimada do popup
+        const popupWidth = Math.min(viewportWidth - 40, 400); // largura máxima do popup
         
-        // Calcula a posição inicial do popup
-        let popupX = clickX + offsetX;
-        let popupY = clickY + offsetY;
+        // Calcula a posição ideal do popup
+        let popupX = viewportWidth / 2; // Centraliza horizontalmente
+        let popupY = 20; // Começa no topo
         
-        // Verifica se o popup ficaria por cima da seta ou do bairro correto
+        // Se houver seta ou bairro correto, ajusta a posição
         if (arrowPath) {
+          // Calcula a distância entre o clique e o alvo
           const distance = Math.sqrt(dx * dx + dy * dy);
-          const popupHeight = 300; // altura estimada do popup
-          const popupWidth = 400; // largura estimada do popup
           
-          // Se o popup ficaria por cima da seta ou do bairro correto
-          if (Math.abs(popupY - targetY) < popupHeight) {
-            // Move o popup mais para a direita
-            popupX = Math.max(popupX + popupWidth/2, targetX + popupWidth);
+          // Se o clique estiver na metade superior da tela
+          if (clickY < viewportHeight / 2) {
+            // Posiciona o popup abaixo do clique
+            popupY = Math.min(clickY + 100, viewportHeight - popupHeight - 20);
+          } else {
+            // Posiciona o popup acima do clique
+            popupY = Math.max(clickY - popupHeight - 100, 20);
+          }
+          
+          // Ajusta horizontalmente para evitar sobreposição com a seta
+          if (Math.abs(clickX - targetX) < popupWidth / 2) {
+            // Se o clique estiver na metade esquerda da tela
+            if (clickX < viewportWidth / 2) {
+              popupX = Math.min(clickX + popupWidth / 2, viewportWidth - popupWidth / 2);
+            } else {
+              // Se o clique estiver na metade direita da tela
+              popupX = Math.max(clickX - popupWidth / 2, popupWidth / 2);
+            }
           }
         }
-        
-        // Ajusta a posição para evitar que o popup saia da tela
-        popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
-        popupY = Math.max(20, Math.min(popupY, viewportHeight - 200));
         
         setPopupPosition({
           top: `${popupY}px`,
           left: `${popupX}px`
         });
       } else {
-        // Em desktop, calcula a posição baseada no clique
+        // Em desktop, mantém o comportamento atual
         const clickX = (clickedPosition.lng + 180) * (viewportWidth / 360);
         const clickY = (90 - clickedPosition.lat) * (viewportHeight / 180);
         
-        // Se tiver o ponto correto (arrowPath), calcula sua posição na viewport
         let targetX = 0, targetY = 0;
         if (arrowPath) {
           targetX = (arrowPath[1].lng + 180) * (viewportWidth / 360);
           targetY = (90 - arrowPath[1].lat) * (viewportHeight / 180);
         }
         
-        // Calcula a direção do vetor entre os pontos
         const dx = arrowPath ? targetX - clickX : 0;
         const dy = arrowPath ? targetY - clickY : 0;
         
-        // Deslocamento padrão para a direita e para cima
-        const offsetX = 100; // pixels para a direita
-        const offsetY = -150; // pixels para cima
+        const offsetX = 100;
+        const offsetY = -150;
         
-        // Calcula a posição inicial do popup
         let popupX = clickX + offsetX;
         let popupY = clickY + offsetY;
         
-        // Verifica se o popup ficaria por cima da seta ou do bairro correto
         if (arrowPath) {
           const distance = Math.sqrt(dx * dx + dy * dy);
-          const popupHeight = 300; // altura estimada do popup
-          const popupWidth = 400; // largura estimada do popup
+          const popupHeight = 300;
+          const popupWidth = 400;
           
-          // Se o popup ficaria por cima da seta ou do bairro correto
           if (Math.abs(popupY - targetY) < popupHeight) {
-            // Move o popup mais para a direita
             popupX = Math.max(popupX + popupWidth/2, targetX + popupWidth);
           }
         }
         
-        // Ajusta a posição para evitar que o popup saia da tela
         popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
         popupY = Math.max(20, Math.min(popupY, viewportHeight - 200));
         
@@ -252,29 +255,33 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   return (
     <div style={{
       position: 'fixed',
-      top: gameOver ? '50%' : popupPosition.top,
-      left: gameOver ? '50%' : popupPosition.left,
-      transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
-      width: '90%',
+      top: gameOver ? '50%' : window.innerWidth <= 768 ? 'auto' : popupPosition.top,
+      bottom: window.innerWidth <= 768 ? 0 : 'auto',
+      left: gameOver ? '50%' : window.innerWidth <= 768 ? 0 : popupPosition.left,
+      right: window.innerWidth <= 768 ? 0 : 'auto',
+      transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'none' : 'translate(-50%, -50%)',
+      width: window.innerWidth <= 768 ? '100%' : '90%',
       maxWidth: gameOver ? '800px' : '600px',
-      background: 'rgba(0, 25, 0, 0.98)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
+      background: 'rgba(0, 25, 0, 0.95)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
       color: 'white',
-      zIndex: gameOver ? 9999 : 1001,
+      zIndex: 9999,
       padding: gameOver ? 'clamp(35px, 7vw, 45px)' : 'clamp(25px, 5vw, 35px)',
-      borderRadius: '24px',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(50, 205, 50, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-      border: '2px solid rgba(50, 205, 50, 0.3)',
-      margin: '10px',
-      animation: gameOver ? 'fadeInScale 0.3s ease-out' : 'slideIn 0.3s ease-out'
+      borderRadius: window.innerWidth <= 768 ? '24px 24px 0 0' : '24px',
+      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
+      border: 'none',
+      margin: window.innerWidth <= 768 ? '0' : '10px',
+      animation: gameOver ? 'fadeInScale 0.3s ease-out' : window.innerWidth <= 768 ? 'slideUp 0.3s ease-out' : 'slideIn 0.3s ease-out',
+      maxHeight: window.innerWidth <= 768 ? '90vh' : 'auto',
+      overflowY: window.innerWidth <= 768 ? 'auto' : 'visible'
     }}>
       {!gameOver && clickedPosition && (
         <div style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 'clamp(25px, 5vw, 35px)',
+          gap: 'clamp(12px, 2vw, 20px)',
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
@@ -283,20 +290,16 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               <div style={{
                 textAlign: 'center',
                 color: '#fff',
-                fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
+                fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
                 fontFamily: "'Inter', sans-serif",
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px',
+                gap: '2px',
                 opacity: 0.95,
-                background: 'rgba(50, 205, 50, 0.1)',
-                padding: 'clamp(15px, 3vw, 20px)',
-                borderRadius: '16px',
-                border: '1px solid rgba(50, 205, 50, 0.2)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                marginBottom: '4px'
               }}>
                 <div style={{ 
-                  fontSize: 'clamp(1.3rem, 3.2vw, 1.6rem)', 
+                  fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
                   color: '#FFD700', 
                   fontWeight: 700,
                   textAlign: 'center',
@@ -305,9 +308,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                    INCRÍVEL! 🎯
                 </div>
                 <div style={{
-                  fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
+                  fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
                   color: '#fff',
-                  lineHeight: 1.4
+                  lineHeight: 1.1
                 }}>
                   Em {clickTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>!
                 </div>
@@ -315,31 +318,26 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
               <div style={{
                 display: 'flex',
-                gap: 'clamp(25px, 5vw, 35px)',
+                gap: 'clamp(10px, 2vw, 20px)',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap'
               }}>
                 <div style={{
                   display: 'flex',
-                  gap: '4px',
+                  gap: '2px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  padding: 'clamp(12px, 2.5vw, 16px)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  flexWrap: 'wrap'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
-                    marginRight: 'clamp(8px, 2vw, 12px)',
+                    marginRight: 'clamp(2px, 0.5vw, 4px)',
                     opacity: 0.9
                   }}>🎯</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -348,33 +346,28 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(score)}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
+                    fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
-                    marginLeft: 'clamp(4px, 1vw, 8px)',
+                    marginLeft: 'clamp(1px, 0.3vw, 2px)',
                     opacity: 0.9
                   }}>pts</div>
                 </div>
                 <div style={{
                   display: 'flex',
-                  gap: '4px',
+                  gap: '2px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  padding: 'clamp(12px, 2.5vw, 16px)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  flexWrap: 'wrap'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
-                    marginRight: 'clamp(8px, 2vw, 12px)',
+                    marginRight: 'clamp(2px, 0.5vw, 4px)',
                     opacity: 0.9
                   }}>⏱️</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -383,41 +376,52 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(1000 - (clickTime * 100))}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
+                    fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
-                    marginLeft: 'clamp(4px, 1vw, 8px)',
+                    marginLeft: 'clamp(1px, 0.3vw, 2px)',
                     opacity: 0.9
                   }}>pts</div>
+                  {timeBonus > 0 && (
+                    <div style={{ 
+                      fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                      fontFamily: "'Inter', sans-serif",
+                      fontWeight: 500,
+                      marginLeft: 'clamp(4px, 1vw, 8px)',
+                      color: '#FFD700',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      background: 'rgba(255, 215, 0, 0.1)',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(255, 215, 0, 0.2)',
+                      animation: 'pulseText 1s infinite'
+                    }}>
+                      <span>⚡</span> +{timeBonus.toFixed(2)}s
+                    </div>
+                  )}
                 </div>
               </div>
             </>
           ) : (
             <>
               <div style={{ 
-                fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
+                fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
                 textAlign: 'center',
                 fontFamily: "'Inter', sans-serif",
                 opacity: 0.9,
-                background: 'rgba(255, 255, 255, 0.05)',
-                padding: 'clamp(12px, 2.5vw, 16px)',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                marginBottom: '2px'
               }}>
                 Em {displayedTime.toFixed(2)} seg você clicou
               </div>
               <div style={{
                 display: 'flex',
-                gap: '4px',
+                gap: '2px',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
-                background: 'rgba(255, 255, 255, 0.05)',
-                padding: 'clamp(12px, 2.5vw, 16px)',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                marginBottom: '4px'
               }}>
                 {Math.round(displayedDistance)
                   .toString()
@@ -431,16 +435,16 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     />
                   ))}
                 <div style={{ 
-                  fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
+                  fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
                   fontFamily: "'Inter', sans-serif",
                   fontWeight: 500,
-                  marginLeft: 'clamp(8px, 2vw, 12px)',
+                  marginLeft: 'clamp(4px, 1vw, 8px)',
                   opacity: 0.9
                 }}>metros do bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span></div>
               </div>
               <div style={{
                 display: 'flex',
-                gap: 'clamp(25px, 5vw, 35px)',
+                gap: 'clamp(10px, 2vw, 20px)',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
@@ -448,24 +452,19 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               }}>
                 <div style={{
                   display: 'flex',
-                  gap: '4px',
+                  gap: '2px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  padding: 'clamp(12px, 2.5vw, 16px)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  flexWrap: 'wrap'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
-                    marginRight: 'clamp(8px, 2vw, 12px)',
+                    marginRight: 'clamp(2px, 0.5vw, 4px)',
                     opacity: 0.9
                   }}>📍</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -474,33 +473,28 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(displayedDistance / 1000 * 10) / 10}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
+                    fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
-                    marginLeft: 'clamp(4px, 1vw, 8px)',
+                    marginLeft: 'clamp(1px, 0.3vw, 2px)',
                     opacity: 0.9
                   }}>km</div>
                 </div>
                 <div style={{
                   display: 'flex',
-                  gap: '4px',
+                  gap: '2px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  padding: 'clamp(12px, 2.5vw, 16px)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  flexWrap: 'wrap'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
-                    marginRight: 'clamp(8px, 2vw, 12px)',
+                    marginRight: 'clamp(2px, 0.5vw, 4px)',
                     opacity: 0.9
                   }}>⏱️</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -509,12 +503,31 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(1000 - (clickTime * 100))}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
+                    fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
-                    marginLeft: 'clamp(4px, 1vw, 8px)',
+                    marginLeft: 'clamp(1px, 0.3vw, 2px)',
                     opacity: 0.9
                   }}>pts</div>
+                  {timeBonus > 0 && (
+                    <div style={{ 
+                      fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                      fontFamily: "'Inter', sans-serif",
+                      fontWeight: 500,
+                      marginLeft: 'clamp(4px, 1vw, 8px)',
+                      color: '#FFD700',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      background: 'rgba(255, 215, 0, 0.1)',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(255, 215, 0, 0.2)',
+                      animation: 'pulseText 1s infinite'
+                    }}>
+                      <span>⚡</span> +{timeBonus.toFixed(2)}s
+                    </div>
+                  )}
                 </div>
               </div>
             </>
@@ -524,19 +537,20 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       {timeBonus > 0 && !gameOver && (
         <div style={{
-          marginTop: 'clamp(15px, 3vw, 25px)',
+          marginTop: 'clamp(4px, 1vw, 8px)',
           color: '#FFD700',
           fontWeight: 600,
-          fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
+          fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
           textAlign: 'center',
           fontFamily: "'Inter', sans-serif",
           animation: 'pulseText 1s infinite',
           opacity: 0.95,
           background: 'rgba(255, 215, 0, 0.1)',
-          padding: 'clamp(12px, 2.5vw, 16px)',
-          borderRadius: '12px',
+          padding: 'clamp(4px, 1vw, 8px)',
+          borderRadius: '6px',
           border: '1px solid rgba(255, 215, 0, 0.2)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          display: 'none'
         }}>
           ⚡ +{timeBonus.toFixed(2)}s
         </div>
@@ -544,19 +558,19 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       {feedbackMessage && !gameOver && (
         <div style={{
-          marginTop: 'clamp(15px, 3vw, 25px)',
+          marginTop: 'clamp(4px, 1vw, 8px)',
           color: feedbackMessage.includes("Muito bem") ? '#FFD700' : '#FFD700',
           fontWeight: 600,
-          fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
+          fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
           textAlign: 'center',
           fontFamily: "'Inter', sans-serif",
           animation: feedbackMessage.includes("Muito bem") ? 'pulseText 1s infinite' : 'none',
           opacity: 0.95,
           background: 'rgba(255, 215, 0, 0.1)',
-          padding: 'clamp(12px, 2.5vw, 16px)',
-          borderRadius: '12px',
+          padding: 'clamp(4px, 1vw, 8px)',
+          borderRadius: '6px',
           border: '1px solid rgba(255, 215, 0, 0.2)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
         }}>
           {feedbackMessage}
         </div>
@@ -953,7 +967,17 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             }
             100% {
               opacity: 1;
-              transform: translate(-50%, -50%);
+              transform: translate(-50%, 0);
+            }
+          }
+          @keyframes slideUp {
+            0% {
+              opacity: 0;
+              transform: translateY(100%);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
             }
           }
         `}
