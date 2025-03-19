@@ -69,8 +69,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         setGeoJsonData(data);
         setIsLoading(false);
       })
-      .catch(error => {
-        console.error('Error loading GeoJSON:', error);
+      .catch(() => {
         setIsLoading(false);
       });
   }, []);
@@ -84,7 +83,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   useEffect(() => {
     if (gameState.gameStarted && !gameState.gameOver && audioRef.current) {
-      audioRef.current.play().catch(e => console.log('Erro ao tocar música:', e));
+      audioRef.current.play();
     } else if (gameState.gameOver && audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -152,7 +151,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             targetLayer = layer;
           }
         } catch (error) {
-          console.error('Error checking target neighborhood:', error);
+          // Silently handle error
         }
       });
 
@@ -166,7 +165,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             clickedNeighborhood = feature.properties?.NOME;
           }
         } catch (error) {
-          console.error('Error checking clicked neighborhood:', error);
+          // Silently handle error
         }
       });
 
@@ -202,19 +201,19 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         if (successSoundRef.current && errorSoundRef.current) {
           if (isCorrectNeighborhood || isNearBorder) {
             successSoundRef.current.currentTime = 0;
-            successSoundRef.current.play().catch(e => console.log('Erro ao tocar som de sucesso:', e));
+            successSoundRef.current.play();
           } else {
             errorSoundRef.current.currentTime = 0;
-            errorSoundRef.current.play().catch(e => console.log('Erro ao tocar som de erro:', e));
+            errorSoundRef.current.play();
           }
         }
         
         // Se acertou o bairro correto ou está muito próximo da borda, dá pontuação máxima
         const score = (isCorrectNeighborhood || isNearBorder)
-          ? (isNearBorder ? 2000 : 1000) // Pontuação extra por acertar muito próximo da borda
+          ? (isNearBorder ? 2000 : 1000) * Math.pow(gameState.timeLeft / 10, 2) // Aplica multiplicador de tempo mesmo no acerto
           : calculateScore(distance, gameState.timeLeft).total;
         
-        const newScore = gameState.score + score;
+        const newScore = gameState.score + Math.round(score);
         
         // Verifica se o jogador atingiu a pontuação para a fase 2
         if (newScore >= PHASE_TWO_SCORE && !isPhaseTwo) {
@@ -237,9 +236,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         // Mensagem de feedback personalizada baseada no tipo de acerto
         let feedbackMessage = "";
         if (isNearBorder) {
-          feedbackMessage = `🎯 ACERTO PERFEITO! Você acertou bem pertinho do bairro! Bônus de 2000 pontos!`;
+          feedbackMessage = "";
         } else if (isCorrectNeighborhood) {
-          feedbackMessage = `✨ EXCELENTE! Você acertou dentro do bairro! Bônus de 1000 pontos!`;
+          feedbackMessage = "";
         } else {
           feedbackMessage = getFeedbackMessage(distance);
         }
@@ -339,7 +338,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     // Reseta o estado de pausa ao iniciar nova rodada
     setIsPaused(false);
     if (audioRef.current && gameState.gameStarted && !gameState.gameOver && !gameState.isMuted) {
-      audioRef.current.play().catch(e => console.log('Erro ao tocar música:', e));
+      audioRef.current.play();
     }
 
     // Limpa o timer de feedback se existir

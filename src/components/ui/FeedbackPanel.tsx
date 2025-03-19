@@ -148,10 +148,20 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         }}>
           {!isCorrectNeighborhood && (
             <div>
+              <div style={{ 
+                fontSize: '1.2rem',
+                textAlign: 'center',
+                fontFamily: "'Inter', sans-serif",
+                marginBottom: '10px'
+              }}>
+                Em {displayedTime.toFixed(2)} seg você clicou
+              </div>
               <div style={{
                 display: 'flex',
                 gap: '2px',
-                marginBottom: '5px'
+                marginBottom: '5px',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 {Math.round(displayedDistance)
                   .toString()
@@ -164,13 +174,38 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                       delay={500 + (index * 300)} 
                     />
                   ))}
+                <div style={{ 
+                  fontSize: '1.2rem',
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 500,
+                  marginLeft: '10px'
+                }}>metros do bairro <span style={{ color: '#32CD32' }}>{currentNeighborhood}</span></div>
               </div>
-              <div style={{ 
-                fontSize: '1rem',
-                textAlign: 'center',
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 500
-              }}>metros</div>
+              <div style={{
+                display: 'flex',
+                gap: '2px',
+                marginBottom: '5px',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{ 
+                  fontSize: '1.2rem',
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 500,
+                  marginRight: '10px'
+                }}>Pontos:</div>
+                {Math.round(score)
+                  .toString()
+                  .padStart(4, '0')
+                  .split('')
+                  .map((digit, index) => (
+                    <DigitRoller 
+                      key={index} 
+                      targetDigit={digit} 
+                      delay={800 + (index * 300)} 
+                    />
+                  ))}
+              </div>
             </div>
           )}
 
@@ -184,11 +219,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             gap: '4px'
           }}>
             {!isCorrectNeighborhood ? (
-              <>
-                <div>Em {displayedTime.toFixed(2)} seg você clicou</div>
-                <div>{Math.round(displayedDistance)} metros</div>
-                <div>do bairro <span style={{ color: '#32CD32' }}>{currentNeighborhood}</span></div>
-              </>
+              <div></div>
             ) : (
               <>
                 <div style={{ fontSize: '1.4rem', color: '#FFD700' }}>🎯 INCRÍVEL! Em {displayedTime.toFixed(2)} segundos</div>
@@ -223,9 +254,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           fontFamily: "'Inter', sans-serif",
           fontWeight: 700
         }}>
-          {feedbackMessage === "Tempo esgotado!" 
-            ? "Acabou o tempo! Tá mals!"
-            : "Vocẽ perdeu... Tá mais perdido que saci andando de skate na Palmares!"}
+          {feedbackMessage === "" 
+            ? ""
+            : ""}
         </h2>
       )}
 

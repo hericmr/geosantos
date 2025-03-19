@@ -62,9 +62,10 @@ export const calculateScore = (distance: number, timeLeft: number): ScoreCalcula
   const distanceScore = Math.max(0, 1 - (distance / MAX_DISTANCE_METERS));
   const distancePoints = Math.round(distanceScore * 700);
   
-  // Só calcula pontos por tempo se a distância for menor que 2000m
-  const timeScore = timeLeft / ROUND_TIME;
-  const timePoints = Math.round(timeScore * 600 * distanceScore);
+  // Penalidade de tempo mais severa
+  // Quanto mais tempo passar, menor será o multiplicador
+  const timeMultiplier = Math.pow(timeLeft / ROUND_TIME, 2); // Quadrado do tempo restante
+  const timePoints = Math.round(timeMultiplier * 600 * distanceScore);
   
   return {
     total: distancePoints + timePoints,

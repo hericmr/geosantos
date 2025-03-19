@@ -12,17 +12,17 @@ export const getProgressBarColor = (timeLeft: number): string => {
 
 export const getFeedbackMessage = (distance: number) => {
   if (distance < 50) {
-    return "Muito bem! Você já é praticamente um guia turístico de Santos!";
+    return "";
   } else if (distance < 100) {
-    return "Parabéns! Você conhece Santos como a palma da sua mão!";
+    return "";
   } else if (distance < 200) {
-    return "Boa! Você manja dos paranauê de Santos!";
+    return "";
   } else if (distance < 500) {
-    return "Legal! Continue explorando a cidade!";
+    return "";
   } else if (distance < 1000) {
-    return "Quase lá! Tente se aproximar mais do bairro.";
+    return "";
   } else {
-    return "Tá mais perdido que turista na feira do Gonzaga!";
+    return "";
   }
 };
 
