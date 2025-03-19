@@ -456,7 +456,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         }}>
           <h2 style={{ 
             color: 'white', 
-            marginBottom: 'clamp(15px, 3vw, 25px)', 
+            marginBottom: '10px', 
             fontSize: 'clamp(1.5rem, 4vw, 2.2rem)',
             textAlign: 'center',
             fontFamily: "'Inter', sans-serif",
@@ -478,6 +478,22 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
              score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
              "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!"}
           </h2>
+          
+          {score >= 20000 && (
+            <h3 style={{ 
+              color: 'white', 
+              marginBottom: 'clamp(15px, 3vw, 25px)', 
+              fontSize: 'clamp(1.2rem, 3vw, 1.6rem)',
+              textAlign: 'center',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 600,
+              opacity: 0.9,
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+              lineHeight: 1.2
+            }}>
+              Todos se curvam ao mestre.
+            </h3>
+          )}
 
           <div style={{
             display: 'flex',
@@ -603,11 +619,21 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           }}>
             <button
               onClick={() => {
-                const shareText = score >= 10000 ? 
-                  `🏆 LENDÁRIO! Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Quem consegue superar essa pontuação?` :
-                  score >= 5000 ?
-                  `🌟 IMPRESSIONANTE! Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Quanto você consegue fazer?` :
-                  `🎮 Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Quanto você consegue fazer?`;
+                // Obtém a mensagem personalizada com base na pontuação
+                const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
+                  score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
+                  score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
+                  score >= 8000 ? "MESTRE DOS BAIRROS! 🧠 Você é um GPS ambulante!" :
+                  score >= 5000 ? "IMPRESSIONANTE! 🌟 Quase um GPS humano!!" :
+                  score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
+                  score >= 3000 ? "SANTISTA DE CORAÇÃO! ❤️ Você manja dos bairros!" :
+                  score >= 2000 ? "MUITO BOM! 👏 Você é deve ter ido em algumas aulas de geografia!" :
+                  score >= 1000 ? "BOM JOGO! 👍 Mas ainda precisa andar mais na zona noroeste!" :
+                  score >= 500 ? "QUASE LÁ! 🎯 Dá um role no bondinho pra pegar mais dicas!" :
+                  score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
+                  "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!";
+                  
+                const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Jogue agora em https://caicara.app e veja quanto você consegue fazer!`;
 
                 if (navigator.share) {
                   navigator.share({
