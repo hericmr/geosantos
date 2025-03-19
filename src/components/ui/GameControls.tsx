@@ -90,8 +90,38 @@ export const GameControls: React.FC<GameControlsProps> = ({
           gap: 'clamp(8px, 2vw, 12px)',
           padding: 'clamp(10px, 2vw, 15px)',
           maxWidth: '800px',
-          margin: '0 auto'
+          margin: '0 auto',
+          animation: 'fadeIn 0.3s ease-out'
         }}>
+          <style>
+            {`
+              @keyframes fadeIn {
+                from {
+                  opacity: 0;
+                  transform: translateY(20px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+
+              @keyframes fadeOut {
+                from {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+                to {
+                  opacity: 0;
+                  transform: translateY(-20px);
+                }
+              }
+
+              .fade-out {
+                animation: fadeOut 0.2s ease-out forwards;
+              }
+            `}
+          </style>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -129,7 +159,15 @@ export const GameControls: React.FC<GameControlsProps> = ({
           
           <button 
             className="start-button"
-            onClick={onStartGame}
+            onClick={(e) => {
+              const parent = e.currentTarget.closest('div');
+              if (parent) {
+                parent.classList.add('fade-out');
+                setTimeout(() => {
+                  onStartGame();
+                }, 200);
+              }
+            }}
             style={{
               padding: 'clamp(12px, 2.5vw, 16px) clamp(40px, 6vw, 60px)',
               fontSize: 'clamp(1.2rem, 2.5vw, 1.4rem)',
