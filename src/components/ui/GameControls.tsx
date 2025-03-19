@@ -269,7 +269,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
                   gap: '4px'
                 }}>
                   <span style={{ 
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                    fontSize: isMobile ? 'clamp(0.7rem, 1.8vw, 0.8rem)' : 'clamp(1rem, 2.5vw, 1.2rem)',
                     color: '#000000',
                     fontWeight: 600,
                     textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
@@ -277,7 +277,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
                     Rodada {roundNumber}
                   </span>
                   <span style={{ 
-                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
+                    fontSize: isMobile ? 'clamp(0.9rem, 2vw, 1rem)' : 'clamp(1.4rem, 3.5vw, 1.8rem)',
                     color: '#000000',
                     fontWeight: 700,
                     textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
