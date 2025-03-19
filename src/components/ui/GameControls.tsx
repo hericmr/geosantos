@@ -41,61 +41,66 @@ export const GameControls: React.FC<GameControlsProps> = ({
       {!gameStarted ? (
         <div style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          gap: 'clamp(12px, 2vw, 20px)',
-          padding: 'clamp(15px, 3vw, 25px) 0'
+          justifyContent: 'space-between',
+          gap: 'clamp(8px, 1.5vw, 15px)',
+          padding: 'clamp(8px, 1.5vw, 12px)',
+          maxWidth: '600px',
+          margin: '0 auto'
         }}>
-          <h2 style={{ 
-            fontSize: 'clamp(2.2rem, 6vw, 3rem)', 
-            margin: '0',
-            textShadow: '1px 1px 3px rgba(0, 0, 0, 0.5)',
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 700,
-            color: '#32CD32',
-            lineHeight: 1.2
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
           }}>
-            O Caiçara
-          </h2>
-          
-          <p style={{ 
-            fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
-            margin: '0 0 10px 0',
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 600,
-            color: '#FFD700',
-            textShadow: '1px 1px 3px rgba(0, 0, 0, 0.5)',
-            lineHeight: 1.3,
-            maxWidth: '80%',
-            textAlign: 'center'
-          }}>
-            Quão bem você conhece a sua cidade?
-          </p>
+            <h2 style={{ 
+              fontSize: 'clamp(1.8rem, 4vw, 2.2rem)', 
+              margin: '0',
+              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.4)',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 700,
+              color: '#32CD32',
+              lineHeight: 1.1
+            }}>
+              O Caiçara
+            </h2>
+            
+            <p style={{ 
+              fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', 
+              margin: '3px 0 0 0',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 600,
+              color: '#FFD700',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+              lineHeight: 1.2
+            }}>
+              Quão bem você conhece a sua cidade?
+            </p>
+          </div>
           
           <button 
             onClick={onStartGame}
             style={{
-              padding: 'clamp(10px, 2vw, 15px) clamp(20px, 5vw, 30px)',
-              fontSize: 'clamp(1.2rem, 3vw, 1.4rem)',
+              padding: 'clamp(6px, 1.5vw, 10px) clamp(12px, 3vw, 20px)',
+              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
               background: '#32CD32',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '6px',
               color: 'white',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'background 0.2s ease',
               fontWeight: 700,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+              whiteSpace: 'nowrap'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.background = '#28a745';
-              e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.background = '#32CD32';
-              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            Iniciar Jogo
+            Iniciar
           </button>
         </div>
       ) : (
