@@ -211,9 +211,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         const popupHeight = 300; // altura estimada do popup
         const popupWidth = 400; // largura estimada do popup
         
-        // Calcula a posição inicial do popup (canto superior direito da tela)
-        let popupX = viewportWidth - popupWidth - 20; // 20px de margem da borda
-        let popupY = 20; // 20px do topo
+        // Deslocamento padrão para a direita e para cima
+        const offsetX = 50; // pixels para a direita
+        const offsetY = -100; // pixels para cima
+        
+        // Calcula a posição inicial do popup próximo ao clique
+        let popupX = clickX + offsetX;
+        let popupY = clickY + offsetY;
         
         // Verifica se o popup ficaria por cima de algum ponto importante
         if (arrowPath) {
@@ -233,11 +237,17 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             popupY + popupHeight > targetY - 50
           );
           
-          // Se estiver sobrepondo algum ponto, move para o canto superior esquerdo
+          // Se estiver sobrepondo algum ponto, ajusta a posição
           if (isOverClick || isOverTarget) {
-            popupX = 20; // 20px da borda esquerda
+            // Move o popup para a direita do ponto de clique
+            popupX = clickX + popupWidth/2;
+            popupY = clickY - popupHeight/2;
           }
         }
+        
+        // Ajusta a posição para evitar que o popup saia da tela
+        popupX = Math.min(Math.max(popupX, 20), viewportWidth - popupWidth - 20);
+        popupY = Math.max(20, Math.min(popupY, viewportHeight - popupHeight - 20));
         
         setPopupPosition({
           top: `${popupY}px`,
