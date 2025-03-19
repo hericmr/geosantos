@@ -298,30 +298,6 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 }}>
                   {currentNeighborhood.charAt(0).toUpperCase() + currentNeighborhood.slice(1).toLowerCase()}!
                 </span>
-                <div style={{ 
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <span style={{ 
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-                    color: '#000000',
-                    fontWeight: 600,
-                    textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
-                  }}>
-                    Tempo Total
-                  </span>
-                  <span style={{ 
-                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
-                    color: '#000000',
-                    fontWeight: 700,
-                    textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    {Math.round(totalTimeLeft * 10) / 10}s
-                  </span>
-                </div>
               </div>
             </div>
           </div>
