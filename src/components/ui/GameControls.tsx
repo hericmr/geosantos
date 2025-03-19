@@ -56,16 +56,16 @@ export const GameControls: React.FC<GameControlsProps> = ({
             lineHeight: 1.2
           }}>O Caiçara</h2>
           <p style={{ 
-            fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', 
+            fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)', 
             marginBottom: '0.5rem',
-            opacity: 0.95,
             fontFamily: "'Inter', sans-serif",
-            fontWeight: 500,
-            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
+            fontWeight: 600,
+            color: '#FFD700',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
             lineHeight: 1.4,
             maxWidth: '90%'
           }}>
-            Quão bem você conhece Santos?!
+            Quão bem você conhece a sua cidade?
           </p>
           <button 
             onClick={onStartGame}
@@ -230,6 +230,27 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 </div>
               </div>
             </div>
+          </div>
+          
+          <div style={{
+            width: '100%',
+            padding: '10px 0',
+            textAlign: 'center',
+            background: 'rgba(20, 83, 45, 0.85)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}>
+            <p style={{ 
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)', 
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 600,
+              color: '#FFD700',
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+              lineHeight: 1.2,
+              margin: 0
+            }}>
+              Quão bem você conhece a sua cidade?
+            </p>
           </div>
         </div>
       )}
