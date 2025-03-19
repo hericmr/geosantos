@@ -238,23 +238,24 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   return (
     <div style={{
       position: 'fixed',
-      top: gameOver ? '50%' : popupPosition.top,
-      left: gameOver ? '50%' : popupPosition.left,
-      transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
-      width: '90%',
-      maxWidth: gameOver ? '600px' : '400px',
+      top: gameOver ? '50%' : window.innerWidth <= 768 ? 'auto' : popupPosition.top,
+      bottom: window.innerWidth <= 768 ? '0' : 'auto',
+      left: gameOver ? '50%' : window.innerWidth <= 768 ? '0' : popupPosition.left,
+      transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'none' : 'translate(-50%, -50%)',
+      width: window.innerWidth <= 768 ? '100%' : '90%',
+      maxWidth: gameOver ? '600px' : window.innerWidth <= 768 ? 'none' : '400px',
       background: gameOver ? 'rgba(0, 25, 0, 0.98)' : 'rgba(0, 25, 0, 0.95)',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
       color: 'white',
       zIndex: gameOver ? 9999 : 1001,
-      padding: gameOver ? 'clamp(35px, 7vw, 45px)' : 'clamp(20px, 4vw, 30px)',
-      borderRadius: '20px',
+      padding: gameOver ? 'clamp(35px, 7vw, 45px)' : window.innerWidth <= 768 ? '20px' : 'clamp(20px, 4vw, 30px)',
+      borderRadius: window.innerWidth <= 768 ? '20px 20px 0 0' : '20px',
       boxShadow: gameOver ? 
         '0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(50, 205, 50, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)' :
         '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
       border: gameOver ? '2px solid rgba(50, 205, 50, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
-      margin: '10px',
+      margin: window.innerWidth <= 768 ? '0' : '10px',
       animation: gameOver ? 'fadeInScale 0.3s ease-out' : 'none'
     }}>
       {!gameOver && clickedPosition && (
