@@ -214,48 +214,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           left: `${popupX}px`
         });
       } else {
-        // Em desktop, calcula a posição baseada no clique
-        const clickX = (clickedPosition.lng + 180) * (viewportWidth / 360);
-        const clickY = (90 - clickedPosition.lat) * (viewportHeight / 180);
-        
-        // Se tiver o ponto correto (arrowPath), calcula sua posição na viewport
-        let targetX = 0, targetY = 0;
-        if (arrowPath) {
-          targetX = (arrowPath[1].lng + 180) * (viewportWidth / 360);
-          targetY = (90 - arrowPath[1].lat) * (viewportHeight / 180);
-        }
-        
-        // Dimensões do popup
+        // Em desktop, sempre posiciona no canto superior direito
         const popupHeight = 300; // altura estimada do popup
         const popupWidth = 400; // largura estimada do popup
         
-        // Calcula a posição inicial do popup (canto superior direito da tela)
-        let popupX = viewportWidth - popupWidth - 20; // 20px de margem da borda
-        let popupY = viewportHeight - popupHeight - 100; // 100px do fundo da tela
-        
-        // Verifica se o popup ficaria por cima de algum ponto importante
-        if (arrowPath) {
-          // Verifica se o popup está sobrepondo o ponto de clique
-          const isOverClick = (
-            popupX < clickX + 50 && 
-            popupX + popupWidth > clickX - 50 && 
-            popupY < clickY + 50 && 
-            popupY + popupHeight > clickY - 50
-          );
-          
-          // Verifica se o popup está sobrepondo o ponto correto
-          const isOverTarget = (
-            popupX < targetX + 50 && 
-            popupX + popupWidth > targetX - 50 && 
-            popupY < targetY + 50 && 
-            popupY + popupHeight > targetY - 50
-          );
-          
-          // Se estiver sobrepondo algum ponto, move para o canto inferior esquerdo
-          if (isOverClick || isOverTarget) {
-            popupX = 20; // 20px da borda esquerda
-          }
-        }
+        // Posição fixa no canto superior direito
+        const popupX = viewportWidth - popupWidth - 20; // 20px de margem da borda
+        const popupY = 20; // 20px do topo
         
         setPopupPosition({
           top: `${popupY}px`,
