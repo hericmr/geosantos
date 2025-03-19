@@ -150,41 +150,97 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       
-      // Converte as coordenadas do mapa para coordenadas da viewport
-      const clickX = (clickedPosition.lng + 180) * (viewportWidth / 360);
-      const clickY = (90 - clickedPosition.lat) * (viewportHeight / 180);
-      
-      // Se tiver o ponto correto (arrowPath), calcula sua posição na viewport
-      let targetX = 0, targetY = 0;
-      if (arrowPath) {
-        targetX = (arrowPath[1].lng + 180) * (viewportWidth / 360);
-        targetY = (90 - arrowPath[1].lat) * (viewportHeight / 180);
+      if (viewportWidth <= 768) {
+        // Em mobile, calcula a posição baseada no clique
+        const clickX = (clickedPosition.lng + 180) * (viewportWidth / 360);
+        const clickY = (90 - clickedPosition.lat) * (viewportHeight / 180);
+        
+        // Se tiver o ponto correto (arrowPath), calcula sua posição na viewport
+        let targetX = 0, targetY = 0;
+        if (arrowPath) {
+          targetX = (arrowPath[1].lng + 180) * (viewportWidth / 360);
+          targetY = (90 - arrowPath[1].lat) * (viewportHeight / 180);
+        }
+        
+        // Calcula a direção do vetor entre os pontos
+        const dx = arrowPath ? targetX - clickX : 0;
+        const dy = arrowPath ? targetY - clickY : 0;
+        
+        // Deslocamento padrão para a direita e para cima
+        const offsetX = 100; // pixels para a direita
+        const offsetY = -150; // pixels para cima
+        
+        // Calcula a posição inicial do popup
+        let popupX = clickX + offsetX;
+        let popupY = clickY + offsetY;
+        
+        // Verifica se o popup ficaria por cima da seta ou do bairro correto
+        if (arrowPath) {
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const popupHeight = 300; // altura estimada do popup
+          const popupWidth = 400; // largura estimada do popup
+          
+          // Se o popup ficaria por cima da seta ou do bairro correto
+          if (Math.abs(popupY - targetY) < popupHeight) {
+            // Move o popup mais para a direita
+            popupX = Math.max(popupX + popupWidth/2, targetX + popupWidth);
+          }
+        }
+        
+        // Ajusta a posição para evitar que o popup saia da tela
+        popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
+        popupY = Math.max(20, Math.min(popupY, viewportHeight - 200));
+        
+        setPopupPosition({
+          top: `${popupY}px`,
+          left: `${popupX}px`
+        });
+      } else {
+        // Em desktop, calcula a posição baseada no clique
+        const clickX = (clickedPosition.lng + 180) * (viewportWidth / 360);
+        const clickY = (90 - clickedPosition.lat) * (viewportHeight / 180);
+        
+        // Se tiver o ponto correto (arrowPath), calcula sua posição na viewport
+        let targetX = 0, targetY = 0;
+        if (arrowPath) {
+          targetX = (arrowPath[1].lng + 180) * (viewportWidth / 360);
+          targetY = (90 - arrowPath[1].lat) * (viewportHeight / 180);
+        }
+        
+        // Calcula a direção do vetor entre os pontos
+        const dx = arrowPath ? targetX - clickX : 0;
+        const dy = arrowPath ? targetY - clickY : 0;
+        
+        // Deslocamento padrão para a direita e para cima
+        const offsetX = 100; // pixels para a direita
+        const offsetY = -150; // pixels para cima
+        
+        // Calcula a posição inicial do popup
+        let popupX = clickX + offsetX;
+        let popupY = clickY + offsetY;
+        
+        // Verifica se o popup ficaria por cima da seta ou do bairro correto
+        if (arrowPath) {
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const popupHeight = 300; // altura estimada do popup
+          const popupWidth = 400; // largura estimada do popup
+          
+          // Se o popup ficaria por cima da seta ou do bairro correto
+          if (Math.abs(popupY - targetY) < popupHeight) {
+            // Move o popup mais para a direita
+            popupX = Math.max(popupX + popupWidth/2, targetX + popupWidth);
+          }
+        }
+        
+        // Ajusta a posição para evitar que o popup saia da tela
+        popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
+        popupY = Math.max(20, Math.min(popupY, viewportHeight - 200));
+        
+        setPopupPosition({
+          top: `${popupY}px`,
+          left: `${popupX}px`
+        });
       }
-      
-      // Calcula a direção do vetor entre os pontos
-      const dx = arrowPath ? targetX - clickX : 0;
-      const dy = arrowPath ? targetY - clickY : 0;
-      const angle = Math.atan2(dy, dx);
-      
-      // Calcula a posição central do popup
-      let popupX = clickX;
-      let popupY = clickY;
-      
-      // Obter a altura da barra de controle (aproximadamente)
-      const controlBarHeight = 150; // altura estimada da barra de controle
-      const safeBottomMargin = 20; // margem adicional de segurança
-      
-      // Garantir que o popup nunca fique abaixo da área segura
-      const maxY = viewportHeight - controlBarHeight - safeBottomMargin;
-      
-      // Ajusta a posição para garantir que o popup fique visível e acima da barra
-      popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
-      popupY = Math.min(popupY, maxY);
-      
-      setPopupPosition({
-        top: `${popupY}px`,
-        left: `${popupX}px`
-      });
     }
   }, [clickedPosition, arrowPath]);
 
@@ -198,7 +254,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       position: 'fixed',
       top: gameOver ? '50%' : popupPosition.top,
       left: gameOver ? '50%' : popupPosition.left,
-      transform: gameOver ? 'translate(-50%, -50%)' : 'translate(-50%, -100%)',
+      transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
       width: '90%',
       maxWidth: gameOver ? '600px' : '400px',
       background: gameOver ? 'rgba(0, 25, 0, 0.98)' : 'rgba(0, 25, 0, 0.95)',
