@@ -257,74 +257,89 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
       width: '90%',
       maxWidth: gameOver ? '600px' : '400px',
-      background: gameOver ? 'rgba(0, 25, 0, 0.98)' : 'rgba(0, 25, 0, 0.95)',
+      background: 'rgba(0, 25, 0, 0.98)',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
       color: 'white',
       zIndex: gameOver ? 9999 : 1001,
-      padding: gameOver ? 'clamp(35px, 7vw, 45px)' : 'clamp(20px, 4vw, 30px)',
-      borderRadius: '20px',
-      boxShadow: gameOver ? 
-        '0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(50, 205, 50, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)' :
-        '0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
-      border: gameOver ? '2px solid rgba(50, 205, 50, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+      padding: gameOver ? 'clamp(35px, 7vw, 45px)' : 'clamp(25px, 5vw, 35px)',
+      borderRadius: '24px',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(50, 205, 50, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+      border: '2px solid rgba(50, 205, 50, 0.3)',
       margin: '10px',
-      animation: gameOver ? 'fadeInScale 0.3s ease-out' : 'none'
+      animation: gameOver ? 'fadeInScale 0.3s ease-out' : 'slideIn 0.3s ease-out'
     }}>
       {!gameOver && clickedPosition && (
         <div style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 'clamp(20px, 4vw, 30px)',
+          gap: 'clamp(25px, 5vw, 35px)',
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
           {isCorrectNeighborhood ? (
-            // Layout para quando acerta o bairro
             <>
               <div style={{
-                textAlign: 'left',
+                textAlign: 'center',
                 color: '#fff',
-                fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
+                fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
                 fontFamily: "'Inter', sans-serif",
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '4px',
-                opacity: 0.95
+                gap: '8px',
+                opacity: 0.95,
+                background: 'rgba(50, 205, 50, 0.1)',
+                padding: 'clamp(15px, 3vw, 20px)',
+                borderRadius: '16px',
+                border: '1px solid rgba(50, 205, 50, 0.2)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
               }}>
                 <div style={{ 
-                  fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
+                  fontSize: 'clamp(1.3rem, 3.2vw, 1.6rem)', 
                   color: '#FFD700', 
-                  fontWeight: 600,
-                  textAlign: 'center'
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
                 }}>
-                   INCRÍVEL! Em {clickTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>!
+                   INCRÍVEL! 🎯
+                </div>
+                <div style={{
+                  fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
+                  color: '#fff',
+                  lineHeight: 1.4
+                }}>
+                  Em {clickTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>!
                 </div>
               </div>
 
               <div style={{
                 display: 'flex',
-                gap: 'clamp(20px, 4vw, 30px)',
+                gap: 'clamp(25px, 5vw, 35px)',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap'
               }}>
                 <div style={{
                   display: 'flex',
-                  gap: '2px',
+                  gap: '4px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap'
+                  flexWrap: 'wrap',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  padding: 'clamp(12px, 2.5vw, 16px)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     marginRight: 'clamp(8px, 2vw, 12px)',
                     opacity: 0.9
                   }}>🎯</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -333,7 +348,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(score)}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
                     marginLeft: 'clamp(4px, 1vw, 8px)',
@@ -342,19 +357,24 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 </div>
                 <div style={{
                   display: 'flex',
-                  gap: '2px',
+                  gap: '4px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap'
+                  flexWrap: 'wrap',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  padding: 'clamp(12px, 2.5vw, 16px)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     marginRight: 'clamp(8px, 2vw, 12px)',
                     opacity: 0.9
                   }}>⏱️</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -363,7 +383,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(1000 - (clickTime * 100))}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
                     marginLeft: 'clamp(4px, 1vw, 8px)',
@@ -373,22 +393,31 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               </div>
             </>
           ) : (
-            // Layout para quando erra o bairro
             <>
               <div style={{ 
-                fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
                 textAlign: 'center',
                 fontFamily: "'Inter', sans-serif",
-                opacity: 0.9
+                opacity: 0.9,
+                background: 'rgba(255, 255, 255, 0.05)',
+                padding: 'clamp(12px, 2.5vw, 16px)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
               }}>
                 Em {displayedTime.toFixed(2)} seg você clicou
               </div>
               <div style={{
                 display: 'flex',
-                gap: '2px',
+                gap: '4px',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
+                background: 'rgba(255, 255, 255, 0.05)',
+                padding: 'clamp(12px, 2.5vw, 16px)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
               }}>
                 {Math.round(displayedDistance)
                   .toString()
@@ -402,7 +431,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     />
                   ))}
                 <div style={{ 
-                  fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                  fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
                   fontFamily: "'Inter', sans-serif",
                   fontWeight: 500,
                   marginLeft: 'clamp(8px, 2vw, 12px)',
@@ -411,26 +440,31 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               </div>
               <div style={{
                 display: 'flex',
-                gap: 'clamp(20px, 4vw, 30px)',
+                gap: 'clamp(25px, 5vw, 35px)',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexWrap: 'wrap'
               }}>
                 <div style={{
                   display: 'flex',
-                  gap: '2px',
+                  gap: '4px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap'
+                  flexWrap: 'wrap',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  padding: 'clamp(12px, 2.5vw, 16px)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     marginRight: 'clamp(8px, 2vw, 12px)',
                     opacity: 0.9
                   }}>📍</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -439,7 +473,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(displayedDistance / 1000 * 10) / 10}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
                     marginLeft: 'clamp(4px, 1vw, 8px)',
@@ -448,19 +482,24 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 </div>
                 <div style={{
                   display: 'flex',
-                  gap: '2px',
+                  gap: '4px',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap'
+                  flexWrap: 'wrap',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  padding: 'clamp(12px, 2.5vw, 16px)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     marginRight: 'clamp(8px, 2vw, 12px)',
                     opacity: 0.9
                   }}>⏱️</div>
                   <div style={{ 
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                    fontSize: 'clamp(1.8rem, 4.5vw, 2.2rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 700,
                     color: '#fff',
@@ -469,7 +508,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     {Math.round(1000 - (clickTime * 100))}
                   </div>
                   <div style={{ 
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                    fontSize: 'clamp(1.1rem, 2.8vw, 1.3rem)',
                     fontFamily: "'Inter', sans-serif",
                     fontWeight: 500,
                     marginLeft: 'clamp(4px, 1vw, 8px)',
@@ -484,14 +523,19 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       {timeBonus > 0 && !gameOver && (
         <div style={{
-          marginTop: 'clamp(12px, 3vw, 20px)',
+          marginTop: 'clamp(15px, 3vw, 25px)',
           color: '#FFD700',
           fontWeight: 600,
-          fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
+          fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
           textAlign: 'center',
           fontFamily: "'Inter', sans-serif",
           animation: 'pulseText 1s infinite',
-          opacity: 0.95
+          opacity: 0.95,
+          background: 'rgba(255, 215, 0, 0.1)',
+          padding: 'clamp(12px, 2.5vw, 16px)',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 215, 0, 0.2)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
         }}>
           ⚡ +{timeBonus.toFixed(2)}s
         </div>
@@ -499,14 +543,19 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       {feedbackMessage && !gameOver && (
         <div style={{
-          marginTop: 'clamp(12px, 3vw, 20px)',
+          marginTop: 'clamp(15px, 3vw, 25px)',
           color: feedbackMessage.includes("Muito bem") ? '#FFD700' : '#FFD700',
           fontWeight: 600,
-          fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
+          fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
           textAlign: 'center',
           fontFamily: "'Inter', sans-serif",
           animation: feedbackMessage.includes("Muito bem") ? 'pulseText 1s infinite' : 'none',
-          opacity: 0.95
+          opacity: 0.95,
+          background: 'rgba(255, 215, 0, 0.1)',
+          padding: 'clamp(12px, 2.5vw, 16px)',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 215, 0, 0.2)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
         }}>
           {feedbackMessage}
         </div>
@@ -878,7 +927,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           }
           @keyframes pulseText {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
             100% { transform: scale(1); }
           }
           @keyframes fadeInScale {
@@ -895,6 +944,16 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
+          }
+          @keyframes slideIn {
+            0% {
+              opacity: 0;
+              transform: translate(-50%, -20px);
+            }
+            100% {
+              opacity: 1;
+              transform: translate(-50%, -50%);
+            }
           }
         `}
       </style>
