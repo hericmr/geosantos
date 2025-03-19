@@ -260,7 +260,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         }
         
         setTimeout(() => {
-          const duration = 6000;
+          const duration = 4000;
           const interval = 100;
           let timeElapsed = 0;
           
@@ -290,7 +290,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             }
             startNextRound(geoJsonData);
           }, duration);
-        }, 500);
+        }, 300);
         
         if (clickedFeature) {
           updateGameState({
@@ -533,16 +533,14 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         />
       )}
 
-      {!gameState.showFeedback && (
-        <GameControls
-          gameStarted={gameState.gameStarted}
-          currentNeighborhood={gameState.currentNeighborhood}
-          timeLeft={gameState.timeLeft}
-          score={gameState.score}
-          onStartGame={handleStartGame}
-          getProgressBarColor={getProgressBarColor}
-        />
-      )}
+      <GameControls
+        gameStarted={gameState.gameStarted}
+        currentNeighborhood={gameState.currentNeighborhood}
+        timeLeft={gameState.timeLeft}
+        score={gameState.score}
+        onStartGame={handleStartGame}
+        getProgressBarColor={getProgressBarColor}
+      />
 
       {gameState.showFeedback && (
         <FeedbackPanel
