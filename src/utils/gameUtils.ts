@@ -5,6 +5,31 @@ import { ScoreCalculation } from '../types/game';
 // Earth's radius in meters
 const EARTH_RADIUS = 6371000;
 
+// Calcula o ponto mais próximo em um segmento de reta
+export const closestPointOnSegment = (p: LatLng, v: LatLng, w: LatLng): LatLng => {
+  // Converte para coordenadas cartesianas para simplificar o cálculo
+  const vx = v.lng;
+  const vy = v.lat;
+  const wx = w.lng;
+  const wy = w.lat;
+  const px = p.lng;
+  const py = p.lat;
+
+  // Calcula o quadrado da distância do segmento
+  const l2 = Math.pow(wx - vx, 2) + Math.pow(wy - vy, 2);
+  
+  if (l2 === 0) return v; // v == w case
+  
+  // Calcula a projeção do ponto p no segmento
+  const t = Math.max(0, Math.min(1, ((px - vx) * (wx - vx) + (py - vy) * (wy - vy)) / l2));
+  
+  // Calcula o ponto mais próximo
+  return new LatLng(
+    vy + t * (wy - vy),
+    vx + t * (wx - vx)
+  );
+};
+
 export const calculateDistance = (point1: LatLng, point2: LatLng): number => {
   // Convert latitude and longitude to radians
   const lat1 = point1.lat * Math.PI / 180;

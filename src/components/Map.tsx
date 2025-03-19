@@ -10,12 +10,13 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
 import { MapProps } from '../types/game';
 import { useGameState } from '../hooks/useGameState';
-import { calculateDistance, calculateScore } from '../utils/gameUtils';
+import { calculateDistance, calculateScore, closestPointOnSegment } from '../utils/gameUtils';
 import { getProgressBarColor, getFeedbackMessage, FASE_1_BAIRROS, PHASE_TWO_TIME } from '../utils/gameConstants';
 
 import { AudioControls } from './ui/AudioControls';
 import { GameControls } from './ui/GameControls';
 import { FeedbackPanel } from './ui/FeedbackPanel';
+import { ScoreDisplay } from './ui/ScoreDisplay';
 import { MapEvents } from './game/MapEvents';
 import { GeoJSONLayer } from './game/GeoJSONLayer';
 
@@ -133,23 +134,22 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const handleMapClick = (latlng: L.LatLng) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
 
-    const clickDuration = 10 - gameState.timeLeft; // Tempo total (10s) menos o tempo restante
+    const clickDuration = 10 - gameState.timeLeft;
     updateGameState({ clickedPosition: latlng });
 
     if (geoJsonRef.current) {
-      let targetNeighborhoodCenter: L.LatLng | null = null;
+      let targetLayer: L.Layer | null = null;
       let clickedFeature: any = null;
       let clickedNeighborhood: string | null = null;
 
-      // Primeiro, encontramos o bairro alvo e seu centro
+      // Primeiro, encontramos o bairro alvo
       const layers = geoJsonRef.current.getLayers();
       layers.forEach((layer: L.Layer) => {
         const feature = (layer as any).feature;
-        const polygon = layer as L.Polygon;
         
         try {
           if (feature.properties?.NOME === gameState.currentNeighborhood) {
-            targetNeighborhoodCenter = polygon.getBounds().getCenter();
+            targetLayer = layer;
           }
         } catch (error) {
           console.error('Error checking target neighborhood:', error);
@@ -163,7 +163,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         
         try {
           if (polygon.getBounds().contains(latlng)) {
-            clickedFeature = feature;
             clickedNeighborhood = feature.properties?.NOME;
           }
         } catch (error) {
@@ -171,17 +170,37 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         }
       });
 
-      // Se encontramos o centro do bairro alvo, calculamos a distância e atualizamos o estado
-      if (targetNeighborhoodCenter) {
-        const distance = calculateDistance(latlng, targetNeighborhoodCenter);
+      // Se encontramos o bairro alvo, calculamos a distância até o ponto mais próximo
+      if (targetLayer) {
+        const polygon = targetLayer as L.Polygon;
+        const latLngs = polygon.getLatLngs()[0] as L.LatLng[];
         
-        // Se o clique estiver muito próximo ao centro (menos de 100 metros), considera como acerto
-        const isNearCenter = distance < 100;
+        // Encontra o ponto mais próximo do polígono
+        let minDistance = Infinity;
+        let closestPoint: L.LatLng = latlng;
+        
+        // Para cada segmento do polígono
+        for (let i = 0; i < latLngs.length; i++) {
+          const p1 = latLngs[i];
+          const p2 = latLngs[(i + 1) % latLngs.length];
+          
+          // Calcula o ponto mais próximo no segmento
+          const point = closestPointOnSegment(latlng, p1 as L.LatLng, p2 as L.LatLng);
+          const distance = calculateDistance(latlng, point);
+          
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestPoint = point;
+          }
+        }
+        
+        const distance = minDistance;
+        const isNearBorder = distance < 100;
         const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
         
         // Toca o som de feedback apropriado
         if (successSoundRef.current && errorSoundRef.current) {
-          if (isCorrectNeighborhood || isNearCenter) {
+          if (isCorrectNeighborhood || isNearBorder) {
             successSoundRef.current.currentTime = 0;
             successSoundRef.current.play().catch(e => console.log('Erro ao tocar som de sucesso:', e));
           } else {
@@ -190,9 +209,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           }
         }
         
-        // Se acertou o bairro correto ou está muito próximo ao centro, dá pontuação máxima
-        const score = (isCorrectNeighborhood || isNearCenter)
-          ? (isNearCenter ? 2000 : 1000) // Pontuação extra por acertar muito próximo ao centro
+        // Se acertou o bairro correto ou está muito próximo da borda, dá pontuação máxima
+        const score = (isCorrectNeighborhood || isNearBorder)
+          ? (isNearBorder ? 2000 : 1000) // Pontuação extra por acertar muito próximo da borda
           : calculateScore(distance, gameState.timeLeft).total;
         
         const newScore = gameState.score + score;
@@ -212,16 +231,27 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         const newNegativeSum = score < 0 ? negativeScoreSum + Math.abs(score) : negativeScoreSum;
         setNegativeScoreSum(newNegativeSum);
         
+        // Só mostra a seta se não acertou o bairro, apontando para o ponto mais próximo
+        const arrowPathToShow: [L.LatLng, L.LatLng] | null = (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null;
+        
+        // Mensagem de feedback personalizada baseada no tipo de acerto
+        let feedbackMessage = "";
+        if (isNearBorder) {
+          feedbackMessage = `🎯 ACERTO PERFEITO! Você acertou bem pertinho do bairro! Bônus de 2000 pontos!`;
+        } else if (isCorrectNeighborhood) {
+          feedbackMessage = `✨ EXCELENTE! Você acertou dentro do bairro! Bônus de 1000 pontos!`;
+        } else {
+          feedbackMessage = getFeedbackMessage(distance);
+        }
+        
         updateGameState({
           clickTime: clickDuration,
-          arrowPath: (isCorrectNeighborhood || isNearCenter) ? [latlng, targetNeighborhoodCenter] : [latlng, targetNeighborhoodCenter],
+          arrowPath: arrowPathToShow,
           score: newScore,
           showFeedback: true,
           feedbackOpacity: 1,
           feedbackProgress: 100,
-          feedbackMessage: (isCorrectNeighborhood || isNearCenter) 
-            ? "Acertou em cheio! Você é um verdadeiro caiçara!" 
-            : getFeedbackMessage(calculateDistance(latlng, targetNeighborhoodCenter)),
+          feedbackMessage: feedbackMessage,
           gameOver: newNegativeSum > 40
         });
 
@@ -453,6 +483,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         </div>
       )}
 
+      {gameState.gameStarted && (
+        <ScoreDisplay score={gameState.score} />
+      )}
+
       <MapContainer
         center={center}
         zoom={zoom}
@@ -471,20 +505,22 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             geoJsonRef={geoJsonRef}
           />
         )}
-        {gameState.clickedPosition && gameState.arrowPath && (
+        {gameState.clickedPosition && (
           <>
             <Marker
               position={gameState.clickedPosition}
               icon={bandeira2Icon}
             />
-            <Polyline
-              positions={gameState.arrowPath}
-              color="#FF0000"
-              weight={3}
-              opacity={0.8}
-              dashArray="10, 10"
-              className="arrow-path"
-            />
+            {gameState.arrowPath && (
+              <Polyline
+                positions={gameState.arrowPath}
+                color="#FF0000"
+                weight={3}
+                opacity={0.8}
+                dashArray="10, 10"
+                className="arrow-path"
+              />
+            )}
           </>
         )}
       </MapContainer>
@@ -524,6 +560,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           gameOver={gameState.gameOver}
           onPauseGame={handlePauseGame}
           score={gameState.score}
+          currentNeighborhood={gameState.currentNeighborhood}
         />
       )}
 

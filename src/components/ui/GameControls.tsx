@@ -28,14 +28,21 @@ export const GameControls: React.FC<GameControlsProps> = ({
           <h2 style={{ 
             fontSize: 'clamp(2rem, 5vw, 2.5rem)', 
             marginBottom: '1.2rem',
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 700,
+            letterSpacing: '0.5px',
+            color: '#32CD32'
           }}>O Caiçara</h2>
           <p style={{ 
             fontSize: 'clamp(1rem, 2.2vw, 1.2rem)', 
             marginBottom: '1.5rem',
-            opacity: 0.9
+            opacity: 0.9,
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 500,
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)'
           }}>
-            Aprenda a geografia de Santos. Encontre os bairros da cidade!
+            Quão bem você conheçe santos?!
           </p>
           <button 
             onClick={onStartGame}
@@ -104,19 +111,21 @@ export const GameControls: React.FC<GameControlsProps> = ({
               </span>
               <span style={{
                 color: 'white',
-                fontWeight: 'bold',
+                fontWeight: 600,
                 fontSize: 'clamp(1.4rem, 3.5vw, 2.4rem)',
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)',
                 textTransform: 'uppercase',
-                letterSpacing: '1px'
+                letterSpacing: '0.5px',
+                fontFamily: "'Inter', sans-serif"
               }}>
                 {currentNeighborhood}!
               </span>
               <span style={{ 
                 fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
-                color: '#FFD700'
+                color: '#FFD700',
+                opacity: 0
               }}>
-                {Math.round(score)} pts
+                {Math.round(timeLeft * 10) / 10}s
               </span>
             </div>
           </div>

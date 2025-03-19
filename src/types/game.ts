@@ -64,6 +64,7 @@ export interface FeedbackPanelProps {
   gameOver: boolean;
   onPauseGame: () => void;
   score: number;
+  currentNeighborhood: string;
 }
 
 export interface MapEventsProps {

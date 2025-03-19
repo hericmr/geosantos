@@ -10,17 +10,20 @@ export const getProgressBarColor = (timeLeft: number): string => {
   return '#FF4444';
 };
 
-export const getFeedbackMessage = (distance: number): string => {
-  if (distance < 10) return "Perfeito! Você é entende dos bairros!";
-  if (distance < 30) return "Impressionante! Você é tão santista que até o peixe te respeita!";
-  if (distance < 50) return "Brabo! Você é mais santista que pastel de vento da feira!";
-  if (distance < 100) return "Muito bom!";
-  if (distance < 300) return "Muito bom! Você já é praticamente um guia turístico de Santos!";
-  if (distance < 500) return "Legal! Manja mais muita gente!";
-  if (distance < 1000) return "Tá quase lá! Mais um pouco e você já vira morador de Santos!";
-  if (distance < 1500) return "Eita! Tá mais perdido que turista no mercado do peixe!";
-  if (distance < 2000) return "Vish! Tá mais perdido que doido na Ponta da Praia!";
-  return "Olha... errou só por mais de dois quilômetros, sabe nada!";
+export const getFeedbackMessage = (distance: number) => {
+  if (distance < 50) {
+    return "Muito bem! Você já é praticamente um guia turístico de Santos!";
+  } else if (distance < 100) {
+    return "Parabéns! Você conhece Santos como a palma da sua mão!";
+  } else if (distance < 200) {
+    return "Boa! Você manja dos paranauê de Santos!";
+  } else if (distance < 500) {
+    return "Legal! Continue explorando a cidade!";
+  } else if (distance < 1000) {
+    return "Quase lá! Tente se aproximar mais do bairro.";
+  } else {
+    return "Tá mais perdido que turista na feira do Gonzaga!";
+  }
 };
 
 export const FASE_1_BAIRROS = [

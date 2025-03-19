@@ -2,6 +2,72 @@ import React, { useEffect, useState } from 'react';
 import { FeedbackPanelProps } from '../../types/game';
 import { getFeedbackMessage } from '../../utils/gameConstants';
 
+const DigitRoller: React.FC<{ targetDigit: string; delay: number }> = ({ targetDigit, delay }) => {
+  const [isRolling, setIsRolling] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsRolling(false);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+
+  return (
+    <div style={{
+      background: '#000',
+      padding: '4px 2px',
+      borderRadius: '4px',
+      width: '40px',
+      height: '50px',
+      overflow: 'hidden',
+      position: 'relative',
+      border: '1px solid rgba(255,255,255,0.2)'
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        animation: isRolling ? 'rollDigits 0.3s linear infinite' : 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        transform: !isRolling ? `translateY(${-40 * parseInt(targetDigit)}px)` : undefined,
+        transition: !isRolling ? 'transform 0.3s ease-out' : undefined
+      }}>
+        {[...Array(10)].map((_, i) => (
+          <div key={i} style={{
+            height: '40px',
+            fontSize: '32px',
+            fontWeight: 700,
+            color: '#fff',
+            fontFamily: "'Inter', monospace",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {i}
+          </div>
+        ))}
+        {[0,1,2,3,4,5,6,7,8,9].map((n) => (
+          <div key={`repeat-${n}`} style={{
+            height: '40px',
+            fontSize: '32px',
+            fontWeight: 700,
+            color: '#fff',
+            fontFamily: "'Inter', monospace",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {n}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   showFeedback,
   clickedPosition,
@@ -15,7 +81,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   geoJsonData,
   gameOver,
   onPauseGame,
-  score
+  score,
+  currentNeighborhood
 }) => {
   const [displayedDistance, setDisplayedDistance] = useState(0);
   const [displayedTime, setDisplayedTime] = useState(0);
@@ -56,6 +123,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
   if (!showFeedback) return null;
 
+  // Verifica se o clique foi dentro do bairro correto (quando não há seta)
+  const isCorrectNeighborhood = !arrowPath;
+
   return (
     <div style={{
       position: 'fixed',
@@ -66,20 +136,81 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       backdropFilter: 'blur(10px)',
       WebkitBackdropFilter: 'blur(10px)',
       color: 'white',
-      textAlign: 'center',
       zIndex: 1001,
-      padding: '15px'
+      padding: '20px'
     }}>
-      {!gameOver && clickedPosition && arrowPath && (
+      {!gameOver && clickedPosition && (
         <div style={{
-          fontSize: window.innerWidth < 768 ? '0.8em' : '1em',
-          color: '#FFD700',
-          marginBottom: '10px',
-          opacity: 0.8
+          display: 'flex',
+          alignItems: 'center',
+          gap: '30px',
+          justifyContent: 'center'
         }}>
-          {calculateScore(calculateDistance(clickedPosition, arrowPath[1]), clickTime).total >= 0 
-            ? `Faltam ${Math.max(0, 5000 - score)} pontos para a fase 2` 
-            : null}
+          {!isCorrectNeighborhood && (
+            <div>
+              <div style={{
+                display: 'flex',
+                gap: '2px',
+                marginBottom: '5px'
+              }}>
+                {Math.round(displayedDistance)
+                  .toString()
+                  .padStart(5, '0')
+                  .split('')
+                  .map((digit, index) => (
+                    <DigitRoller 
+                      key={index} 
+                      targetDigit={digit} 
+                      delay={500 + (index * 300)} 
+                    />
+                  ))}
+              </div>
+              <div style={{ 
+                fontSize: '1rem',
+                textAlign: 'center',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 500
+              }}>metros</div>
+            </div>
+          )}
+
+          <div style={{
+            textAlign: 'left',
+            color: '#fff',
+            fontSize: '1.2rem',
+            fontFamily: "'Inter', sans-serif",
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px'
+          }}>
+            {!isCorrectNeighborhood ? (
+              <>
+                <div>Em {displayedTime.toFixed(2)} seg você clicou</div>
+                <div>{Math.round(displayedDistance)} metros</div>
+                <div>do bairro <span style={{ color: '#32CD32' }}>{currentNeighborhood}</span></div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: '1.4rem', color: '#FFD700' }}>🎯 INCRÍVEL! Em {displayedTime.toFixed(2)} segundos</div>
+                <div style={{ fontSize: '1.4rem' }}>você acertou o bairro</div>
+                <div style={{ fontSize: '1.6rem', color: '#32CD32', fontWeight: 'bold' }}>{currentNeighborhood}!</div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {feedbackMessage && !gameOver && (
+        <div style={{
+          marginTop: '15px',
+          color: feedbackMessage.includes("Muito bem") ? '#FFD700' : '#FFD700',
+          fontWeight: 600,
+          fontSize: '1.3rem',
+          textAlign: 'center',
+          fontFamily: "'Inter', sans-serif",
+          animation: feedbackMessage.includes("Muito bem") ? 'pulseText 1s infinite' : 'none'
+        }}>
+          {feedbackMessage}
         </div>
       )}
 
@@ -87,9 +218,10 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         <h2 style={{ 
           color: 'white', 
           marginBottom: '20px', 
-          fontSize: window.innerWidth < 768 ? '1.5em' : '2em',
-          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
-          padding: window.innerWidth < 768 ? '0 10px' : '0'
+          fontSize: '2rem',
+          textAlign: 'center',
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 700
         }}>
           {feedbackMessage === "Tempo esgotado!" 
             ? "Acabou o tempo! Tá mals!"
@@ -99,82 +231,16 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       <div style={{
         display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        gap: '20px',
-        marginBottom: '15px',
-        padding: '10px',
-        borderRadius: '10px'
-      }}>
-        <div>
-          <div style={{ 
-            fontSize: window.innerWidth < 768 ? '24px' : '32px', 
-            fontWeight: 'bold', 
-            color: '#32CD32',
-            fontFamily: 'monospace',
-            letterSpacing: '2px',
-            textShadow: isAnimating ? '0 0 5px #32CD32' : 'none',
-            transition: 'text-shadow 0.1s ease-in-out'
-          }}>
-            {Math.round(displayedDistance).toString().padStart(5, '0')}
-          </div>
-          <div style={{ color: '#32CD32', fontSize: window.innerWidth < 768 ? '0.8em' : '1em', marginTop: '5px' }}>metros</div>
-        </div>
-
-        {feedbackMessage && !gameOver && (
-          <div style={{ 
-            fontSize: window.innerWidth < 768 ? '1em' : (feedbackMessage.includes("fase 2") ? '2em' : '1.5em'),
-            color: feedbackMessage.includes("fase 2") ? '#32CD32' : '#FFD700',
-            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
-            fontWeight: 'bold',
-            animation: feedbackMessage.includes("fase 2") ? 'pulseText 1s infinite' : 'none',
-            flex: '1',
-            maxWidth: window.innerWidth < 768 ? '40%' : '50%',
-            textAlign: 'center'
-          }}>
-            {feedbackMessage}
-          </div>
-        )}
-
-        <div>
-          <div style={{ 
-            fontSize: window.innerWidth < 768 ? '24px' : '32px', 
-            fontWeight: 'bold', 
-            color: '#FFA500',
-            fontFamily: 'monospace',
-            letterSpacing: '2px',
-            textShadow: isAnimating ? '0 0 5px #FFA500' : 'none',
-            transition: 'text-shadow 0.1s ease-in-out'
-          }}>
-            {displayedTime.toFixed(2)}
-          </div>
-          <div style={{ color: '#FFA500', fontSize: window.innerWidth < 768 ? '0.8em' : '1em', marginTop: '5px' }}>segundos</div>
-        </div>
-      </div>
-
-      {clickedPosition && arrowPath && (
-        <div style={{ 
-          fontSize: window.innerWidth < 768 ? '20px' : '24px', 
-          color: gameOver ? '#FF4444' : '#FFD700',
-          marginBottom: '15px',
-          fontWeight: 'bold'
-        }}>
-          Pontuação: {calculateScore(calculateDistance(clickedPosition, arrowPath[1]), clickTime).total}
-        </div>
-      )}
-
-      <div style={{
-        display: 'flex',
-        gap: window.innerWidth < 768 ? '5px' : '10px',
+        gap: '10px',
         justifyContent: 'center',
-        marginBottom: '15px'
+        marginTop: '15px'
       }}>
         {!gameOver && (
           <button
             onClick={onPauseGame}
             style={{
-              padding: window.innerWidth < 768 ? '6px 15px' : '8px 20px',
-              fontSize: window.innerWidth < 768 ? '0.9em' : '1em',
+              padding: '8px 20px',
+              fontSize: '1rem',
               background: '#FFA500',
               color: 'white',
               border: 'none',
@@ -198,8 +264,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             }
           }}
           style={{
-            padding: window.innerWidth < 768 ? '6px 15px' : '8px 20px',
-            fontSize: window.innerWidth < 768 ? '0.9em' : '1em',
+            padding: '8px 20px',
+            fontSize: '1rem',
             background: gameOver ? '#FF4444' : '#32CD32',
             color: 'white',
             border: 'none',
@@ -220,7 +286,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         height: '4px',
         background: '#2A2A2A',
         overflow: 'hidden',
-        position: 'relative'
+        position: 'relative',
+        marginTop: '15px'
       }}>
         <div style={{
           width: `${feedbackProgress}%`,
@@ -235,6 +302,14 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       <style>
         {`
+          @keyframes rollDigits {
+            0% {
+              transform: translateY(-400px);
+            }
+            100% {
+              transform: translateY(0);
+            }
+          }
           @keyframes pulseText {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
