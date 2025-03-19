@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FeedbackPanelProps } from '../../types/game';
-import { getFeedbackMessage } from '../../utils/gameConstants';
+import { getFeedbackMessage, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS } from '../../utils/gameConstants';
 
 const DigitRoller: React.FC<{ targetDigit: string; delay: number }> = ({ targetDigit, delay }) => {
   const [isRolling, setIsRolling] = useState(true);
@@ -93,6 +93,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [popupPosition, setPopupPosition] = useState({ top: '20px', left: '20px' });
+  const [timeBonus, setTimeBonus] = useState(0);
 
   useEffect(() => {
     if (showFeedback && clickedPosition) {
@@ -103,6 +104,17 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       setDisplayedDistance(0);
       setDisplayedTime(0);
       setFeedbackMessage(getFeedbackMessage(distance));
+
+      // Calcula o bônus de tempo baseado na pontuação
+      let bonus = 0;
+      if (score.total >= TIME_BONUS_THRESHOLDS.EXCELLENT) {
+        bonus = TIME_BONUS_AMOUNTS.EXCELLENT;
+      } else if (score.total >= TIME_BONUS_THRESHOLDS.GOOD) {
+        bonus = TIME_BONUS_AMOUNTS.GOOD;
+      } else if (score.total >= TIME_BONUS_THRESHOLDS.FAIR) {
+        bonus = TIME_BONUS_AMOUNTS.FAIR;
+      }
+      setTimeBonus(bonus);
 
       const duration = 2000; // 2 segundos de animação
       const steps = 60; // 60 passos para animação suave
@@ -217,7 +229,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   fontWeight: 600,
                   textAlign: 'center'
                 }}>
-                  🎯 INCRÍVEL! Em {displayedTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{currentNeighborhood}</span>!
+                   INCRÍVEL! Em {displayedTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{currentNeighborhood}</span>!
                 </div>
               </div>
 
@@ -346,7 +358,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     fontFamily: "'Inter', sans-serif",
                     marginRight: 'clamp(8px, 2vw, 12px)',
                     opacity: 0.9
-                  }}>🎯</div>
+                  }}>📍</div>
                   <div style={{ 
                     fontSize: 'clamp(1.5rem, 4vw, 2rem)',
                     fontFamily: "'Inter', sans-serif",
@@ -354,7 +366,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     color: '#fff',
                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
                   }}>
-                    {Math.round(score)}
+                    {Math.round(displayedDistance / 1000 * 10) / 10}
                   </div>
                   <div style={{ 
                     fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
@@ -362,7 +374,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     fontWeight: 500,
                     marginLeft: 'clamp(4px, 1vw, 8px)',
                     opacity: 0.9
-                  }}>pts</div>
+                  }}>km</div>
                 </div>
                 <div style={{
                   display: 'flex',
@@ -397,6 +409,21 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {timeBonus > 0 && !gameOver && (
+        <div style={{
+          marginTop: 'clamp(12px, 3vw, 20px)',
+          color: '#FFD700',
+          fontWeight: 600,
+          fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
+          textAlign: 'center',
+          fontFamily: "'Inter', sans-serif",
+          animation: 'pulseText 1s infinite',
+          opacity: 0.95
+        }}>
+          ⚡ +{timeBonus.toFixed(2)}s
         </div>
       )}
 

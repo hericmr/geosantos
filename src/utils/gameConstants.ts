@@ -3,23 +3,36 @@ export const PHASE_TWO_TIME = 5; // 5 seconds per round in phase 2
 export const TIME_BONUS = 1.5; // Time bonus for correct neighborhood
 export const MAX_DISTANCE_METERS = 2000; // Maximum distance considered for scoring
 
-export const getProgressBarColor = (timeLeft: number): string => {
-  const percentage = (timeLeft / ROUND_TIME) * 100;
+// Constantes para o sistema de bônus de tempo
+export const TIME_BONUS_THRESHOLDS = {
+  EXCELLENT: 2000, // Pontuação excelente
+  GOOD: 1500,      // Pontuação boa
+  FAIR: 1000       // Pontuação razoável
+};
+
+export const TIME_BONUS_AMOUNTS = {
+  EXCELLENT: 1.5,  // 1.5 segundos de bônus
+  GOOD: 1.0,       // 1 segundo de bônus
+  FAIR: 0.5        // 0.5 segundos de bônus
+};
+
+export const getProgressBarColor = (timeLeft: number, roundInitialTime: number): string => {
+  const percentage = (timeLeft / roundInitialTime) * 100;
   if (percentage > 60) return '#00FF66';
   if (percentage > 30) return '#FFD700';
   return '#FF4444';
 };
 
-export const getFeedbackMessage = (distance: number) => {
-  if (distance < 50) {
+export const getFeedbackMessage = (distance: number): string => {
+  const distanceKm = distance / 1000;
+  
+  if (distanceKm < 0.5) {
     return "";
-  } else if (distance < 100) {
+  } else if (distanceKm < 1) {
     return "";
-  } else if (distance < 200) {
+  } else if (distanceKm < 2) {
     return "";
-  } else if (distance < 500) {
-    return "";
-  } else if (distance < 1000) {
+  } else if (distanceKm < 5) {
     return "";
   } else {
     return "";
