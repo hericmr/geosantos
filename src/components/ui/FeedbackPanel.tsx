@@ -212,8 +212,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         const dy = arrowPath ? targetY - clickY : 0;
         
         // Deslocamento padrão para a direita e para cima
-        const offsetX = 100; // pixels para a direita
-        const offsetY = -150; // pixels para cima
+        const offsetX = 200; // pixels para a direita
+        const offsetY = -200; // pixels para cima
         
         // Calcula a posição inicial do popup
         let popupX = clickX + offsetX;
@@ -226,9 +226,10 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           const popupWidth = 400; // largura estimada do popup
           
           // Se o popup ficaria por cima da seta ou do bairro correto
-          if (Math.abs(popupY - targetY) < popupHeight) {
-            // Move o popup mais para a direita
-            popupX = Math.max(popupX + popupWidth/2, targetX + popupWidth);
+          if (Math.abs(popupY - targetY) < popupHeight || Math.abs(popupX - targetX) < popupWidth) {
+            // Move o popup mais para a direita e para cima
+            popupX = Math.max(popupX + popupWidth, targetX + popupWidth);
+            popupY = Math.min(popupY - popupHeight/2, targetY - popupHeight);
           }
         }
         
