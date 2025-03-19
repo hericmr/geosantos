@@ -159,16 +159,20 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       const dy = arrowPath ? targetY - clickY : 0;
       const angle = Math.atan2(dy, dx);
       
-      // Define a distância do popup em relação ao ponto clicado
-      const distance = 20; // pixels
+      // Calcula a posição central do popup
+      let popupX = clickX;
+      let popupY = clickY;
       
-      // Calcula a posição do popup perpendicular à linha entre os pontos
-      let popupX = clickX + Math.cos(angle + Math.PI/2) * distance;
-      let popupY = clickY + Math.sin(angle + Math.PI/2) * distance;
+      // Obter a altura da barra de controle (aproximadamente)
+      const controlBarHeight = 150; // altura estimada da barra de controle
+      const safeBottomMargin = 20; // margem adicional de segurança
       
-      // Ajusta a posição para garantir que o popup fique visível
+      // Garantir que o popup nunca fique abaixo da área segura
+      const maxY = viewportHeight - controlBarHeight - safeBottomMargin;
+      
+      // Ajusta a posição para garantir que o popup fique visível e acima da barra
       popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
-      popupY = Math.min(Math.max(popupY, 100), viewportHeight - 200);
+      popupY = Math.min(popupY, maxY);
       
       setPopupPosition({
         top: `${popupY}px`,
@@ -187,7 +191,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       position: 'fixed',
       top: gameOver ? '50%' : popupPosition.top,
       left: gameOver ? '50%' : popupPosition.left,
-      transform: 'translate(-50%, -50%)',
+      transform: gameOver ? 'translate(-50%, -50%)' : 'translate(-50%, -100%)',
       width: '90%',
       maxWidth: gameOver ? '600px' : '400px',
       background: gameOver ? 'rgba(0, 25, 0, 0.98)' : 'rgba(0, 25, 0, 0.95)',
