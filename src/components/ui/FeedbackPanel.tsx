@@ -213,7 +213,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         
         // Calcula a posição inicial do popup (canto superior direito da tela)
         let popupX = viewportWidth - popupWidth - 20; // 20px de margem da borda
-        let popupY = 20; // 20px do topo
+        let popupY = viewportHeight - popupHeight - 100; // 100px do fundo da tela
         
         // Verifica se o popup ficaria por cima de algum ponto importante
         if (arrowPath) {
@@ -233,7 +233,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             popupY + popupHeight > targetY - 50
           );
           
-          // Se estiver sobrepondo algum ponto, move para o canto superior esquerdo
+          // Se estiver sobrepondo algum ponto, move para o canto inferior esquerdo
           if (isOverClick || isOverTarget) {
             popupX = 20; // 20px da borda esquerda
           }
