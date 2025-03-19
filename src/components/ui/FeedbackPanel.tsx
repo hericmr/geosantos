@@ -617,15 +617,15 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               {score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
                score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
                score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
-               score >= 8000 ? "MESTRE DOS BAIRROS! 🧠 Você é um GPS ambulante!" :
-               score >= 5000 ? "IMPRESSIONANTE! 🌟 Quase um GPS humano!!" :
+               score >= 8000 ? "MESTRE DOS BAIRROS!  Você é um GPS ambulante!" :
+               score >= 5000 ? "IMPRESSIONANTE!  Quase um GPS humano!!" :
                score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
-               score >= 3000 ? "SANTISTA DE CORAÇÃO! ❤️ Você manja dos bairros!" :
-               score >= 2000 ? "MUITO BOM! 👏 Você é deve ter ido em algumas aulas de geografia!" :
-               score >= 1000 ? "BOM JOGO! 👍 Mas ainda precisa andar mais na zona noroeste!" :
-               score >= 500 ? "QUASE LÁ! 🎯 Dá um role no bondinho pra pegar mais dicas!" :
-               score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
-               "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!"}
+               score >= 3000 ? "SANTISTA DE CORAÇÃO!  Você manja dos bairros!" :
+               score >= 2000 ? "MUITO BOM!  Você é deve ter ido em algumas aulas de geografia!" :
+               score >= 1000 ? "BOM JOGO!  Mas ainda precisa andar mais pela zona noroeste!" :
+               score >= 500 ? "QUASE LÁ!  Dá um role no bondinho pra pegar umas dicas!" :
+               score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! " :
+               "Eita! Parece que você não sabe nada de Santos!"}
             </div>
           </div>
 
@@ -680,17 +680,17 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
                   score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
                   score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
-                  score >= 8000 ? "MESTRE DOS BAIRROS! 🧠 Você é um GPS ambulante!" :
-                  score >= 5000 ? "IMPRESSIONANTE! 🌟 Quase um GPS humano!!" :
+                  score >= 8000 ? "MESTRE DOS BAIRROS! Você é um GPS ambulante!" :
+                  score >= 5000 ? "IMPRESSIONANTE!  Quase um GPS humano!!" :
                   score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
-                  score >= 3000 ? "SANTISTA DE CORAÇÃO! ❤️ Você manja dos bairros!" :
-                  score >= 2000 ? "MUITO BOM! 👏 Você é deve ter ido em algumas aulas de geografia!" :
-                  score >= 1000 ? "BOM JOGO! 👍 Mas ainda precisa andar mais na zona noroeste!" :
-                  score >= 500 ? "QUASE LÁ! 🎯 Dá um role no bondinho pra pegar mais dicas!" :
-                  score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! 🏖️" :
-                  "Game Over! 🚨 Eita! Parece que você não sabe nada de Santos!";
+                  score >= 3000 ? "SANTISTA DE CORAÇÃO!  Você manja dos bairros!" :
+                  score >= 2000 ? "MUITO BOM!  Você é deve ter ido em algumas aulas de geografia!" :
+                  score >= 1000 ? "BOM JOGO! Mas ainda precisa andar mais na zona noroeste!" :
+                  score >= 500 ? "QUASE LÁ!  Dá um role no bondinho pra pegar mais dicas!" :
+                  score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! " :
+                  "Eita! Parece que você não sabe nada de Santos!";
                   
-                const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos - Nível ${score >= 20000 ? 12 : score >= 16000 ? 10 : score >= 12000 ? 8 : score >= 8000 ? 6 : score >= 5000 ? 4 : score >= 3000 ? 3 : score >= 1000 ? 2 : 1}! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
+                const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
                 
                 if (navigator.share) {
                   navigator.share({
