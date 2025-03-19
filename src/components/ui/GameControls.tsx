@@ -107,7 +107,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
               }
 
               .fade-out {
-                animation: fadeOut 0.15s ease-out forwards;
+                animation: fadeOut 0.3s ease-out forwards;
               }
             `}
           </style>
@@ -154,7 +154,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 parent.classList.add('fade-out');
                 setTimeout(() => {
                   onStartGame();
-                }, 200);
+                }, 300);
               }
             }}
             style={{
