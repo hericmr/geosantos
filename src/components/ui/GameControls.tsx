@@ -315,7 +315,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
               fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)', 
               fontFamily: "'Inter', sans-serif",
               fontWeight: 600,
-              color: '#000000',
+              color: '#FFFFFF',
               lineHeight: 1.2,
               margin: 0
             }}>
