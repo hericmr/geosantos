@@ -588,7 +588,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   textAlign: 'center',
                   fontFamily: "'Inter', sans-serif"
                 }}>
-                  Seu QI de viajante:
+                  Sua Nota:
                 </span>
                 <span style={{
                   fontSize: 'clamp(1.8rem, 4vw, 2.2rem)',
@@ -657,22 +657,21 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 transition: 'all 0.2s ease',
                 fontFamily: "'Inter', sans-serif",
                 fontWeight: 700,
-                boxShadow: '0 4px 15px rgba(255, 165, 0, 0.3)',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                transform: 'translateY(0)',
-                animation: 'floatButton 2s infinite'
+                transform: 'translateY(0)'
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.background = '#FF8C00';
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 165, 0, 0.4)';
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.2)';
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.background = '#FFA500';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 165, 0, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
               }}
             >
               <span>📱</span> Compartilhar
@@ -680,7 +679,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             
             <button
               onClick={() => {
-                window.open('https://blog.caicara.app', '_blank');
+                window.open('https://hericmr.github.io/me', '_blank');
               }}
               style={{
                 padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
@@ -693,7 +692,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 transition: 'all 0.2s ease',
                 fontFamily: "'Inter', sans-serif",
                 fontWeight: 700,
-                boxShadow: '0 4px 15px rgba(76, 175, 80, 0.3)',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
@@ -701,15 +700,15 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               onMouseOver={(e) => {
                 e.currentTarget.style.background = '#45a049';
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(76, 175, 80, 0.4)';
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.2)';
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.background = '#4CAF50';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(76, 175, 80, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
               }}
             >
-              <span>📝</span> Blog Caiçara
+              <span>📝</span> Héric Moura
             </button>
           </div>
         </div>
@@ -755,7 +754,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           style={{
             padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
             fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-            background: gameOver ? '#FF4444' : '#32CD32',
+            background: gameOver ? '#FF0000' : '#32CD32',
             color: 'white',
             border: 'none',
             borderRadius: '5px',
@@ -765,11 +764,11 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
             position: 'relative',
             overflow: 'hidden',
-            width: 'clamp(120px, 25vw, 150px)',
-            height: 'clamp(40px, 8vw, 50px)'
+            width: gameOver ? 'clamp(150px, 30vw, 180px)' : 'clamp(120px, 25vw, 150px)',
+            height: gameOver ? 'clamp(50px, 10vw, 60px)' : 'clamp(40px, 8vw, 50px)'
           }}
-          onMouseOver={(e) => e.currentTarget.style.background = gameOver ? '#FF0000' : '#28a745'}
-          onMouseOut={(e) => e.currentTarget.style.background = gameOver ? '#FF4444' : '#32CD32'}
+          onMouseOver={(e) => e.currentTarget.style.background = gameOver ? '#CC0000' : '#28a745'}
+          onMouseOut={(e) => e.currentTarget.style.background = gameOver ? '#FF0000' : '#32CD32'}
         >
           <div style={{
             position: 'absolute',
@@ -796,7 +795,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           <span style={{
             position: 'relative',
             zIndex: 2
-          }}>{gameOver ? 'Jogar Novamente' : 'Próximo'}</span>
+          }}>{gameOver ? 'Tente Outra Vez' : 'Próximo'}</span>
         </button>
       </div>
 
@@ -829,11 +828,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
-          }
-          @keyframes floatButton {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0); }
           }
         `}
       </style>
