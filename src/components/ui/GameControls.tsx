@@ -43,68 +43,176 @@ export const GameControls: React.FC<GameControlsProps> = ({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 'clamp(15px, 3vw, 25px)'
+          gap: 'clamp(15px, 3vw, 25px)',
+          padding: 'clamp(20px, 4vw, 40px) 0'
         }}>
-          <h2 style={{ 
-            fontSize: 'clamp(2.2rem, 6vw, 3rem)', 
-            marginBottom: '0.5rem',
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.4)',
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            color: '#32CD32',
-            lineHeight: 1.2
-          }}>O Caiçara</h2>
-          <p style={{ 
-            fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)', 
-            marginBottom: '0.5rem',
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 600,
-            color: '#FFD700',
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-            lineHeight: 1.4,
-            maxWidth: '90%'
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            background: 'rgba(0, 0, 0, 0.3)',
+            padding: 'clamp(15px, 4vw, 25px)',
+            borderRadius: '15px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            width: '90%',
+            maxWidth: '600px',
+            marginBottom: 'clamp(10px, 2vw, 20px)'
           }}>
-            Quão bem você conhece a sua cidade?
-          </p>
-          <button 
-            onClick={onStartGame}
-            style={{
-              padding: 'clamp(15px, 3vw, 20px) clamp(30px, 7vw, 40px)',
-              fontSize: 'clamp(1.3rem, 4vw, 1.6rem)',
-              background: 'linear-gradient(145deg, #38E54D, #2EBD41)',
-              border: 'none',
-              borderRadius: '12px',
-              color: 'white',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              touchAction: 'manipulation',
-              boxShadow: '0 4px 15px rgba(46, 189, 65, 0.3)',
-              minWidth: 'clamp(200px, 60vw, 300px)',
-              minHeight: 'clamp(60px, 12vw, 80px)',
+            <h2 style={{ 
+              fontSize: 'clamp(2.5rem, 7vw, 3.5rem)', 
+              marginBottom: '10px',
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.6)',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 800,
+              letterSpacing: '0.5px',
+              color: '#32CD32',
+              lineHeight: 1.2,
+              textAlign: 'center',
+              animation: 'titlePulse 2s infinite'
+            }}>
+              <span style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', verticalAlign: 'middle', marginRight: '8px' }}>🌊</span>
+              O Caiçara
+              <span style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', verticalAlign: 'middle', marginLeft: '8px' }}>🗺️</span>
+            </h2>
+            
+            <p style={{
+              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 500,
+              color: '#FFFFFF',
+              opacity: 0.9,
+              textAlign: 'center',
+              margin: '0 0 15px 0'
+            }}>
+              Desafie seus conhecimentos geográficos!
+            </p>
+            
+            <p style={{ 
+              fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)', 
+              marginBottom: '20px',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 600,
+              color: '#FFD700',
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+              lineHeight: 1.4,
+              maxWidth: '90%',
+              textAlign: 'center'
+            }}>
+              Quão bem você conhece a sua cidade?
+            </p>
+          </div>
+          
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'clamp(10px, 2vw, 15px)',
+            width: '90%',
+            maxWidth: '600px'
+          }}>
+            <div style={{
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(46, 189, 65, 0.4)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(46, 189, 65, 0.3)';
-            }}
-            onTouchStart={(e) => {
-              e.currentTarget.style.transform = 'scale(0.95)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(46, 189, 65, 0.2)';
-            }}
-            onTouchEnd={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(46, 189, 65, 0.3)';
-            }}
-          >
-            Iniciar Jogo
-          </button>
+              gap: 'clamp(15px, 3vw, 25px)',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              marginBottom: 'clamp(15px, 3vw, 25px)'
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                background: 'rgba(0, 0, 0, 0.3)',
+                padding: 'clamp(10px, 2vw, 15px)',
+                borderRadius: '10px',
+                maxWidth: '160px'
+              }}>
+                <span style={{ fontSize: 'clamp(1.8rem, 4vw, 2.2rem)', marginBottom: '5px' }}>🎯</span>
+                <span style={{ fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', textAlign: 'center', fontWeight: 600 }}>Localize os bairros</span>
+              </div>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                background: 'rgba(0, 0, 0, 0.3)',
+                padding: 'clamp(10px, 2vw, 15px)',
+                borderRadius: '10px',
+                maxWidth: '160px'
+              }}>
+                <span style={{ fontSize: 'clamp(1.8rem, 4vw, 2.2rem)', marginBottom: '5px' }}>⏱️</span>
+                <span style={{ fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', textAlign: 'center', fontWeight: 600 }}>Contra o relógio</span>
+              </div>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                background: 'rgba(0, 0, 0, 0.3)',
+                padding: 'clamp(10px, 2vw, 15px)',
+                borderRadius: '10px',
+                maxWidth: '160px'
+              }}>
+                <span style={{ fontSize: 'clamp(1.8rem, 4vw, 2.2rem)', marginBottom: '5px' }}>🏆</span>
+                <span style={{ fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', textAlign: 'center', fontWeight: 600 }}>Ganhe pontos</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={onStartGame}
+              style={{
+                padding: 'clamp(15px, 3vw, 20px) clamp(30px, 7vw, 40px)',
+                fontSize: 'clamp(1.3rem, 4vw, 1.6rem)',
+                background: 'linear-gradient(145deg, #38E54D, #2EBD41)',
+                border: 'none',
+                borderRadius: '12px',
+                color: 'white',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                touchAction: 'manipulation',
+                boxShadow: '0 4px 15px rgba(46, 189, 65, 0.3)',
+                minWidth: 'clamp(200px, 60vw, 300px)',
+                minHeight: 'clamp(60px, 12vw, 80px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                animation: 'float 3s ease-in-out infinite'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px) scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(46, 189, 65, 0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(46, 189, 65, 0.3)';
+              }}
+              onTouchStart={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(46, 189, 65, 0.2)';
+              }}
+              onTouchEnd={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(46, 189, 65, 0.3)';
+              }}
+            >
+              <span style={{ marginRight: '10px', fontSize: 'clamp(1.5rem, 3.5vw, 1.8rem)' }}>🎮</span> Iniciar Jogo
+            </button>
+          </div>
+          
+          <style>
+            {`
+              @keyframes float {
+                0% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+                100% { transform: translateY(0); }
+              }
+              @keyframes titlePulse {
+                0% { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); }
+                50% { text-shadow: 2px 2px 15px rgba(50, 205, 50, 0.5); }
+                100% { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); }
+              }
+            `}
+          </style>
         </div>
       ) : (
         <div style={{
