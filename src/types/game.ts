@@ -11,6 +11,9 @@ export interface GameState {
   currentNeighborhood: string;
   score: number;
   timeLeft: number;
+  totalTimeLeft: number;
+  roundInitialTime: number;
+  roundNumber: number;
   gameOver: boolean;
   gameStarted: boolean;
   isCountingDown: boolean;
@@ -26,6 +29,7 @@ export interface GameState {
   clickTime: number;
   feedbackOpacity: number;
   feedbackProgress: number;
+  timeBonus: number;
 }
 
 export interface ScoreCalculation {
@@ -45,9 +49,12 @@ export interface GameControlsProps {
   gameStarted: boolean;
   currentNeighborhood: string;
   timeLeft: number;
+  totalTimeLeft: number;
+  roundNumber: number;
+  roundInitialTime: number;
   score: number;
   onStartGame: () => void;
-  getProgressBarColor: (timeLeft: number) => string;
+  getProgressBarColor: (timeLeft: number, roundInitialTime: number) => string;
 }
 
 export interface FeedbackPanelProps {
@@ -59,7 +66,7 @@ export interface FeedbackPanelProps {
   onNextRound: (geoJsonData: FeatureCollection) => void;
   calculateDistance: (point1: LatLng, point2: LatLng) => number;
   calculateScore: (distance: number, timeLeft: number) => ScoreCalculation;
-  getProgressBarColor: (timeLeft: number) => string;
+  getProgressBarColor: (timeLeft: number, roundInitialTime: number) => string;
   geoJsonData: FeatureCollection | null;
   gameOver: boolean;
   onPauseGame: () => void;

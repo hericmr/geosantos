@@ -11,9 +11,27 @@ export const TIME_BONUS_THRESHOLDS = {
 };
 
 export const TIME_BONUS_AMOUNTS = {
-  EXCELLENT: 1.5,  // 1.5 segundos de bônus
-  GOOD: 1.0,       // 1 segundo de bônus
-  FAIR: 0.5        // 0.5 segundos de bônus
+  EXCELLENT: 2.0,  // 2 segundos de bônus
+  GOOD: 1.5,       // 1.5 segundos de bônus
+  FAIR: 1.0        // 1 segundo de bônus
+};
+
+// Função para calcular o bônus de tempo baseado na pontuação
+export const calculateTimeBonus = (score: number): number => {
+  // Pontuação máxima possível é 1500 (1000 de distância + 500 de tempo)
+  const maxScore = 1500;
+  const maxBonus = 2.0; // Máximo de 2 segundos de bônus
+  
+  // Calcula o bônus proporcional à pontuação
+  // Quanto maior a pontuação, maior o bônus
+  // Pontuação mínima para receber bônus é 500
+  if (score < 500) return 0;
+  
+  // Normaliza a pontuação entre 0 e 1, considerando 500 como mínimo
+  const normalizedScore = (score - 500) / (maxScore - 500);
+  
+  // Calcula o bônus proporcional
+  return Math.min(maxBonus, normalizedScore * maxBonus);
 };
 
 export const getProgressBarColor = (timeLeft: number, roundInitialTime: number): string => {

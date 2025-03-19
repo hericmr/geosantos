@@ -5,6 +5,9 @@ export const GameControls: React.FC<GameControlsProps> = ({
   gameStarted,
   currentNeighborhood,
   timeLeft,
+  totalTimeLeft,
+  roundNumber,
+  roundInitialTime,
   score,
   onStartGame,
   getProgressBarColor
@@ -121,10 +124,10 @@ export const GameControls: React.FC<GameControlsProps> = ({
             bottom: 0
           }}>
             <div style={{
-              width: `${(timeLeft / 10) * 100}%`,
+              width: `${(timeLeft / roundInitialTime) * 100}%`,
               height: '100%',
-              background: `linear-gradient(90deg, ${getProgressBarColor(timeLeft)}, ${getProgressBarColor(timeLeft)}CC)`,
-              transition: 'all 0.3s ease',
+              background: `linear-gradient(90deg, ${getProgressBarColor(timeLeft, roundInitialTime)}, ${getProgressBarColor(timeLeft, roundInitialTime)}CC)`,
+              transition: 'width 0.1s linear',
               position: 'absolute',
               left: 0,
               top: 0,
@@ -164,15 +167,30 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 maxWidth: '1200px',
                 margin: '0 auto'
               }}>
-                <span style={{ 
-                  fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
-                  color: '#000000',
-                  fontWeight: 700,
-                  textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
-                  whiteSpace: 'nowrap'
+                <div style={{ 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}>
-                  {Math.round(timeLeft * 10) / 10}s
-                </span>
+                  <span style={{ 
+                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                    color: '#000000',
+                    fontWeight: 600,
+                    textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
+                  }}>
+                    Rodada {roundNumber}
+                  </span>
+                  <span style={{ 
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
+                    color: '#000000',
+                    fontWeight: 700,
+                    textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {Math.round(timeLeft * 10) / 10}s
+                  </span>
+                </div>
                 <span style={{
                   color: 'white',
                   fontWeight: 800,
@@ -186,15 +204,30 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 }}>
                   {currentNeighborhood.charAt(0).toUpperCase() + currentNeighborhood.slice(1).toLowerCase()}!
                 </span>
-                <span style={{ 
-                  fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
-                  color: '#000000',
-                  fontWeight: 700,
-                  textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
-                  whiteSpace: 'nowrap'
+                <div style={{ 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}>
-                  {Math.round(timeLeft * 10) / 10}s
-                </span>
+                  <span style={{ 
+                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                    color: '#000000',
+                    fontWeight: 600,
+                    textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
+                  }}>
+                    Tempo Total
+                  </span>
+                  <span style={{ 
+                    fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
+                    color: '#000000',
+                    fontWeight: 700,
+                    textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {Math.round(totalTimeLeft * 10) / 10}s
+                  </span>
+                </div>
               </div>
             </div>
           </div>

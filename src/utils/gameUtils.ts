@@ -48,29 +48,25 @@ export const calculateDistance = (point1: LatLng, point2: LatLng): number => {
 };
 
 export const calculateScore = (distance: number, timeLeft: number): ScoreCalculation => {
-  // Se a distância for maior que 2000m, aplica penalidade
-  if (distance > 2000) {
-    const penalty = Math.round((distance - 2000) / 50); // -1 ponto a cada 50m além dos 2000m
-    return {
-      total: -penalty,
-      distancePoints: -penalty,
-      timePoints: 0 // Sem pontos por tempo em erros grandes
-    };
-  }
-
-  // Cálculo normal para distâncias até 2000m
-  const distanceScore = Math.max(0, 1 - (distance / MAX_DISTANCE_METERS));
-  const distancePoints = Math.round(distanceScore * 700);
+  // Converte a distância para quilômetros
+  const distanceKm = distance / 1000;
   
-  // Penalidade de tempo mais severa
-  // Quanto mais tempo passar, menor será o multiplicador
-  const timeMultiplier = Math.pow(timeLeft / ROUND_TIME, 2); // Quadrado do tempo restante
-  const timePoints = Math.round(timeMultiplier * 600 * distanceScore);
+  // Pontuação baseada na distância
+  // Quanto menor a distância, maior a pontuação
+  // Máximo de 1000 pontos para distância de 0km
+  // Mínimo de 0 pontos para distância de 10km ou mais
+  const distanceScore = Math.max(0, 1000 * (1 - (distanceKm / 10)));
+  
+  // Bônus de tempo
+  // Quanto mais tempo restante, maior o bônus
+  // Máximo de 500 pontos de bônus
+  // Só dá bônus se o tempo for menor que 2 segundos
+  const timeBonus = timeLeft <= 2 ? Math.round((timeLeft / 2) * 500) : 0;
   
   return {
-    total: distancePoints + timePoints,
-    distancePoints,
-    timePoints
+    total: Math.round(distanceScore + timeBonus),
+    distancePoints: Math.round(distanceScore),
+    timePoints: timeBonus
   };
 };
 

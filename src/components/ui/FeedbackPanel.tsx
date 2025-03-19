@@ -229,7 +229,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   fontWeight: 600,
                   textAlign: 'center'
                 }}>
-                   INCRÍVEL! Em {displayedTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{currentNeighborhood}</span>!
+                   INCRÍVEL! Em {clickTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{currentNeighborhood}</span>!
                 </div>
               </div>
 
@@ -443,19 +443,123 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       )}
 
       {gameOver && (
-        <h2 style={{ 
-          color: 'white', 
-          marginBottom: 'clamp(15px, 3vw, 25px)', 
-          fontSize: 'clamp(1.8rem, 4.5vw, 2.5rem)',
-          textAlign: 'center',
-          fontFamily: "'Inter', sans-serif",
-          fontWeight: 700,
-          opacity: 0.95
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 'clamp(20px, 4vw, 30px)',
+          justifyContent: 'center',
+          flexWrap: 'wrap'
         }}>
-          {feedbackMessage === "" 
-            ? ""
-            : ""}
-        </h2>
+          <h2 style={{ 
+            color: 'white', 
+            marginBottom: 'clamp(15px, 3vw, 25px)', 
+            fontSize: 'clamp(1.8rem, 4.5vw, 2.5rem)',
+            textAlign: 'center',
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 700,
+            opacity: 0.95
+          }}>
+            {score >= 10000 ? "LENDÁRIO! 🏆" :
+             score >= 5000 ? "IMPRESSIONANTE! 🌟" :
+             score >= 2000 ? "MUITO BOM! 👏" :
+             score >= 1000 ? "BOM JOGO! 👍" :
+             "Game Over!"}
+          </h2>
+
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'clamp(10px, 2vw, 15px)',
+            background: 'rgba(0, 0, 0, 0.7)',
+            padding: 'clamp(20px, 4vw, 30px)',
+            borderRadius: '10px',
+            border: '2px solid #32CD32'
+          }}>
+            <span style={{
+              fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
+              color: '#FFD700',
+              fontWeight: 600,
+              textAlign: 'center',
+              fontFamily: "'Inter', sans-serif"
+            }}>
+              Pontuação Final
+            </span>
+            <span style={{
+              fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
+              color: '#32CD32',
+              fontWeight: 700,
+              textAlign: 'center',
+              fontFamily: "'Inter', sans-serif",
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+            }}>
+              {score}
+            </span>
+            <span style={{
+              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+              color: '#FFD700',
+              fontWeight: 500,
+              textAlign: 'center',
+              fontFamily: "'Inter', sans-serif",
+              opacity: 0.9
+            }}>
+              {score >= 10000 ? "Você é um verdadeiro mestre do jogo! Conseguiu uma pontuação lendária!" :
+               score >= 5000 ? "Você dominou o jogo! Uma performance impressionante!" :
+               score >= 2000 ? "Você jogou muito bem! Continue praticando para melhorar ainda mais!" :
+               score >= 1000 ? "Você tem potencial! Tente novamente para melhorar sua pontuação!" :
+               "Não desanime! Pratique mais para melhorar sua pontuação!"}
+            </span>
+          </div>
+
+          <div style={{
+            display: 'flex',
+            gap: 'clamp(10px, 2vw, 15px)',
+            flexWrap: 'wrap',
+            justifyContent: 'center'
+          }}>
+            <button
+              onClick={() => {
+                const shareText = score >= 10000 ? 
+                  `🏆 LENDÁRIO! Joguei O Caiçara e fiz ${score} pontos! Quem consegue superar essa pontuação?` :
+                  score >= 5000 ?
+                  `🌟 IMPRESSIONANTE! Joguei O Caiçara e fiz ${score} pontos! Quanto você consegue fazer?` :
+                  `🎮 Joguei O Caiçara e fiz ${score} pontos! Quanto você consegue fazer?`;
+
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'O Caiçara',
+                    text: shareText,
+                    url: window.location.href
+                  }).catch(console.error);
+                } else {
+                  navigator.clipboard.writeText(shareText);
+                  alert('Texto copiado para a área de transferência!');
+                }
+              }}
+              style={{
+                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
+                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                background: '#FFA500',
+                color: '#000000',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = '#FF8C00'}
+              onMouseOut={(e) => e.currentTarget.style.background = '#FFA500'}
+            >
+              <span>📱</span> Compartilhar
+            </button>
+          </div>
+        </div>
       )}
 
       <div style={{

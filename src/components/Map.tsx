@@ -353,6 +353,13 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       progressIntervalRef.current = null;
     }
 
+    // Define o tempo inicial da rodada
+    const newInitialTime = isPhaseTwo ? PHASE_TWO_TIME : 10;
+    updateGameState({
+      roundInitialTime: newInitialTime,
+      timeLeft: newInitialTime
+    });
+
     // Reseta o estado do feedback
     updateGameState({
       showFeedback: false,
@@ -360,8 +367,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       feedbackProgress: 0,
       clickedPosition: null,
       arrowPath: null,
-      isCountingDown: false,
-      timeLeft: isPhaseTwo ? PHASE_TWO_TIME : 10 // Define o tempo baseado na fase
+      isCountingDown: false
     });
 
     // Pequeno delay para garantir que o estado foi limpo
@@ -537,6 +543,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         gameStarted={gameState.gameStarted}
         currentNeighborhood={gameState.currentNeighborhood}
         timeLeft={gameState.timeLeft}
+        totalTimeLeft={gameState.totalTimeLeft}
+        roundNumber={gameState.roundNumber}
+        roundInitialTime={gameState.roundInitialTime}
         score={gameState.score}
         onStartGame={handleStartGame}
         getProgressBarColor={getProgressBarColor}
