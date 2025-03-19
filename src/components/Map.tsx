@@ -50,7 +50,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [isPhaseTwo, setIsPhaseTwo] = useState(false);
   const [showPhaseTwoIntro, setShowPhaseTwoIntro] = useState(false);
   const [showPhaseOneMessage, setShowPhaseOneMessage] = useState(false);
-  const PHASE_TWO_SCORE = 5000;
+  const PHASE_TWO_SCORE = 10000;
   
   const {
     gameState,
@@ -660,7 +660,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             fontSize: window.innerWidth < 768 ? '1em' : '1.2em',
             margin: 0
           }}>
-            Faça 5000 pontos para desbloquear a fase 2!
+            Faça 10000 pontos para desbloquear a fase 2!
           </p>
         </div>
       )}
