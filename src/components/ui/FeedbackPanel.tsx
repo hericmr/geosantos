@@ -72,6 +72,13 @@ const DigitRoller: React.FC<{ targetDigit: string; delay: number }> = ({ targetD
   );
 };
 
+// Adicionar uma função auxiliar para capitalizar cada palavra do nome do bairro
+const capitalizeWords = (str: string) => {
+  return str.split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+};
+
 export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   showFeedback,
   clickedPosition,
@@ -236,7 +243,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   fontWeight: 600,
                   textAlign: 'center'
                 }}>
-                   INCRÍVEL! Em {clickTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{currentNeighborhood}</span>!
+                   INCRÍVEL! Em {clickTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>!
                 </div>
               </div>
 
@@ -344,7 +351,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   fontWeight: 500,
                   marginLeft: 'clamp(8px, 2vw, 12px)',
                   opacity: 0.9
-                }}>metros do bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{currentNeighborhood}</span></div>
+                }}>metros do bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span></div>
               </div>
               <div style={{
                 display: 'flex',
