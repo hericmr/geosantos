@@ -162,34 +162,52 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           targetY = (90 - arrowPath[1].lat) * (viewportHeight / 180);
         }
         
-        // Calcula a direção do vetor entre os pontos
-        const dx = arrowPath ? targetX - clickX : 0;
-        const dy = arrowPath ? targetY - clickY : 0;
+        // Dimensões do popup
+        const popupHeight = 300; // altura estimada do popup
+        const popupWidth = 400; // largura estimada do popup
         
         // Deslocamento padrão para a direita e para cima
-        const offsetX = 100; // pixels para a direita
-        const offsetY = -150; // pixels para cima
+        const offsetX = 50; // pixels para a direita
+        const offsetY = -100; // pixels para cima
         
-        // Calcula a posição inicial do popup
+        // Calcula a posição inicial do popup próximo ao clique
         let popupX = clickX + offsetX;
         let popupY = clickY + offsetY;
         
-        // Verifica se o popup ficaria por cima da seta ou do bairro correto
+        // Verifica se o popup ficaria por cima de algum ponto importante
         if (arrowPath) {
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          const popupHeight = 300; // altura estimada do popup
-          const popupWidth = 400; // largura estimada do popup
+          // Verifica se o popup está sobrepondo o ponto de clique
+          const isOverClick = (
+            popupX < clickX + 50 && 
+            popupX + popupWidth > clickX - 50 && 
+            popupY < clickY + 50 && 
+            popupY + popupHeight > clickY - 50
+          );
           
-          // Se o popup ficaria por cima da seta ou do bairro correto
-          if (Math.abs(popupY - targetY) < popupHeight) {
-            // Move o popup mais para a direita
-            popupX = Math.max(popupX + popupWidth/2, targetX + popupWidth);
+          // Verifica se o popup está sobrepondo o ponto correto
+          const isOverTarget = (
+            popupX < targetX + 50 && 
+            popupX + popupWidth > targetX - 50 && 
+            popupY < targetY + 50 && 
+            popupY + popupHeight > targetY - 50
+          );
+          
+          // Se estiver sobrepondo algum ponto, ajusta a posição
+          if (isOverClick || isOverTarget) {
+            // Tenta posicionar à direita do ponto de clique
+            popupX = clickX + popupWidth/2;
+            popupY = clickY - popupHeight/2;
+            
+            // Se ainda estiver sobrepondo, tenta posicionar à esquerda
+            if (isOverClick || isOverTarget) {
+              popupX = clickX - popupWidth - popupWidth/2;
+            }
           }
         }
         
         // Ajusta a posição para evitar que o popup saia da tela
-        popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
-        popupY = Math.max(20, Math.min(popupY, viewportHeight - 200));
+        popupX = Math.min(Math.max(popupX, 20), viewportWidth - popupWidth - 20);
+        popupY = Math.max(20, Math.min(popupY, viewportHeight - popupHeight - 20));
         
         setPopupPosition({
           top: `${popupY}px`,
