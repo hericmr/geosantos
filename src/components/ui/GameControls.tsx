@@ -45,7 +45,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
               transform: scale(1);
             }
             50% { 
-              transform: scale(1.05);
+              transform: scale(1.03);
             }
             100% { 
               transform: scale(1);
@@ -55,7 +55,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
           @keyframes fadeIn {
             from {
               opacity: 0;
-              transform: translateY(20px);
+              transform: translateY(10px);
             }
             to {
               opacity: 1;
@@ -64,19 +64,19 @@ export const GameControls: React.FC<GameControlsProps> = ({
           }
 
           .game-title {
-            animation: pulseText 2s infinite;
+            animation: pulseText 1.5s infinite;
           }
 
           .game-description {
-            animation: fadeIn 0.8s ease-out;
+            animation: fadeIn 0.3s ease-out;
           }
 
           .game-instructions {
-            animation: fadeIn 1s ease-out 0.3s both;
+            animation: fadeIn 0.4s ease-out 0.1s both;
           }
 
           .start-button {
-            animation: fadeIn 0.8s ease-out 0.6s both;
+            animation: fadeIn 0.3s ease-out 0.2s both;
           }
         `}
       </style>
@@ -95,17 +95,6 @@ export const GameControls: React.FC<GameControlsProps> = ({
         }}>
           <style>
             {`
-              @keyframes fadeIn {
-                from {
-                  opacity: 0;
-                  transform: translateY(20px);
-                }
-                to {
-                  opacity: 1;
-                  transform: translateY(0);
-                }
-              }
-
               @keyframes fadeOut {
                 from {
                   opacity: 1;
@@ -113,12 +102,12 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 }
                 to {
                   opacity: 0;
-                  transform: translateY(-20px);
+                  transform: translateY(-10px);
                 }
               }
 
               .fade-out {
-                animation: fadeOut 0.2s ease-out forwards;
+                animation: fadeOut 0.15s ease-out forwards;
               }
             `}
           </style>
