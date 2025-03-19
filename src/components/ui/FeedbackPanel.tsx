@@ -256,7 +256,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       left: gameOver ? '50%' : popupPosition.left,
       transform: gameOver ? 'translate(-50%, -50%)' : window.innerWidth <= 768 ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
       width: '90%',
-      maxWidth: gameOver ? '600px' : '400px',
+      maxWidth: gameOver ? '800px' : '600px',
       background: 'rgba(0, 25, 0, 0.98)',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
@@ -443,7 +443,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 gap: 'clamp(25px, 5vw, 35px)',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
+                width: '100%'
               }}>
                 <div style={{
                   display: 'flex',
