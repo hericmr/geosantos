@@ -37,7 +37,7 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
       >
         {isMuted ? (
           <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔇</span>
-        ) : volume > 0.5 ? (
+        ) : volume > 0.3 ? (
           <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔊</span>
         ) : volume > 0 ? (
           <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔉</span>
