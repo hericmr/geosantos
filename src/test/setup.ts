@@ -28,4 +28,20 @@ vi.mock('react-leaflet', () => ({
   Polyline: vi.fn(),
   GeoJSON: vi.fn(),
   useMap: vi.fn()
+}));
+
+// Mock para o L.LatLng do Leaflet
+class LatLng {
+  lat: number;
+  lng: number;
+
+  constructor(lat: number, lng: number) {
+    this.lat = lat;
+    this.lng = lng;
+  }
+}
+
+// Mock para o módulo Leaflet
+vi.mock('leaflet', () => ({
+  LatLng: LatLng
 })); 
