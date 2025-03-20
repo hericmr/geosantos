@@ -33,8 +33,9 @@ export interface GameState {
 }
 
 export interface ScoreCalculation {
-  score: number;
-  timeBonus: number;
+  total: number;
+  distance: number;
+  time: number;
 }
 
 export interface AudioControlsProps {

@@ -14,8 +14,8 @@ import { calculateDistance, calculateScore, closestPointOnSegment } from '../uti
 import { getProgressBarColor, getFeedbackMessage, FASE_1_BAIRROS, PHASE_TWO_TIME } from '../utils/gameConstants';
 
 import { AudioControls } from './ui/AudioControls';
-import { FeedbackPanel } from './ui/feedback/FeedbackPanel';
 import { GameControls } from './ui/GameControls';
+import { FeedbackPanel } from './ui/FeedbackPanel';
 import { ScoreDisplay } from './ui/ScoreDisplay';
 import { MapEvents } from './game/MapEvents';
 import { GeoJSONLayer } from './game/GeoJSONLayer';
