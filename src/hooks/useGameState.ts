@@ -7,27 +7,26 @@ export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>({
     currentNeighborhood: '',
     score: 0,
-    timeLeft: ROUND_TIME,
-    totalTimeLeft: ROUND_TIME,
-    roundInitialTime: ROUND_TIME,
+    timeLeft: 10,
+    totalTimeLeft: 300,
+    roundInitialTime: 10,
     roundNumber: 1,
     gameOver: false,
     gameStarted: false,
     isCountingDown: false,
     isPaused: false,
     clickedPosition: null,
-    lastClickTime: 0,
-    feedbackMessage: '',
-    revealedNeighborhoods: new Set(),
-    wrongNeighborhood: '',
-    arrowPath: null,
-    isMuted: false,
-    volume: 0.5,
     showFeedback: false,
-    clickTime: 0,
     feedbackOpacity: 0,
     feedbackProgress: 0,
-    timeBonus: 0
+    feedbackMessage: '',
+    revealedNeighborhoods: new Set(),
+    clickTime: 0,
+    timeBonus: 0,
+    isMuted: false,
+    volume: 0.5,
+    arrowPath: null,
+    lastClickTime: 0
   });
 
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);

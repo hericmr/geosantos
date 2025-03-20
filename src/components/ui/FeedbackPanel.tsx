@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { FeedbackPanelProps } from '../../types/game';
 import { getFeedbackMessage, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS } from '../../utils/gameConstants';
+import * as turf from '@turf/turf';
+import { Feature, Polygon, MultiPolygon } from 'geojson';
 
 const DigitRoller: React.FC<{ targetDigit: string; delay: number }> = ({ targetDigit, delay }) => {
   const [isRolling, setIsRolling] = useState(true);
@@ -104,11 +106,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
   useEffect(() => {
     if (showFeedback && clickedPosition) {
+      // Calcula a distância usando a função calculateDistance passada como prop
       const distance = arrowPath ? calculateDistance(clickedPosition, arrowPath[1]) : 0;
+      console.log('Distância calculada:', distance); // Debug
       const score = calculateScore(distance, clickTime);
       
       setIsAnimating(true);
-      setDisplayedDistance(0);
+      setDisplayedDistance(distance); // Atualiza diretamente com a distância calculada
       setDisplayedTime(0);
       setFeedbackMessage(getFeedbackMessage(distance));
 
@@ -128,13 +132,11 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       const duration = 2000;
       const steps = 60;
       const stepDuration = duration / steps;
-      const distanceStep = distance / steps;
       const timeStep = clickTime / steps;
 
       let currentStep = 0;
       const interval = setInterval(() => {
         currentStep++;
-        setDisplayedDistance(prev => Math.min(prev + distanceStep, distance));
         setDisplayedTime(prev => Math.min(prev + timeStep, clickTime));
         
         if (currentStep >= steps) {
@@ -145,7 +147,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
       return () => clearInterval(interval);
     }
-  }, [showFeedback, clickedPosition, arrowPath, clickTime, calculateDistance, calculateScore]);
+  }, [showFeedback, clickedPosition, arrowPath, clickTime, calculateScore, calculateDistance]);
 
   useEffect(() => {
     if (clickedPosition) {
@@ -190,7 +192,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             popupY = Math.max(clickY - popupHeight - 100, 20);
           }
           
-          // Ajusta horizontalmente para evitar sobreposição com a seta
+          // Ajusta horizontalmente para evitar sobreposição com a seta e o bairro
           if (Math.abs(clickX - targetX) < popupWidth / 2) {
             // Se o clique estiver na metade esquerda da tela
             if (clickX < viewportWidth / 2) {
@@ -207,7 +209,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           left: `${popupX}px`
         });
       } else {
-        // Em desktop, mantém o comportamento atual
+        // Lógica para desktop
         const clickX = (clickedPosition.lng + 180) * (viewportWidth / 360);
         const clickY = (90 - clickedPosition.lat) * (viewportHeight / 180);
         
@@ -220,24 +222,65 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         const dx = arrowPath ? targetX - clickX : 0;
         const dy = arrowPath ? targetY - clickY : 0;
         
-        const offsetX = 100;
-        const offsetY = -150;
+        // Dimensões do popup
+        const popupHeight = 300;
+        const popupWidth = 400;
         
-        let popupX = clickX + offsetX;
-        let popupY = clickY + offsetY;
+        // Calcula a distância entre o clique e o alvo
+        const distance = Math.sqrt(dx * dx + dy * dy);
         
+        // Define a direção do vetor entre os pontos
+        const angle = Math.atan2(dy, dx);
+        
+        // Calcula uma posição segura baseada no ângulo e evitando o bairro correto
+        let popupX, popupY;
+        
+        // Se o clique estiver na metade esquerda da tela
+        if (clickX < viewportWidth / 2) {
+          // Posiciona o popup à direita do clique
+          popupX = clickX + popupWidth + 50;
+        } else {
+          // Posiciona o popup à esquerda do clique
+          popupX = clickX - popupWidth - 50;
+        }
+        
+        // Ajusta a posição vertical baseado no ângulo e evitando o bairro correto
+        if (Math.abs(angle) < Math.PI / 2) {
+          // Se o ângulo for menor que 90 graus, posiciona acima
+          popupY = clickY - popupHeight - 50;
+        } else {
+          // Se o ângulo for maior que 90 graus, posiciona abaixo
+          popupY = clickY + 50;
+        }
+        
+        // Ajusta a posição para evitar o bairro correto
         if (arrowPath) {
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          const popupHeight = 300;
-          const popupWidth = 400;
+          const targetY = (90 - arrowPath[1].lat) * (viewportHeight / 180);
+          const targetX = (arrowPath[1].lng + 180) * (viewportWidth / 360);
           
-          if (Math.abs(popupY - targetY) < popupHeight) {
-            popupX = Math.max(popupX + popupWidth/2, targetX + popupWidth);
+          // Se o popup estiver muito próximo do bairro correto
+          if (Math.abs(popupY - targetY) < popupHeight / 2) {
+            // Move o popup para mais longe do bairro correto
+            if (popupY < targetY) {
+              popupY = targetY - popupHeight - 100;
+            } else {
+              popupY = targetY + 100;
+            }
+          }
+          
+          // Ajusta horizontalmente se necessário
+          if (Math.abs(popupX - targetX) < popupWidth / 2) {
+            if (popupX < targetX) {
+              popupX = targetX - popupWidth - 100;
+            } else {
+              popupX = targetX + 100;
+            }
           }
         }
         
-        popupX = Math.min(Math.max(popupX, 200), viewportWidth - 200);
-        popupY = Math.max(20, Math.min(popupY, viewportHeight - 200));
+        // Garante que o popup fique dentro da viewport
+        popupX = Math.min(Math.max(popupX, popupWidth/2), viewportWidth - popupWidth/2);
+        popupY = Math.max(20, Math.min(popupY, viewportHeight - popupHeight - 20));
         
         setPopupPosition({
           top: `${popupY}px`,
@@ -249,8 +292,17 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
   if (!showFeedback) return null;
 
-  // Verifica se o clique foi dentro do bairro correto (quando não há seta)
-  const isCorrectNeighborhood = !arrowPath;
+  // Verifica se o clique foi dentro do bairro correto
+  const isCorrectNeighborhood = !arrowPath && clickedPosition && currentNeighborhood && 
+    geoJsonData?.features.some(feature => 
+      feature.properties?.name === currentNeighborhood &&
+      (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') &&
+      turf.booleanPointInPolygon([clickedPosition.lng, clickedPosition.lat], feature as Feature<Polygon | MultiPolygon>)
+    );
+
+  // Calcula a distância até o bairro correto
+  const distance = arrowPath && clickedPosition ? calculateDistance(clickedPosition, arrowPath[1]) : 0;
+  console.log('Distância atual:', distance); // Debug
 
   return (
     <div style={{
@@ -440,7 +492,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   fontWeight: 500,
                   marginLeft: 'clamp(4px, 1vw, 8px)',
                   opacity: 0.9
-                }}>metros do bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span></div>
+                }}>metros até a intersecção com o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span></div>
               </div>
               <div style={{
                 display: 'flex',
@@ -470,7 +522,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                     color: '#fff',
                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
                   }}>
-                    {Math.round(displayedDistance / 1000 * 10) / 10}
+                    {(displayedDistance / 1000).toFixed(1)}
                   </div>
                   <div style={{ 
                     fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',

@@ -1,17 +1,32 @@
 import Phaser from 'phaser';
 
 export class AudioManager {
-    private scene: Phaser.Scene;
-    private music: Phaser.Sound.BaseSound;
+    private music: Phaser.Sound.BaseSound | null = null;
+    private sounds: Map<string, Phaser.Sound.BaseSound> = new Map();
     private isMuted: boolean = false;
 
-    constructor(scene: Phaser.Scene) {
-        this.scene = scene;
-        this.loadAudio();
+    constructor(private scene: Phaser.Scene) {
+        this.loadSounds();
     }
 
-    private loadAudio() {
-        this.scene.load.audio('musica', 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/musica.ogg');
+    private loadSounds() {
+        // Carrega os sons
+        this.scene.load.audio('success', 'assets/audio/success.mp3');
+        this.scene.load.audio('error', 'assets/audio/error.mp3');
+        this.scene.load.audio('background', 'assets/audio/background.mp3');
+    }
+
+    public playSound(key: string) {
+        const sound = this.sounds.get(key);
+        if (sound) {
+            sound.play();
+        }
+    }
+
+    public setMusicVolume(volume: number) {
+        if (this.music) {
+            (this.music as Phaser.Sound.WebAudioSound).setVolume(volume);
+        }
     }
 
     playMusic() {
@@ -35,12 +50,6 @@ export class AudioManager {
             this.stopMusic();
         } else {
             this.playMusic();
-        }
-    }
-
-    setVolume(volume: number) {
-        if (this.music) {
-            this.music.setVolume(volume);
         }
     }
 

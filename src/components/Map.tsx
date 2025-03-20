@@ -321,7 +321,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             feedbackProgress: 100,
             feedbackMessage: feedbackMessage,
             gameOver: newNegativeSum > 40,
-            revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood])
+            revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
+            arrowPath: (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null
           });
 
           if (newNegativeSum > 40) {

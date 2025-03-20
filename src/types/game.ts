@@ -18,22 +18,18 @@ export interface GameState {
   gameStarted: boolean;
   isCountingDown: boolean;
   isPaused: boolean;
-  clickedPosition: LatLng | null;
-  lastClickTime: number;
-  feedbackMessage: string;
-  revealedNeighborhoods: Set<string>;
-  wrongNeighborhood: string;
-  arrowPath: [LatLng, LatLng] | null;
-  isMuted: boolean;
-  volume: number;
+  clickedPosition: L.LatLng | null;
   showFeedback: boolean;
-  clickTime: number;
   feedbackOpacity: number;
   feedbackProgress: number;
+  feedbackMessage: string;
+  revealedNeighborhoods: Set<string>;
+  clickTime: number;
   timeBonus: number;
-  pontuacao: number;
-  tempoRestante: number;
-  bairroAtual: string | null;
+  isMuted: boolean;
+  volume: number;
+  arrowPath: [LatLng, LatLng] | null;
+  lastClickTime: number;
 }
 
 export interface ScoreCalculation {
