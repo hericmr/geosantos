@@ -19,6 +19,9 @@ import { FeedbackPanel } from './ui/FeedbackPanel';
 import { ScoreDisplay } from './ui/ScoreDisplay';
 import { MapEvents } from './game/MapEvents';
 import { GeoJSONLayer } from './game/GeoJSONLayer';
+import { DistanceCircle } from './game/DistanceCircle';
+import { NeighborhoodManager } from './game/NeighborhoodManager';
+import { GameAudioManager } from './game/GameAudioManager';
 
 // Fix for default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -63,6 +66,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     feedbackTimerRef
   } = useGameState();
 
+  // Estado para controlar os sons de feedback
+  const [playSuccessSound, setPlaySuccessSound] = useState(false);
+  const [playErrorSound, setPlayErrorSound] = useState(false);
+
   useEffect(() => {
     setIsLoading(true);
     fetch('https://raw.githubusercontent.com/hericmr/jogocaicara/refs/heads/main/public/data/bairros.geojson')
@@ -76,114 +83,14 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       });
   }, []);
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = gameState.isMuted ? 0 : gameState.volume;
-      audioRef.current.loop = true;
-    }
-  }, [gameState.volume, gameState.isMuted]);
-
-  useEffect(() => {
-    if (gameState.gameStarted && !gameState.gameOver && audioRef.current) {
-      audioRef.current.play();
-    } else if (gameState.gameOver && audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  }, [gameState.gameStarted, gameState.gameOver]);
-
-  useEffect(() => {
-    if (gameState.gameStarted && !gameState.gameOver && gameState.timeLeft <= 0) {
-      updateGameState({
-        gameOver: true,
-        showFeedback: true,
-        feedbackOpacity: 1,
-        feedbackProgress: 100,
-        feedbackMessage: "Tempo esgotado!"
-      });
-    }
-  }, [gameState.timeLeft, gameState.gameStarted, gameState.gameOver]);
-
-  useEffect(() => {
-    if (mapRef.current && distanceCircle) {
-      // Limpa círculos anteriores
-      mapRef.current.eachLayer((layer: L.Layer) => {
-        if (layer instanceof L.Circle) {
-          mapRef.current?.removeLayer(layer);
-        }
-      });
-
-      // Desenha o novo círculo
-      const circle = L.circle(distanceCircle.center, {
-        radius: 0, // Começa com raio 0
-        color: '#ff6b6b', // Vermelho mais suave
-        fillColor: '#ff6b6b',
-        fillOpacity: 0.05, // Opacidade reduzida
-        weight: 1.5, // Borda mais fina
-        className: 'distance-circle'
-      }).addTo(mapRef.current);
-
-      // Espera a animação da bandeira terminar (0.3s) antes de começar a animação do círculo
-      setTimeout(() => {
-        // Animação do círculo
-        const startTime = Date.now();
-        const duration = 500; // 0.5 segundos
-        const targetRadius = distanceCircle.radius;
-
-        const animate = () => {
-          const currentTime = Date.now();
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-
-          // Função de easing para suavizar a animação
-          const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-          const currentRadius = targetRadius * easeOutCubic;
-
-          circle.setRadius(currentRadius);
-
-          if (progress < 1) {
-            requestAnimationFrame(animate);
-          } else {
-            // Remove o círculo após a animação
-            setTimeout(() => {
-              if (mapRef.current) {
-                mapRef.current.removeLayer(circle);
-                setDistanceCircle(null);
-              }
-            }, 500); // Espera 0.5 segundos antes de remover
-          }
-        };
-
-        animate();
-      }, 300); // Espera 0.3 segundos (duração da animação da bandeira)
-    }
-  }, [distanceCircle]);
-
-  const selectRandomNeighborhood = (data: FeatureCollection) => {
-    const features = data.features;
-    let availableFeatures = features;
-
-    // Se não estiver na fase 2, filtra apenas os bairros da fase 1
-    if (!isPhaseTwo) {
-      availableFeatures = features.filter(feature => 
-        FASE_1_BAIRROS.includes(feature.properties?.NOME)
-      );
-    }
-
-    const randomIndex = Math.floor(Math.random() * availableFeatures.length);
-    const neighborhood = availableFeatures[randomIndex].properties?.NOME;
-    updateGameState({ currentNeighborhood: neighborhood });
-  };
-
   const handleStartGame = () => {
     if (geoJsonData) {
       setShowPhaseOneMessage(true);
       setTimeout(() => {
         setShowPhaseOneMessage(false);
         startGame();
-        selectRandomNeighborhood(geoJsonData);
         setIsPhaseTwo(false);
-      }, 3000); // Mensagem some após 3 segundos
+      }, 3000);
     }
   };
 
@@ -262,15 +169,15 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         const isNearBorder = distance < 100;
         const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
         
-        // Toca o som de feedback apropriado
-        if (successSoundRef.current && errorSoundRef.current) {
-          if (isCorrectNeighborhood || isNearBorder) {
-            successSoundRef.current.currentTime = 0;
-            successSoundRef.current.play();
-          } else {
-            errorSoundRef.current.currentTime = 0;
-            errorSoundRef.current.play();
-          }
+        // Atualizar para usar os novos estados de som
+        if (isCorrectNeighborhood || isNearBorder) {
+          setPlaySuccessSound(true);
+          // Reset após um curto delay
+          setTimeout(() => setPlaySuccessSound(false), 100);
+        } else {
+          setPlayErrorSound(true);
+          // Reset após um curto delay
+          setTimeout(() => setPlayErrorSound(false), 100);
         }
         
         // Se acertou o bairro correto ou está muito próximo da borda, dá pontuação máxima
@@ -450,7 +357,17 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div style={{
+      margin: 0,
+      padding: 0,
+      width: '100vw',
+      height: '100vh',
+      overflow: 'hidden'
+    }}>
+      <audio ref={audioRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/musica.ogg" preload="auto" />
+      <audio ref={successSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/success.mp3" preload="auto" />
+      <audio ref={errorSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/error.mp3" preload="auto" />
+      
       <style>
         {`
           .bandeira-marker {
@@ -577,10 +494,15 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         `}
       </style>
       
-      <audio ref={audioRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/musica.ogg" preload="auto" />
-      <audio ref={successSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/success.mp3" preload="auto" />
-      <audio ref={errorSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/error.mp3" preload="auto" />
-      
+      <GameAudioManager
+        audioRef={audioRef}
+        successSoundRef={successSoundRef}
+        errorSoundRef={errorSoundRef}
+        gameState={gameState}
+        playSuccess={playSuccessSound}
+        playError={playErrorSound}
+      />
+
       {isLoading && (
         <div className="loading-spinner" role="alert">
           <p>Carregando o jogo...</p>
@@ -624,6 +546,21 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             currentNeighborhood={gameState.currentNeighborhood}
             onMapClick={handleMapClick}
             geoJsonRef={geoJsonRef}
+          />
+        )}
+        
+        <NeighborhoodManager
+          geoJsonData={geoJsonData}
+          geoJsonRef={geoJsonRef}
+          isPhaseTwo={isPhaseTwo}
+          updateGameState={updateGameState}
+        />
+
+        {mapRef.current && (
+          <DistanceCircle
+            map={mapRef.current}
+            distanceCircle={distanceCircle}
+            onAnimationComplete={() => setDistanceCircle(null)}
           />
         )}
       </MapContainer>
