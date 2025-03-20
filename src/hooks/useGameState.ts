@@ -36,7 +36,7 @@ export const useGameState = () => {
       const timer = setInterval(() => {
         setGameState(prev => {
           if (prev.timeLeft <= 0) {
-            return { ...prev, gameOver: true, timeLeft: 0 };
+            return { ...prev, gameOver: true, timeLeft: 0, showFeedback: true };
           }
           return { 
             ...prev, 
