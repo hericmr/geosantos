@@ -90,7 +90,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         setShowPhaseOneMessage(false);
         startGame();
         setIsPhaseTwo(false);
-      }, 3000);
+      }, 1000);
     }
   };
 
@@ -166,19 +166,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         }
         
         const distance = minDistance;
-        const isNearBorder = distance < 100;
+        const isNearBorder = distance < 10;
         const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
         
-        // Atualizar para usar os novos estados de som
-        if (isCorrectNeighborhood || isNearBorder) {
-          setPlaySuccessSound(true);
-          // Reset após um curto delay
-          setTimeout(() => setPlaySuccessSound(false), 100);
-        } else {
-          setPlayErrorSound(true);
-          // Reset após um curto delay
-          setTimeout(() => setPlayErrorSound(false), 100);
-        }
         
         // Se acertou o bairro correto ou está muito próximo da borda, dá pontuação máxima
         const score = (isCorrectNeighborhood || isNearBorder)
@@ -232,7 +222,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             arrowPath: (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null
           });
 
-          if (newNegativeSum > 40) {
+          if (newNegativeSum > 30) {
             // Se for game over, não inicia próxima rodada
             return;
           }
@@ -273,8 +263,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           // Mostra o círculo após um pequeno delay para garantir que a bandeira já foi fincada
           setTimeout(() => {
             setDistanceCircle(circleToShow);
-          }, 100);
-        }, 100);
+          }, 200);
+        }, 200);
       }
     }
   };
