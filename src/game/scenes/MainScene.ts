@@ -15,6 +15,7 @@ export class MainScene extends Phaser.Scene {
     private gerenciadorBairros!: GerenciadorBairros;
     private particulasAcerto!: Phaser.GameObjects.Particles.ParticleEmitter;
     private particulasErro!: Phaser.GameObjects.Particles.ParticleEmitter;
+    private circuloDistancia!: Phaser.GameObjects.Graphics;
 
     constructor() {
         super({ key: 'MainScene' });
@@ -112,6 +113,10 @@ export class MainScene extends Phaser.Scene {
             tint: 0xff0000
         });
         this.particulasErro.stop();
+
+        // Criar círculo de distância (inicialmente invisível)
+        this.circuloDistancia = this.add.graphics();
+        this.circuloDistancia.setVisible(false);
     }
 
     private selecionarNovoBairro() {
@@ -204,12 +209,54 @@ export class MainScene extends Phaser.Scene {
             this.bairroAtual
         );
 
-        if (acertou) {
-            const bairro = this.gerenciadorBairros.getBairroPorNome(this.bairroAtual);
-            if (bairro) {
+        const bairro = this.gerenciadorBairros.getBairroPorNome(this.bairroAtual);
+        if (bairro) {
+            const pontoCentral = bairro.getPontoCentral();
+            const distancia = Phaser.Math.Distance.Between(
+                pointer.x,
+                pointer.y,
+                pontoCentral.x,
+                pontoCentral.y
+            );
+
+            // Desenhar círculo de distância
+            this.circuloDistancia.clear();
+            this.circuloDistancia.setVisible(true);
+            
+            // Desenhar círculo externo (borda)
+            this.circuloDistancia.lineStyle(2, acertou ? 0x00ff00 : 0xff0000, 0.5);
+            this.circuloDistancia.strokeCircle(pointer.x, pointer.y, distancia);
+            
+            // Desenhar círculo interno (preenchimento)
+            this.circuloDistancia.fillStyle(acertou ? 0x00ff00 : 0xff0000, 0.1);
+            this.circuloDistancia.fillCircle(pointer.x, pointer.y, distancia);
+
+            // Esconder o círculo após 1 segundo
+            this.time.delayedCall(1000, () => {
+                this.circuloDistancia.setVisible(false);
+            });
+
+            if (acertou) {
                 // Efeito visual de acerto
                 this.particulasAcerto.setPosition(pointer.x, pointer.y);
                 this.particulasAcerto.start();
+
+                // Adicionar animação da bandeira
+                const bandeira = this.add.sprite(pointer.x, pointer.y, 'bandeira');
+                bandeira.setScale(0.5);
+
+                // Animação da bandeira
+                this.tweens.add({
+                    targets: bandeira,
+                    y: pointer.y - 100,
+                    scale: 0.8,
+                    alpha: 0,
+                    duration: 1000,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        bandeira.destroy();
+                    }
+                });
                 
                 // Animar o bairro com efeito de brilho
                 this.gerenciadorBairros.desenharBairro(bairro);
@@ -229,13 +276,6 @@ export class MainScene extends Phaser.Scene {
                 });
 
                 // Atualizar pontuação com animação
-                const pontoCentral = bairro.getPontoCentral();
-                const distancia = Phaser.Math.Distance.Between(
-                    pointer.x,
-                    pointer.y,
-                    pontoCentral.x,
-                    pontoCentral.y
-                );
                 const pontosGanhos = this.calcularPontuacao(distancia, 10 - this.tempoRestante);
                 this.pontuacao += pontosGanhos;
                 

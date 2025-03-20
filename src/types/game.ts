@@ -31,6 +31,9 @@ export interface GameState {
   feedbackOpacity: number;
   feedbackProgress: number;
   timeBonus: number;
+  pontuacao: number;
+  tempoRestante: number;
+  bairroAtual: string | null;
 }
 
 export interface ScoreCalculation {
@@ -85,4 +88,26 @@ export interface GeoJSONLayerProps {
   currentNeighborhood: string;
   onMapClick: (latlng: LatLng) => void;
   geoJsonRef: React.RefObject<L.GeoJSON>;
+}
+
+export interface Coordenada {
+    x: number;
+    y: number;
+}
+
+export interface BairroData {
+    nome: string;
+    coordenadas: Coordenada[];
+    pontoCentral: Coordenada;
+}
+
+export interface ParticleConfig {
+    speed: { min: number; max: number };
+    angle: { min: number; max: number };
+    scale: { start: number; end: number };
+    alpha: { start: number; end: number };
+    lifespan: number;
+    quantity: number;
+    blendMode: string;
+    tint: number;
 } 

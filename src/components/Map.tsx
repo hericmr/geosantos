@@ -38,6 +38,7 @@ const bandeira2Icon = new L.Icon({
 });
 
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
+  const mapRef = useRef<L.Map | null>(null);
   const geoJsonRef = useRef<L.GeoJSON>(null) as React.RefObject<L.GeoJSON>;
   const audioRef = useRef<HTMLAudioElement>(null);
   const successSoundRef = useRef<HTMLAudioElement>(null);
@@ -51,6 +52,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [showPhaseTwoIntro, setShowPhaseTwoIntro] = useState(false);
   const [showPhaseOneMessage, setShowPhaseOneMessage] = useState(false);
   const PHASE_TWO_SCORE = 10000;
+  const [distanceCircle, setDistanceCircle] = useState<{ center: L.LatLng; radius: number } | null>(null);
   
   const {
     gameState,
@@ -101,6 +103,61 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       });
     }
   }, [gameState.timeLeft, gameState.gameStarted, gameState.gameOver]);
+
+  useEffect(() => {
+    if (mapRef.current && distanceCircle) {
+      // Limpa círculos anteriores
+      mapRef.current.eachLayer((layer: L.Layer) => {
+        if (layer instanceof L.Circle) {
+          mapRef.current?.removeLayer(layer);
+        }
+      });
+
+      // Desenha o novo círculo
+      const circle = L.circle(distanceCircle.center, {
+        radius: 0, // Começa com raio 0
+        color: '#ff6b6b', // Vermelho mais suave
+        fillColor: '#ff6b6b',
+        fillOpacity: 0.05, // Opacidade reduzida
+        weight: 1.5, // Borda mais fina
+        className: 'distance-circle'
+      }).addTo(mapRef.current);
+
+      // Espera a animação da bandeira terminar (0.3s) antes de começar a animação do círculo
+      setTimeout(() => {
+        // Animação do círculo
+        const startTime = Date.now();
+        const duration = 500; // 0.5 segundos
+        const targetRadius = distanceCircle.radius;
+
+        const animate = () => {
+          const currentTime = Date.now();
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Função de easing para suavizar a animação
+          const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+          const currentRadius = targetRadius * easeOutCubic;
+
+          circle.setRadius(currentRadius);
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            // Remove o círculo após a animação
+            setTimeout(() => {
+              if (mapRef.current) {
+                mapRef.current.removeLayer(circle);
+                setDistanceCircle(null);
+              }
+            }, 500); // Espera 0.5 segundos antes de remover
+          }
+        };
+
+        animate();
+      }, 300); // Espera 0.3 segundos (duração da animação da bandeira)
+    }
+  }, [distanceCircle]);
 
   const selectRandomNeighborhood = (data: FeatureCollection) => {
     const features = data.features;
@@ -238,8 +295,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         const newNegativeSum = score < 0 ? negativeScoreSum + Math.abs(score) : negativeScoreSum;
         setNegativeScoreSum(newNegativeSum);
         
-        // Só mostra a seta se não acertou o bairro, apontando para o ponto mais próximo
-        const arrowPathToShow: [L.LatLng, L.LatLng] | null = (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null;
+        // Desenha um círculo indicando a distância até o ponto correto
+        const circleToShow = (!isCorrectNeighborhood && !isNearBorder) ? {
+          center: latlng,
+          radius: distance
+        } : null;
         
         // Mensagem de feedback personalizada baseada no tipo de acerto
         let feedbackMessage = "";
@@ -254,7 +314,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         // Atualiza o resto do estado após um pequeno delay
         setTimeout(() => {
           updateGameState({
-            arrowPath: arrowPathToShow,
             clickTime: clickDuration,
             score: newScore,
             showFeedback: true,
@@ -302,6 +361,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               startNextRound(geoJsonData);
             }, duration);
           }, 300);
+
+          // Mostra o círculo após um pequeno delay para garantir que a bandeira já foi fincada
+          setTimeout(() => {
+            setDistanceCircle(circleToShow);
+          }, 100);
         }, 100);
       }
     }
@@ -406,20 +470,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             100% {
               transform: scale(1) translateY(0);
               opacity: 1;
-            }
-          }
-
-          .arrow-path {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: drawArrow 1s ease-out forwards;
-            animation-delay: 0.5s;
-            z-index: 999;
-          }
-
-          @keyframes drawArrow {
-            to {
-              stroke-dashoffset: 0;
             }
           }
 
@@ -546,6 +596,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         style={{ width: '100%', height: '100%' }}
         zoomControl={false}
         attributionControl={false}
+        ref={mapRef}
       >
         <MapEvents onClick={handleMapClick} />
         <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
