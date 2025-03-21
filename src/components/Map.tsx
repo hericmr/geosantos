@@ -500,7 +500,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       )}
 
       {gameState.gameStarted && (
-        <ScoreDisplay score={gameState.score} />
+        <ScoreDisplay 
+          icon="🎯"
+          value={gameState.score}
+          unit="pts"
+        />
       )}
 
       <MapContainer

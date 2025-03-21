@@ -12,7 +12,7 @@ describe('FeedbackPanel', () => {
     feedbackProgress: 50,
     onNextRound: jest.fn(),
     calculateDistance: jest.fn(),
-    calculateScore: jest.fn(() => ({ total: 1000, distance: 500, time: 500 })),
+    calculateScore: jest.fn(() => ({ total: 1000, distancePoints: 500, timePoints: 500 })),
     getProgressBarColor: jest.fn(),
     geoJsonData: null,
     gameOver: false,
@@ -45,7 +45,7 @@ describe('FeedbackPanel', () => {
       arrowPath: [
         { lat: 0, lng: 0 } as LatLng,
         { lat: 1, lng: 1 } as LatLng
-      ],
+      ] as [LatLng, LatLng],
       calculateDistance: jest.fn(() => 1000)
     };
 
@@ -73,7 +73,7 @@ describe('FeedbackPanel', () => {
   it('calls onNextRound when next button is clicked', () => {
     const props = {
       ...mockProps,
-      geoJsonData: { type: 'FeatureCollection', features: [] }
+      geoJsonData: { type: 'FeatureCollection' as const, features: [] }
     };
 
     render(<FeedbackPanel {...props} />);
