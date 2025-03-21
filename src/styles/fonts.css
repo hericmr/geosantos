@@ -1,9 +1,0 @@
-@font-face {
-    font-family: 'Figtree';
-    font-style: normal;
-    font-display: swap;
-    font-weight: 300;
-    src: url(/assets/figtree-latin-ext-300-normal-Cpj3BkVl.woff2) format("woff2"),
-         url(/assets/figtree-latin-ext-300-normal-CrZRYx5M.woff) format("woff");
-    unicode-range: U+0100-02BA;
-} 
