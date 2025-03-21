@@ -181,7 +181,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   fontWeight: 500,
                   marginLeft: 'clamp(4px, 1vw, 8px)',
                   opacity: 0.9
-                }}>metros até a intersecção com o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span></div>
+                }}>metros até o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span></div>
               </div>
               <div style={{
                 display: 'flex',
@@ -280,6 +280,55 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               value={score}
               unit="pts"
             />
+            <button
+              onClick={() => {
+                const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Eu conheço Santos!" :
+                  score >= 15000 ? "MITO SANTISTA! Até as ondas do mar me aplaudem!" :
+                  score >= 10000 ? "LENDÁRIO! Eu sou um Pelé da geografia santista!" :
+                  score >= 8000 ? "MESTRE DOS BAIRROS! Eu sou um GPS ambulante!" :
+                  score >= 5000 ? "IMPRESSIONANTE! Quase um GPS humano!!" :
+                  score >= 4000 ? "SOU MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
+                  score >= 3000 ? "SANTISTA DE CORAÇÃO! Eu manjo dos bairros!" :
+                  score >= 2000 ? "MUITO BOM! Eu devo ter ido em algumas aulas de geografia!" :
+                  score >= 1000 ? "BOM JOGO! Mas ainda preciso andar mais na zona noroeste!" :
+                  score >= 500 ? "QUASE LÁ! Vou dar um rolê no bondinho pra pegar mais dicas!" :
+                  score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! " :
+                  "Eita! Parece que eu não sei nada de Santos!";
+
+                const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
+
+                if (navigator.share) {
+                  navigator.share({
+                    text: shareText
+                  }).catch(console.error);
+                } else {
+                  navigator.clipboard.writeText(shareText)
+                    .then(() => alert('Texto copiado para a área de transferência!'))
+                    .catch(console.error);
+                }
+              }}
+              style={{
+                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
+                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                background: '#4267B2',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontWeight: 600,
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '16px'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = '#365899'}
+              onMouseOut={(e) => e.currentTarget.style.background = '#4267B2'}
+            >
+              <span style={{ fontSize: '1.2em' }}>📢</span>
+              Compartilhar
+            </button>
           </div>
         </div>
       )}
