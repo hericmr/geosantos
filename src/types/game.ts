@@ -30,6 +30,7 @@ export interface GameState {
   volume: number;
   arrowPath: [LatLng, LatLng] | null;
   lastClickTime: number;
+  totalDistance: number;
 }
 
 export interface ScoreCalculation {

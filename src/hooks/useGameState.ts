@@ -26,7 +26,8 @@ export const useGameState = () => {
     isMuted: false,
     volume: 0.5,
     arrowPath: null,
-    lastClickTime: 0
+    lastClickTime: 0,
+    totalDistance: 0
   });
 
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -66,7 +67,8 @@ export const useGameState = () => {
       roundNumber: 1,
       isCountingDown: false,
       isPaused: false,
-      revealedNeighborhoods: new Set()
+      revealedNeighborhoods: new Set(),
+      totalDistance: 0
     }));
 
     setTimeout(() => {

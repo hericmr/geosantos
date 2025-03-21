@@ -22,6 +22,7 @@ import { GeoJSONLayer } from './game/GeoJSONLayer';
 import { DistanceCircle } from './game/DistanceCircle';
 import { NeighborhoodManager } from './game/NeighborhoodManager';
 import { GameAudioManager } from './game/GameAudioManager';
+import { DistanceDisplay } from './ui/DistanceDisplay';
 
 // Fix for default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -210,6 +211,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
         // Atualiza o resto do estado após um pequeno delay
         setTimeout(() => {
+          const newTotalDistance = gameState.totalDistance + distance;
           updateGameState({
             clickTime: clickDuration,
             score: newScore,
@@ -217,9 +219,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             feedbackOpacity: 1,
             feedbackProgress: 100,
             feedbackMessage: feedbackMessage,
-            gameOver: newNegativeSum > 40,
+            gameOver: newNegativeSum > 40 || newTotalDistance > 4000,
             revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
-            arrowPath: (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null
+            arrowPath: (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null,
+            totalDistance: newTotalDistance
           });
 
           if (newNegativeSum > 30) {
@@ -495,11 +498,35 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       )}
 
       {gameState.gameStarted && (
-        <ScoreDisplay 
-          icon="🎯"
-          value={gameState.score}
-          unit="pts"
-        />
+        <>
+          <div style={{
+            position: 'fixed',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '20px',
+            alignItems: 'center',
+            zIndex: 1000
+          }}>
+            <ScoreDisplay 
+              icon="🎯"
+              value={gameState.score}
+              unit="pts"
+            />
+          </div>
+          <div style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 1000
+          }}>
+            <DistanceDisplay
+              totalDistance={gameState.totalDistance}
+              maxDistance={4000}
+            />
+          </div>
+        </>
       )}
 
       <MapContainer

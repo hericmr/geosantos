@@ -15,25 +15,39 @@ describe('ScoreCalculator', () => {
       timeBonusThreshold: 2,
       nearBorderDistance: 10,
       nearBorderBonus: 2000,
-      correctNeighborhoodBonus: 1000
+      correctNeighborhoodBonus: 1000,
+      maxTotalDistanceKm: 4
     };
   });
 
   describe('constructor', () => {
     it('should use default config when no config is provided', () => {
-      const calc = new ScoreCalculator();
-      expect(calc['config']).toEqual(defaultConfig);
+      const calculator = new ScoreCalculator();
+      expect(calculator['config']).toEqual({
+        maxDistancePoints: 1000,
+        maxTimeBonus: 500,
+        maxDistanceKm: 10,
+        timeBonusThreshold: 2,
+        nearBorderDistance: 10,
+        nearBorderBonus: 2000,
+        correctNeighborhoodBonus: 1000,
+        maxTotalDistanceKm: 4
+      });
     });
 
     it('should override default config with provided values', () => {
       const customConfig = {
         maxDistancePoints: 2000,
-        maxTimeBonus: 1000
+        maxTimeBonus: 1000,
+        maxDistanceKm: 20,
+        timeBonusThreshold: 5,
+        nearBorderDistance: 20,
+        nearBorderBonus: 4000,
+        correctNeighborhoodBonus: 2000,
+        maxTotalDistanceKm: 8
       };
-      const calc = new ScoreCalculator(customConfig);
-      expect(calc['config'].maxDistancePoints).toBe(2000);
-      expect(calc['config'].maxTimeBonus).toBe(1000);
-      expect(calc['config'].maxDistanceKm).toBe(defaultConfig.maxDistanceKm);
+      const calculator = new ScoreCalculator(customConfig);
+      expect(calculator['config']).toEqual(customConfig);
     });
   });
 
@@ -259,6 +273,60 @@ describe('ScoreCalculator', () => {
     it('should handle very large time values', () => {
       const score = calculator.calculateBaseScore(0, 1000);
       expect(score.timePoints).toBe(0); // Não deve dar bônus para tempo muito alto
+    });
+  });
+
+  describe('game over by total distance', () => {
+    it('should not be game over when total distance is below threshold', () => {
+      const calculator = new ScoreCalculator();
+      const target = new LatLng(0, 0);
+      // Aproximadamente 1.5km por clique (total 3km após dois cliques)
+      const click = new LatLng(0.00675, 0.00675);
+      
+      const result1 = calculator.calculateFinalScore(click, target, 10, false);
+      const result2 = calculator.calculateFinalScore(click, target, 10, false);
+      
+      expect(calculator.isGameOver()).toBe(false);
+      expect(calculator.getTotalDistance()).toBeLessThan(4000);
+      expect(result1.total).toBeGreaterThan(0);
+      expect(result2.total).toBeGreaterThan(0);
+    });
+
+    it('should be game over when total distance exceeds threshold', () => {
+      const calculator = new ScoreCalculator();
+      const target = new LatLng(0, 0);
+      // Aproximadamente 2.5km por clique
+      const click = new LatLng(0.0112, 0.0112);
+      
+      const result1 = calculator.calculateFinalScore(click, target, 10, false);
+      const result2 = calculator.calculateFinalScore(click, target, 10, false);
+      
+      expect(calculator.isGameOver()).toBe(true);
+      expect(calculator.getTotalDistance()).toBeGreaterThan(4000);
+      expect(result1.total).toBeGreaterThan(0); // Primeiro clique ainda deve dar pontos
+      expect(result2.total).toBe(0); // Segundo clique deve retornar zero pontos
+    });
+
+    it('should reset total distance when resetTotalDistance is called', () => {
+      const calculator = new ScoreCalculator();
+      const target = new LatLng(0, 0);
+      // Aproximadamente 2.5km por clique
+      const click = new LatLng(0.0112, 0.0112);
+      
+      const result1 = calculator.calculateFinalScore(click, target, 10, false);
+      const result2 = calculator.calculateFinalScore(click, target, 10, false);
+      
+      expect(calculator.isGameOver()).toBe(true);
+      expect(calculator.getTotalDistance()).toBeGreaterThan(4000);
+      expect(result2.total).toBe(0);
+      
+      calculator.resetTotalDistance();
+      expect(calculator.isGameOver()).toBe(false);
+      expect(calculator.getTotalDistance()).toBe(0);
+      
+      // Deve permitir pontuação novamente após reset
+      const result3 = calculator.calculateFinalScore(click, target, 10, false);
+      expect(result3.total).toBeGreaterThan(0);
     });
   });
 }); 
