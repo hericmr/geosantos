@@ -95,7 +95,7 @@ export const useGameState = () => {
         clickedPosition: null,
         arrowPath: null,
         showFeedback: false,
-        feedbackProgress: 0,
+        feedbackOpacity: 0,
         timeLeft: newTimeLeft,
         roundInitialTime: newTimeLeft,
         roundNumber: nextRoundNumber,

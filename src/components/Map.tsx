@@ -322,28 +322,23 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
     // Define o tempo inicial da rodada
     const newInitialTime = isPhaseTwo ? PHASE_TWO_TIME : 10;
+    
+    // Reseta o estado do feedback e inicia a próxima rodada
     updateGameState({
       roundInitialTime: newInitialTime,
       timeLeft: newInitialTime,
       isCountingDown: true,
-      isPaused: false
-    });
-
-    // Reseta o estado do feedback
-    updateGameState({
+      isPaused: false,
       showFeedback: false,
       feedbackOpacity: 0,
-      feedbackProgress: 0,
+      feedbackProgress: 100, // Reseta para 100%
       clickedPosition: null,
       arrowPath: null,
       revealedNeighborhoods: new Set()
     });
 
-    // Pequeno delay para garantir que o estado foi limpo
-    setTimeout(() => {
-      // Inicia a próxima rodada
-      startNextRound(geoJsonData);
-    }, 100);
+    // Inicia a próxima rodada
+    startNextRound(geoJsonData);
   };
 
   return (
