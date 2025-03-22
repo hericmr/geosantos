@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FeedbackPanel } from '../FeedbackPanel';
 import { LatLng } from 'leaflet';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('FeedbackPanel', () => {
   const mockProps = {
@@ -10,19 +11,19 @@ describe('FeedbackPanel', () => {
     arrowPath: null,
     clickTime: 5,
     feedbackProgress: 50,
-    onNextRound: jest.fn(),
-    calculateDistance: jest.fn(),
-    calculateScore: jest.fn(() => ({ total: 1000, distancePoints: 500, timePoints: 500 })),
-    getProgressBarColor: jest.fn(),
+    onNextRound: vi.fn(),
+    calculateDistance: vi.fn(),
+    calculateScore: vi.fn(() => ({ total: 1000, distancePoints: 500, timePoints: 500 })),
+    getProgressBarColor: vi.fn(),
     geoJsonData: null,
     gameOver: false,
-    onPauseGame: jest.fn(),
+    onPauseGame: vi.fn(),
     score: 1000,
     currentNeighborhood: 'Test Neighborhood'
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders correct neighborhood message when distance is 0', () => {
@@ -30,7 +31,7 @@ describe('FeedbackPanel', () => {
       ...mockProps,
       clickedPosition: { lat: 0, lng: 0 } as LatLng,
       arrowPath: null,
-      calculateDistance: jest.fn(() => 0)
+      calculateDistance: vi.fn(() => 0)
     };
 
     render(<FeedbackPanel {...props} />);
@@ -46,7 +47,7 @@ describe('FeedbackPanel', () => {
         { lat: 0, lng: 0 } as LatLng,
         { lat: 1, lng: 1 } as LatLng
       ] as [LatLng, LatLng],
-      calculateDistance: jest.fn(() => 1000)
+      calculateDistance: vi.fn(() => 1000)
     };
 
     render(<FeedbackPanel {...props} />);

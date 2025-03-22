@@ -1,13 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ActionButtons } from '../ActionButtons';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('ActionButtons', () => {
-  const mockOnPauseGame = jest.fn();
-  const mockOnNextRound = jest.fn();
+  const mockOnPauseGame = vi.fn();
+  const mockOnNextRound = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders both buttons when not game over', () => {

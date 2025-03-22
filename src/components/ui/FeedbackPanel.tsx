@@ -208,13 +208,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         </div>
       )}
 
-      {timeBonus > 0 && !gameOver && (
-        <FeedbackMessage
-          message={`⚡ +${timeBonus.toFixed(2)}s`}
-          isExcellent={true}
-        />
-      )}
-
       {feedbackMessage && !gameOver && (
         <FeedbackMessage
           message={feedbackMessage}
