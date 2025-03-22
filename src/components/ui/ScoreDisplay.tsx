@@ -31,7 +31,7 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
         {unit}
       </div>
       {timeBonus && timeBonus > 0 && (
-        <div style={styles.timeBonus}>
+        <div style={styles.scoreUnit}>
           <span>⚡</span> +{timeBonus.toFixed(2)}s
         </div>
       )}

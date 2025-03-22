@@ -24,6 +24,28 @@ import { NeighborhoodManager } from './game/NeighborhoodManager';
 import { GameAudioManager } from './game/GameAudioManager';
 import { DistanceDisplay } from './ui/DistanceDisplay';
 
+// Função para verificar se um ponto está dentro de um polígono
+// Implementação do algoritmo "ray casting" para determinar se um ponto está dentro de um polígono
+const isPointInsidePolygon = (point: L.LatLng, polygon: L.LatLng[]): boolean => {
+  // Implementação do algoritmo "point-in-polygon" usando ray casting
+  const x = point.lng;
+  const y = point.lat;
+  
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lng;
+    const yi = polygon[i].lat;
+    const xj = polygon[j].lng;
+    const yj = polygon[j].lat;
+    
+    const intersect = ((yi > y) !== (yj > y)) &&
+        (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  
+  return inside;
+};
+
 // Fix for default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -135,14 +157,96 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         
         try {
           if (polygon.getBounds().contains(latlng)) {
-            clickedNeighborhood = feature.properties?.NOME;
+            if (feature.properties?.NOME === gameState.currentNeighborhood) {
+              // Se o clique foi dentro do bairro correto, marcamos isso
+              clickedNeighborhood = feature.properties?.NOME;
+              // Verificamos se o polígono contém o ponto exato, não apenas o retângulo delimitador
+              if (layer instanceof L.Polygon) {
+                const containsPoint = isPointInsidePolygon(latlng, (layer as L.Polygon).getLatLngs()[0] as L.LatLng[]);
+                if (containsPoint) {
+                  // Confirmamos que é realmente dentro do polígono
+                  clickedNeighborhood = feature.properties?.NOME;
+                }
+              }
+            } else {
+              // Se estiver em outro bairro, apenas registramos
+              if (!clickedNeighborhood) {
+                clickedNeighborhood = feature.properties?.NOME;
+              }
+            }
           }
         } catch (error) {
           // Silently handle error
         }
       });
 
-      // Se encontramos o bairro alvo, calculamos a distância até o ponto mais próximo
+      // VERIFICAÇÃO PRIORITÁRIA: Se o clique foi dentro do bairro correto, tratamos isso primeiro
+      const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
+      
+      if (isCorrectNeighborhood) {
+        // Se acertou o bairro, a distância é zero e não precisamos calcular ponto mais próximo
+        const distance = 0;
+        const score = 1000 * Math.pow(gameState.timeLeft / 10, 2); // Pontuação máxima com multiplicador de tempo
+        const newScore = gameState.score + Math.round(score);
+        
+        // Atualiza o estado para refletir o acerto direto
+        setTimeout(() => {
+          updateGameState({
+            clickTime: clickDuration,
+            score: newScore,
+            showFeedback: true,
+            feedbackOpacity: 1,
+            feedbackProgress: 100,
+            feedbackMessage: "",
+            gameOver: false,
+            revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
+            arrowPath: null, // Sem seta quando acerta
+            totalDistance: gameState.totalDistance // Não adiciona distância quando acerta
+          });
+          
+          // Toca o som de sucesso
+          if (successSoundRef.current) {
+            successSoundRef.current.currentTime = 0;
+            successSoundRef.current.play().catch(() => {});
+          }
+          
+          setTimeout(() => {
+            const duration = 4000;
+            const interval = 100;
+            let timeElapsed = 0;
+            
+            // Limpa qualquer intervalo anterior
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current);
+            }
+            
+            // Inicia o intervalo para animar a barra de progresso
+            progressIntervalRef.current = setInterval(() => {
+              timeElapsed += interval;
+              const progress = 100 - (timeElapsed / duration * 100);
+              
+              if (progress <= 0) {
+                if (progressIntervalRef.current) {
+                  clearInterval(progressIntervalRef.current);
+                }
+                
+                // Quando acabar o tempo, inicia a próxima rodada
+                handleNextRound(geoJsonData!);
+                return;
+              }
+              
+              updateGameState({
+                feedbackProgress: progress,
+                feedbackOpacity: progress / 100
+              });
+            }, interval);
+          }, 1000);
+        }, 0);
+        
+        return; // Sai da função, não precisamos fazer mais nada
+      }
+      
+      // Se não acertou o bairro, continua com a lógica original para calcular distância
       if (targetLayer) {
         const polygon = targetLayer as L.Polygon;
         const latLngs = polygon.getLatLngs()[0] as L.LatLng[];
@@ -168,12 +272,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         
         const distance = minDistance;
         const isNearBorder = distance < 10;
-        const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
-        
         
         // Se acertou o bairro correto ou está muito próximo da borda, dá pontuação máxima
-        const score = (isCorrectNeighborhood || isNearBorder)
-          ? (isNearBorder ? 2000 : 1000) * Math.pow(gameState.timeLeft / 10, 2) // Aplica multiplicador de tempo mesmo no acerto
+        const score = isNearBorder
+          ? 2000 * Math.pow(gameState.timeLeft / 10, 2) // Aplica multiplicador de tempo mesmo no acerto
           : calculateScore(distance, gameState.timeLeft).total;
         
         const newScore = gameState.score + Math.round(score);
@@ -202,8 +304,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         // Mensagem de feedback personalizada baseada no tipo de acerto
         let feedbackMessage = "";
         if (isNearBorder) {
-          feedbackMessage = "";
-        } else if (isCorrectNeighborhood) {
           feedbackMessage = "";
         } else {
           feedbackMessage = getFeedbackMessage(distance);
