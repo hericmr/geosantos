@@ -33,7 +33,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
       backdropFilter: 'blur(8px)',
       WebkitBackdropFilter: 'blur(8px)',
       color: 'white',
-      padding: gameStarted ? '0' : 'clamp(20px, 4vw, 30px)',
+      padding: gameStarted ? '0' : 'clamp(10px, 2vw, 15px)',
       textAlign: 'center',
       zIndex: 1002,
       boxSizing: 'border-box'
@@ -41,43 +41,19 @@ export const GameControls: React.FC<GameControlsProps> = ({
       <style>
         {`
           @keyframes pulseText {
-            0% { 
-              transform: scale(1);
-            }
-            50% { 
-              transform: scale(1.03);
-            }
-            100% { 
-              transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
           }
 
           @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
           }
 
-          .game-title {
-            animation: pulseText 1.5s infinite;
-          }
-
-          .game-description {
-            animation: fadeIn 0.3s ease-out;
-          }
-
-          .game-instructions {
-            animation: fadeIn 0.4s ease-out 0.1s both;
-          }
-
-          .start-button {
-            animation: fadeIn 0.3s ease-out 0.2s both;
-          }
+          .game-title { animation: pulseText 1.5s infinite; }
+          .game-description { animation: fadeIn 0.3s ease-out; }
+          .start-button { animation: fadeIn 0.3s ease-out 0.2s both; }
         `}
       </style>
       
@@ -87,41 +63,32 @@ export const GameControls: React.FC<GameControlsProps> = ({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 'clamp(8px, 2vw, 12px)',
-          padding: 'clamp(10px, 2vw, 15px)',
-          maxWidth: '800px',
+          gap: 'clamp(4px, 1vw, 8px)',
+          padding: 'clamp(5px, 1vw, 10px)',
+          maxWidth: '600px',
           margin: '0 auto',
           animation: 'fadeIn 0.3s ease-out'
         }}>
           <style>
             {`
               @keyframes fadeOut {
-                from {
-                  opacity: 1;
-                  transform: translateY(0);
-                }
-                to {
-                  opacity: 0;
-                  transform: translateY(-10px);
-                }
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
               }
-
-              .fade-out {
-                animation: fadeOut 0.3s ease-out forwards;
-              }
+              .fade-out { animation: fadeOut 0.3s ease-out forwards; }
             `}
           </style>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 'clamp(4px, 1vw, 8px)',
+            gap: 'clamp(2px, 0.5vw, 4px)',
             textAlign: 'center',
             width: '100%',
-            padding: '0 20px'
+            padding: '0 10px'
           }}>
             <h2 className="game-title" style={{ 
-              fontSize: 'clamp(2rem, 4.5vw, 2.5rem)', 
+              fontSize: 'clamp(1.8rem, 3.5vw, 2.2rem)', 
               margin: '0',
               textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
               fontFamily: "'Inter', sans-serif",
@@ -133,16 +100,15 @@ export const GameControls: React.FC<GameControlsProps> = ({
             </h2>
             
             <p className="game-description" style={{ 
-              fontSize: 'clamp(1.2rem, 2.2vw, 1.4rem)', 
+              fontSize: 'clamp(0.9rem, 1.8vw, 1.1rem)', 
               margin: '0',
               fontFamily: "'Inter', sans-serif",
               fontWeight: 500,
               color: '#FFFFFF',
               textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
-              lineHeight: 1.3
+              lineHeight: 1.2
             }}>
-              Prepare-se!<br/>
-              Clique o mais próximo possível dos bairros no mapa. Velocidade importa, quanto mais rápido melhor!
+              Clique o mais próximo possível dos bairros indicados
             </p>
           </div>
           
@@ -158,35 +124,35 @@ export const GameControls: React.FC<GameControlsProps> = ({
               }
             }}
             style={{
-              padding: 'clamp(12px, 2.5vw, 16px) clamp(40px, 6vw, 60px)',
-              fontSize: 'clamp(1.2rem, 2.5vw, 1.4rem)',
+              padding: 'clamp(8px, 1.5vw, 12px) clamp(30px, 4vw, 40px)',
+              fontSize: 'clamp(1rem, 2vw, 1.2rem)',
               background: '#32CD32',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '6px',
               color: 'white',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
               fontWeight: 700,
               whiteSpace: 'nowrap',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
               position: 'relative',
               overflow: 'hidden',
-              marginTop: '12px',
+              marginTop: '8px',
               letterSpacing: '1px',
               textTransform: 'uppercase'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)';
               e.currentTarget.style.background = '#28a745';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.3)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.background = '#32CD32';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
             }}
           >
-            Iniciar
+            Jogar
           </button>
         </div>
       ) : (
@@ -294,21 +260,21 @@ export const GameControls: React.FC<GameControlsProps> = ({
           
           <div style={{
             width: '100%',
-            padding: '10px 0',
+            padding: '4px 0',
             textAlign: 'center',
             background: 'rgba(20, 83, 45, 0.85)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
           }}>
             <p style={{ 
-              fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)', 
+              fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', 
               fontFamily: "'Inter', sans-serif",
               fontWeight: 600,
               color: '#FFFFFF',
               lineHeight: 1.2,
               margin: 0
             }}>
-              Quão bem você conhece a sua cidade?
+              Encontre os bairros de Santos
             </p>
           </div>
         </div>
