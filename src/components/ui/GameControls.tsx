@@ -274,7 +274,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
               lineHeight: 1.2,
               margin: 0
             }}>
-              Encontre os bairros de Santos
+              Quão bem você conhece a sua cidade?
             </p>
           </div>
         </div>
