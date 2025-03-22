@@ -43,12 +43,20 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       setFeedbackMessage(getFeedbackMessage(distance));
 
       let bonus = 0;
-      if (score.total >= TIME_BONUS_THRESHOLDS.EXCELLENT) {
+      if (score.total >= TIME_BONUS_THRESHOLDS.PERFECT) {
+        bonus = TIME_BONUS_AMOUNTS.PERFECT;
+      } else if (score.total >= TIME_BONUS_THRESHOLDS.EXCELLENT) {
         bonus = TIME_BONUS_AMOUNTS.EXCELLENT;
+      } else if (score.total >= TIME_BONUS_THRESHOLDS.GREAT) {
+        bonus = TIME_BONUS_AMOUNTS.GREAT;
       } else if (score.total >= TIME_BONUS_THRESHOLDS.GOOD) {
         bonus = TIME_BONUS_AMOUNTS.GOOD;
+      } else if (score.total >= TIME_BONUS_THRESHOLDS.DECENT) {
+        bonus = TIME_BONUS_AMOUNTS.DECENT;
       } else if (score.total >= TIME_BONUS_THRESHOLDS.FAIR) {
         bonus = TIME_BONUS_AMOUNTS.FAIR;
+      } else if (score.total >= TIME_BONUS_THRESHOLDS.CLOSE) {
+        bonus = TIME_BONUS_AMOUNTS.CLOSE;
       }
       setTimeBonus(bonus);
 

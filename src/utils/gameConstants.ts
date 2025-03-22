@@ -5,22 +5,30 @@ export const MAX_DISTANCE_METERS = 2000; // Maximum distance considered for scor
 
 // Constantes para o sistema de bônus de tempo
 export const TIME_BONUS_THRESHOLDS = {
-  EXCELLENT: 2000, // Pontuação excelente
-  GOOD: 1500,      // Pontuação boa
-  FAIR: 1000       // Pontuação razoável
+  PERFECT: 3000,    // Acerto perfeito (clique no bairro)
+  EXCELLENT: 2000,  // Pontuação excelente
+  GREAT: 1750,      // Pontuação ótima
+  GOOD: 1500,       // Pontuação boa
+  DECENT: 1250,     // Pontuação decente
+  FAIR: 1000,       // Pontuação razoável
+  CLOSE: 750        // Pontuação próxima
 };
 
 export const TIME_BONUS_AMOUNTS = {
-  EXCELLENT: 2.0,  // 2 segundos de bônus
-  GOOD: 1.5,       // 1.5 segundos de bônus
-  FAIR: 1.0        // 1 segundo de bônus
+  PERFECT: 3.0,     // 3 segundos de bônus para acerto perfeito
+  EXCELLENT: 2.5,   // 2.5 segundos de bônus
+  GREAT: 2.0,       // 2 segundos de bônus
+  GOOD: 1.5,        // 1.5 segundos de bônus
+  DECENT: 1.25,     // 1.25 segundos de bônus
+  FAIR: 1.0,        // 1 segundo de bônus
+  CLOSE: 0.5        // 0.5 segundos de bônus
 };
 
 // Função para calcular o bônus de tempo baseado na pontuação
 export const calculateTimeBonus = (score: number): number => {
-  // Pontuação máxima possível é 1500 (1000 de distância + 500 de tempo)
-  const maxScore = 1500;
-  const maxBonus = 2.0; // Máximo de 2 segundos de bônus
+  // Pontuação máxima possível é 3000 (clique direto no bairro)
+  const maxScore = 3000;
+  const maxBonus = 3.0; // Máximo de 3 segundos de bônus
   
   // Calcula o bônus proporcional à pontuação
   // Quanto maior a pontuação, maior o bônus

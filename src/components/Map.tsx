@@ -186,7 +186,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       if (isCorrectNeighborhood) {
         // Se acertou o bairro, a distância é zero e não precisamos calcular ponto mais próximo
         const distance = 0;
-        const score = 1000 * Math.pow(gameState.timeLeft / 10, 2); // Pontuação máxima com multiplicador de tempo
+        const score = 3000 * Math.pow(gameState.timeLeft / 10, 2); // Pontuação máxima com multiplicador de tempo
         const newScore = gameState.score + Math.round(score);
         
         // Atualiza o estado para refletir o acerto direto
