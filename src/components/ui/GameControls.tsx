@@ -108,7 +108,8 @@ export const GameControls: React.FC<GameControlsProps> = ({
               textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
               lineHeight: 1.2
             }}>
-              Clique o mais próximo possível dos bairros indicados
+              Prepare-se!<br/>
+              Clique o mais próximo possível dos bairros no mapa. Velocidade importa, quanto mais rápido melhor!
             </p>
           </div>
           
