@@ -72,21 +72,59 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
     }
   }, [showFeedback, clickedPosition, arrowPath, clickTime, calculateScore, calculateDistance]);
 
-  useEffect(() => {
-    if (clickedPosition) {
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      
-      if (isMobile) {
-        setPopupPosition({ top: 'auto', left: '0' });
-      } else {
-        setPopupPosition({ 
-          top: '50%',
-          left: '50%'
-        });
-      }
+  // Esta função determina a melhor posição para o painel de feedback
+  const calculateOptimalPosition = () => {
+    if (!clickedPosition || !arrowPath) {
+      // Se não temos as coordenadas necessárias, posiciona no centro
+      return { top: '50%', left: '50%' };
     }
-  }, [clickedPosition, arrowPath, isMobile]);
+
+    // Obter tamanho da viewport
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    if (isMobile) {
+      // Em dispositivos móveis, mantemos o painel na parte inferior
+      return { top: 'auto', left: '0' };
+    }
+
+    // Coordenadas do clique e do bairro alvo (fim da seta)
+    const clickX = clickedPosition.lng;
+    const clickY = clickedPosition.lat;
+    const targetX = arrowPath[1].lng;
+    const targetY = arrowPath[1].lat;
+    
+    // Calcular o centro da linha entre o clique e o alvo
+    const centerX = (clickX + targetX) / 2;
+    const centerY = (clickY + targetY) / 2;
+    
+    // Abordagem simplificada: Dividir a tela em quatro quadrantes e posicionar 
+    // o painel no quadrante oposto ao clique
+    
+    // Verificar em qual quadrante está o clique
+    const mapInstance = (window as any).mapInstance;
+    if (!mapInstance) {
+      // Fallback se o mapa não estiver disponível
+      return { top: '50%', left: '50%' };
+    }
+    
+    // Vamos usar uma abordagem mais simples - se o clique está na metade direita,
+    // colocamos o feedback à esquerda e vice-versa
+    if (clickX > centerX) {
+      // Clique está mais à direita, posiciona o painel à esquerda
+      return { top: '40%', left: '20%' };
+    } else {
+      // Clique está mais à esquerda, posiciona o painel à direita
+      return { top: '40%', left: '80%' };
+    }
+  };
+
+  useEffect(() => {
+    if (clickedPosition && !gameOver) {
+      const optimalPosition = calculateOptimalPosition();
+      setPopupPosition(optimalPosition);
+    }
+  }, [clickedPosition, arrowPath, isMobile, gameOver]);
 
   const isCorrectNeighborhood = displayedDistance === 0;
 

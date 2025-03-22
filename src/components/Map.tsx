@@ -344,6 +344,13 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     startNextRound(geoJsonData);
   };
 
+  // Disponibilizar a referência do mapa para outros componentes
+  useEffect(() => {
+    if (mapRef.current) {
+      (window as any).mapInstance = mapRef.current;
+    }
+  }, [mapRef.current]);
+
   return (
     <div style={{
       margin: 0,
@@ -532,7 +539,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       <MapContainer
         center={center}
         zoom={zoom}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%', zIndex: 1 }}
         zoomControl={false}
         attributionControl={false}
         ref={mapRef}
