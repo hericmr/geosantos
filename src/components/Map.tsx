@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, GeoJSON as ReactGeoJSON } from 'react-leaflet';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import { FeatureCollection } from 'geojson';
@@ -9,9 +9,9 @@ import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
 import { MapProps } from '../types/game';
-import { useGameState } from '../hooks/useGameState';
-import { calculateDistance, calculateScore, closestPointOnSegment } from '../utils/gameUtils';
-import { getProgressBarColor, getFeedbackMessage, FASE_1_BAIRROS, PHASE_TWO_TIME } from '../utils/gameConstants';
+import { useMapGame } from '../hooks/useMapGame';
+import { getProgressBarColor } from '../utils/gameConstants';
+import { calculateDistance, calculateScore } from '../utils/gameUtils';
 
 import { AudioControls } from './ui/AudioControls';
 import { GameControls } from './ui/GameControls';
@@ -64,385 +64,42 @@ const bandeira2Icon = new L.Icon({
 });
 
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
-  const mapRef = useRef<L.Map | null>(null);
-  const geoJsonRef = useRef<L.GeoJSON>(null) as React.RefObject<L.GeoJSON>;
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const successSoundRef = useRef<HTMLAudioElement>(null);
-  const errorSoundRef = useRef<HTMLAudioElement>(null);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
-  const [negativeScoreSum, setNegativeScoreSum] = useState(0);
-  const [isPhaseTwo, setIsPhaseTwo] = useState(false);
-  const [showPhaseTwoIntro, setShowPhaseTwoIntro] = useState(false);
-  const [showPhaseOneMessage, setShowPhaseOneMessage] = useState(false);
-  const PHASE_TWO_SCORE = 10000;
-  const [distanceCircle, setDistanceCircle] = useState<{ center: L.LatLng; radius: number } | null>(null);
   
   const {
+    mapRef,
+    geoJsonRef,
+    audioRef,
+    successSoundRef,
+    errorSoundRef,
+    isLoading,
+    isPaused,
+    isPhaseTwo,
+    showPhaseTwoIntro,
+    showPhaseOneMessage,
+    distanceCircle,
     gameState,
-    updateGameState,
-    startGame,
-    startNextRound,
-    clearFeedbackTimer,
-    feedbackTimerRef
-  } = useGameState();
-
-  // Estado para controlar os sons de feedback
-  const [playSuccessSound, setPlaySuccessSound] = useState(false);
-  const [playErrorSound, setPlayErrorSound] = useState(false);
+    handleMapClick,
+    handleVolumeChange,
+    handleToggleMute,
+    handlePauseGame,
+    handleNextRound,
+    handleStartGame,
+    setShowPhaseTwoIntro,
+    setDistanceCircle,
+    updateGameState
+  } = useMapGame(geoJsonData);
 
   useEffect(() => {
-    setIsLoading(true);
     fetch('https://raw.githubusercontent.com/hericmr/jogocaicara/refs/heads/main/public/data/bairros.geojson')
       .then(response => response.json())
       .then(data => {
         setGeoJsonData(data);
-        setIsLoading(false);
       })
       .catch(() => {
-        setIsLoading(false);
+        // Handle error silently
       });
   }, []);
-
-  const handleStartGame = () => {
-    if (geoJsonData) {
-      setShowPhaseOneMessage(true);
-      setTimeout(() => {
-        setShowPhaseOneMessage(false);
-        startGame();
-        setIsPhaseTwo(false);
-      }, 1000);
-    }
-  };
-
-  const handleMapClick = (latlng: L.LatLng) => {
-    if (!gameState.gameStarted || !gameState.isCountingDown) return;
-
-    const clickDuration = 10 - gameState.timeLeft;
-
-    // Pausa a barra de tempo imediatamente após o clique
-    updateGameState({
-      isCountingDown: false,
-      isPaused: true
-    });
-
-    // Primeiro, apenas atualiza a posição da bandeira
-    updateGameState({ clickedPosition: latlng });
-
-    if (geoJsonRef.current) {
-      let targetLayer: L.Layer | null = null;
-      let clickedFeature: any = null;
-      let clickedNeighborhood: string | null = null;
-
-      // Primeiro, encontramos o bairro alvo
-      const layers = geoJsonRef.current.getLayers();
-      layers.forEach((layer: L.Layer) => {
-        const feature = (layer as any).feature;
-        
-        try {
-          if (feature.properties?.NOME === gameState.currentNeighborhood) {
-            targetLayer = layer;
-          }
-        } catch (error) {
-          // Silently handle error
-        }
-      });
-
-      // Depois, verificamos se o clique foi dentro de algum bairro
-      layers.forEach((layer: L.Layer) => {
-        const feature = (layer as any).feature;
-        const polygon = layer as L.Polygon;
-        
-        try {
-          if (polygon.getBounds().contains(latlng)) {
-            if (feature.properties?.NOME === gameState.currentNeighborhood) {
-              // Se o clique foi dentro do bairro correto, marcamos isso
-              clickedNeighborhood = feature.properties?.NOME;
-              // Verificamos se o polígono contém o ponto exato, não apenas o retângulo delimitador
-              if (layer instanceof L.Polygon) {
-                const containsPoint = isPointInsidePolygon(latlng, (layer as L.Polygon).getLatLngs()[0] as L.LatLng[]);
-                if (containsPoint) {
-                  // Confirmamos que é realmente dentro do polígono
-                  clickedNeighborhood = feature.properties?.NOME;
-                }
-              }
-            } else {
-              // Se estiver em outro bairro, apenas registramos
-              if (!clickedNeighborhood) {
-                clickedNeighborhood = feature.properties?.NOME;
-              }
-            }
-          }
-        } catch (error) {
-          // Silently handle error
-        }
-      });
-
-      // VERIFICAÇÃO PRIORITÁRIA: Se o clique foi dentro do bairro correto, tratamos isso primeiro
-      const isCorrectNeighborhood = clickedNeighborhood === gameState.currentNeighborhood;
-      
-      if (isCorrectNeighborhood) {
-        // Se acertou o bairro, a distância é zero e não precisamos calcular ponto mais próximo
-        const distance = 0;
-        const score = 3000 * Math.pow(gameState.timeLeft / 10, 2); // Pontuação máxima com multiplicador de tempo
-        const newScore = gameState.score + Math.round(score);
-        
-        // Atualiza o estado para refletir o acerto direto
-        setTimeout(() => {
-          updateGameState({
-            clickTime: clickDuration,
-            score: newScore,
-            showFeedback: true,
-            feedbackOpacity: 1,
-            feedbackProgress: 100,
-            feedbackMessage: "",
-            gameOver: false,
-            revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
-            arrowPath: null, // Sem seta quando acerta
-            totalDistance: gameState.totalDistance // Não adiciona distância quando acerta
-          });
-          
-          // Toca o som de sucesso
-          if (successSoundRef.current) {
-            successSoundRef.current.currentTime = 0;
-            successSoundRef.current.play().catch(() => {});
-          }
-          
-          setTimeout(() => {
-            const duration = 4000;
-            const interval = 100;
-            let timeElapsed = 0;
-            
-            // Limpa qualquer intervalo anterior
-            if (progressIntervalRef.current) {
-              clearInterval(progressIntervalRef.current);
-            }
-            
-            // Inicia o intervalo para animar a barra de progresso
-            progressIntervalRef.current = setInterval(() => {
-              timeElapsed += interval;
-              const progress = 100 - (timeElapsed / duration * 100);
-              
-              if (progress <= 0) {
-                if (progressIntervalRef.current) {
-                  clearInterval(progressIntervalRef.current);
-                }
-                
-                // Quando acabar o tempo, inicia a próxima rodada
-                handleNextRound(geoJsonData!);
-                return;
-              }
-              
-              updateGameState({
-                feedbackProgress: progress,
-                feedbackOpacity: progress / 100
-              });
-            }, interval);
-          }, 1000);
-        }, 0);
-        
-        return; // Sai da função, não precisamos fazer mais nada
-      }
-      
-      // Se não acertou o bairro, continua com a lógica original para calcular distância
-      if (targetLayer) {
-        const polygon = targetLayer as L.Polygon;
-        const latLngs = polygon.getLatLngs()[0] as L.LatLng[];
-        
-        // Encontra o ponto mais próximo do polígono
-        let minDistance = Infinity;
-        let closestPoint: L.LatLng = latlng;
-        
-        // Para cada segmento do polígono
-        for (let i = 0; i < latLngs.length; i++) {
-          const p1 = latLngs[i];
-          const p2 = latLngs[(i + 1) % latLngs.length];
-          
-          // Calcula o ponto mais próximo no segmento
-          const point = closestPointOnSegment(latlng, p1 as L.LatLng, p2 as L.LatLng);
-          const distance = calculateDistance(latlng, point);
-          
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestPoint = point;
-          }
-        }
-        
-        const distance = minDistance;
-        const isNearBorder = distance < 10;
-        
-        // Se acertou o bairro correto ou está muito próximo da borda, dá pontuação máxima
-        const score = isNearBorder
-          ? 2000 * Math.pow(gameState.timeLeft / 10, 2) // Aplica multiplicador de tempo mesmo no acerto
-          : calculateScore(distance, gameState.timeLeft).total;
-        
-        const newScore = gameState.score + Math.round(score);
-        
-        // Verifica se o jogador atingiu a pontuação para a fase 2
-        if (newScore >= PHASE_TWO_SCORE && !isPhaseTwo) {
-          setIsPhaseTwo(true);
-          setShowPhaseTwoIntro(true);
-          updateGameState({
-            showFeedback: false,
-            feedbackOpacity: 0,
-            feedbackProgress: 0
-          });
-        }
-        
-        // Atualiza a soma de pontos negativos se o score for negativo
-        const newNegativeSum = score < 0 ? negativeScoreSum + Math.abs(score) : negativeScoreSum;
-        setNegativeScoreSum(newNegativeSum);
-        
-        // Desenha um círculo indicando a distância até o ponto correto
-        const circleToShow = (!isCorrectNeighborhood && !isNearBorder) ? {
-          center: latlng,
-          radius: distance
-        } : null;
-        
-        // Mensagem de feedback personalizada baseada no tipo de acerto
-        let feedbackMessage = "";
-        if (isNearBorder) {
-          feedbackMessage = "";
-        } else {
-          feedbackMessage = getFeedbackMessage(distance);
-        }
-
-        // Atualiza o resto do estado após um pequeno delay
-        setTimeout(() => {
-          const newTotalDistance = gameState.totalDistance + distance;
-          updateGameState({
-            clickTime: clickDuration,
-            score: newScore,
-            showFeedback: true,
-            feedbackOpacity: 1,
-            feedbackProgress: 100,
-            feedbackMessage: feedbackMessage,
-            gameOver: newNegativeSum > 40 || newTotalDistance > 4000,
-            revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
-            arrowPath: (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null,
-            totalDistance: newTotalDistance
-          });
-
-          if (newNegativeSum > 30) {
-            // Se for game over, não inicia próxima rodada
-            return;
-          }
-          
-          setTimeout(() => {
-            const duration = 4000;
-            const interval = 100;
-            let timeElapsed = 0;
-            
-            // Limpa qualquer intervalo anterior
-            if (progressIntervalRef.current) {
-              clearInterval(progressIntervalRef.current);
-            }
-            
-            progressIntervalRef.current = setInterval(() => {
-              timeElapsed += interval;
-              const remainingProgress = Math.max(0, 100 * (1 - timeElapsed / duration));
-              updateGameState({ feedbackProgress: remainingProgress });
-              
-              if (timeElapsed >= duration) {
-                if (progressIntervalRef.current) {
-                  clearInterval(progressIntervalRef.current);
-                  progressIntervalRef.current = null;
-                }
-                startNextRound(geoJsonData);
-              }
-            }, interval);
-            
-            feedbackTimerRef.current = setTimeout(() => {
-              if (progressIntervalRef.current) {
-                clearInterval(progressIntervalRef.current);
-                progressIntervalRef.current = null;
-              }
-              startNextRound(geoJsonData);
-            }, duration);
-          }, 300);
-
-          // Mostra o círculo após um pequeno delay para garantir que a bandeira já foi fincada
-          setTimeout(() => {
-            setDistanceCircle(circleToShow);
-          }, 200);
-        }, 200);
-      }
-    }
-  };
-
-  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(event.target.value);
-    updateGameState({ volume: newVolume });
-    if (newVolume > 0) {
-      updateGameState({ isMuted: false });
-    }
-  };
-
-  const handleToggleMute = () => {
-    updateGameState({ isMuted: !gameState.isMuted });
-  };
-
-  const handlePauseGame = () => {
-    setIsPaused(true);
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
-    if (feedbackTimerRef.current) {
-      clearTimeout(feedbackTimerRef.current);
-      feedbackTimerRef.current = null;
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    // Pausa a barra de tempo
-    updateGameState({
-      isCountingDown: false,
-      isPaused: true
-    });
-  };
-
-  const handleNextRound = (geoJsonData: FeatureCollection) => {
-    // Reseta o estado de pausa ao iniciar nova rodada
-    setIsPaused(false);
-    if (audioRef.current && gameState.gameStarted && !gameState.gameOver && !gameState.isMuted) {
-      audioRef.current.play();
-    }
-
-    // Limpa o timer de feedback se existir
-    if (feedbackTimerRef.current) {
-      clearTimeout(feedbackTimerRef.current);
-      feedbackTimerRef.current = null;
-    }
-
-    // Limpa o intervalo da barra de progresso se existir
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
-
-    // Define o tempo inicial da rodada
-    const newInitialTime = isPhaseTwo ? PHASE_TWO_TIME : 10;
-    
-    // Reseta o estado do feedback e inicia a próxima rodada
-    updateGameState({
-      roundInitialTime: newInitialTime,
-      timeLeft: newInitialTime,
-      isCountingDown: true,
-      isPaused: false,
-      showFeedback: false,
-      feedbackOpacity: 0,
-      feedbackProgress: 100, // Reseta para 100%
-      clickedPosition: null,
-      arrowPath: null,
-      revealedNeighborhoods: new Set()
-    });
-
-    // Inicia a próxima rodada
-    startNextRound(geoJsonData);
-  };
 
   // Disponibilizar a referência do mapa para outros componentes
   useEffect(() => {
@@ -594,15 +251,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         successSoundRef={successSoundRef}
         errorSoundRef={errorSoundRef}
         gameState={gameState}
-        playSuccess={playSuccessSound}
-        playError={playErrorSound}
+        playSuccess={false}
+        playError={false}
       />
 
-      {isLoading && (
-        <div className="loading-spinner" role="alert">
-          <p>Carregando o jogo...</p>
-        </div>
-      )}
+
 
       {gameState.gameStarted && (
         <>
@@ -769,7 +422,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             textAlign: 'left',
             maxWidth: '500px'
           }}>
-            <li style={{ marginBottom: '10px' }}>⚡ Tempo reduzido para {PHASE_TWO_TIME} segundos</li>
+            <li style={{ marginBottom: '10px' }}>⚡ Tempo reduzido para 5 segundos</li>
             <li style={{ marginBottom: '10px' }}>🎯 Todos os bairros de Santos agora!</li>
             <li style={{ marginBottom: '10px' }}>⚠️ Game over com 40 pontos negativos</li>
           </ul>
