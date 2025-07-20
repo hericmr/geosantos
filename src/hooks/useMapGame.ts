@@ -3,7 +3,8 @@ import * as L from 'leaflet';
 import { FeatureCollection } from 'geojson';
 import { calculateDistance, calculateScore, closestPointOnSegment } from '../utils/gameUtils';
 import { useGameState } from './useGameState';
-import { getFeedbackMessage } from '../utils/gameConstants';
+import { getFeedbackMessage, ROUND_TIME } from '../utils/gameConstants';
+import { GameMode, FamousPlace } from '../types/famousPlaces';
 
 // Função para verificar se um ponto está dentro de um polígono
 const isPointInsidePolygon = (point: L.LatLng, polygon: L.LatLng[]): boolean => {
@@ -25,7 +26,12 @@ const isPointInsidePolygon = (point: L.LatLng, polygon: L.LatLng[]): boolean => 
   return inside;
 };
 
-export const useMapGame = (geoJsonData: FeatureCollection | null) => {
+export const useMapGame = (
+  geoJsonData: FeatureCollection | null,
+  gameMode: GameMode = 'neighborhoods',
+  currentFamousPlace: FamousPlace | null = null,
+  setTargetIconPosition: React.Dispatch<React.SetStateAction<L.LatLng | null>>
+) => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonRef = useRef<L.GeoJSON>(null) as React.RefObject<L.GeoJSON>;
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -35,8 +41,6 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [negativeScoreSum, setNegativeScoreSum] = useState(0);
-  const [isPhaseTwo, setIsPhaseTwo] = useState(false);
-  const [showPhaseTwoIntro, setShowPhaseTwoIntro] = useState(false);
   const [showPhaseOneMessage, setShowPhaseOneMessage] = useState(false);
   const [distanceCircle, setDistanceCircle] = useState<{ center: L.LatLng; radius: number } | null>(null);
   
@@ -52,7 +56,7 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
   const handleMapClick = (latlng: L.LatLng) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
 
-    const clickDuration = 10 - gameState.timeLeft;
+    const clickDuration = gameState.roundInitialTime - gameState.timeLeft;
 
     // Pausa a barra de tempo imediatamente após o clique
     updateGameState({
@@ -61,7 +65,71 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
     });
 
     // Primeiro, apenas atualiza a posição da bandeira
-    updateGameState({ clickedPosition: latlng });
+    setTargetIconPosition(latlng);
+
+    setTimeout(() => {
+      setTargetIconPosition(null);
+      updateGameState({ clickedPosition: latlng });
+    }, 300); // Delay for target icon to show before flag
+
+    // Se for modo lugares famosos, usar coordenadas do lugar
+    if (gameMode === 'famous_places' && currentFamousPlace) {
+      const targetLatLng = L.latLng(currentFamousPlace.latitude, currentFamousPlace.longitude);
+      const distance = calculateDistance(latlng, targetLatLng);
+      const score = calculateScore(distance, gameState.timeLeft).total;
+      const newScore = gameState.score + Math.round(score);
+      
+      setTimeout(() => {
+        updateGameState({
+          clickTime: clickDuration,
+          score: newScore,
+          showFeedback: true,
+          feedbackOpacity: 1,
+          feedbackProgress: 100,
+          feedbackMessage: "",
+          gameOver: false,
+          revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, currentFamousPlace.name]),
+          arrowPath: null,
+          totalDistance: gameState.totalDistance
+        });
+        
+        if (successSoundRef.current) {
+          successSoundRef.current.currentTime = 0;
+          successSoundRef.current.play().catch(() => {});
+        }
+        
+        setTimeout(() => {
+          const duration = 4000;
+          const interval = 100;
+          let timeElapsed = 0;
+          
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+          }
+          
+          progressIntervalRef.current = setInterval(() => {
+            timeElapsed += interval;
+            const progress = 100 - (timeElapsed / duration * 100);
+            
+            if (progress <= 0) {
+              if (progressIntervalRef.current) {
+                clearInterval(progressIntervalRef.current);
+              }
+              
+              handleNextRound(geoJsonData!);
+              return;
+            }
+            
+            updateGameState({
+              feedbackProgress: progress,
+              feedbackOpacity: progress / 100
+            });
+          }, interval);
+        }, 1000);
+      }, 0);
+      
+      return;
+    }
 
     if (geoJsonRef.current) {
       let targetLayer: L.Layer | null = null;
@@ -191,20 +259,10 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
         const isNearBorder = distance < 10;
         
         const score = isNearBorder
-          ? 2000 * Math.pow(gameState.timeLeft / 10, 2)
+          ? 2500 * Math.pow(gameState.timeLeft / 15, 2)
           : calculateScore(distance, gameState.timeLeft).total;
         
         const newScore = gameState.score + Math.round(score);
-        
-        if (newScore >= 10000 && !isPhaseTwo) {
-          setIsPhaseTwo(true);
-          setShowPhaseTwoIntro(true);
-          updateGameState({
-            showFeedback: false,
-            feedbackOpacity: 0,
-            feedbackProgress: 0
-          });
-        }
         
         const newNegativeSum = score < 0 ? negativeScoreSum + Math.abs(score) : negativeScoreSum;
         setNegativeScoreSum(newNegativeSum);
@@ -228,13 +286,13 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
             feedbackOpacity: 1,
             feedbackProgress: 100,
             feedbackMessage: feedbackMessage,
-            gameOver: newNegativeSum > 40 || newTotalDistance > 4000,
+            gameOver: newNegativeSum > 60 || newTotalDistance > 6000,
             revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
             arrowPath: (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null,
             totalDistance: newTotalDistance
           });
 
-          if (newNegativeSum > 30) {
+          if (newNegativeSum > 50) {
             return;
           }
           
@@ -325,11 +383,9 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
       progressIntervalRef.current = null;
     }
 
-    const newInitialTime = isPhaseTwo ? 5 : 10;
-    
     updateGameState({
-      roundInitialTime: newInitialTime,
-      timeLeft: newInitialTime,
+      roundInitialTime: ROUND_TIME,
+      timeLeft: ROUND_TIME,
       isCountingDown: true,
       isPaused: false,
       showFeedback: false,
@@ -349,7 +405,6 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
       setTimeout(() => {
         setShowPhaseOneMessage(false);
         startGame();
-        setIsPhaseTwo(false);
       }, 1000);
     }
   };
@@ -362,8 +417,6 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
     errorSoundRef,
     isLoading,
     isPaused,
-    isPhaseTwo,
-    showPhaseTwoIntro,
     showPhaseOneMessage,
     distanceCircle,
     gameState,
@@ -373,8 +426,8 @@ export const useMapGame = (geoJsonData: FeatureCollection | null) => {
     handlePauseGame,
     handleNextRound,
     handleStartGame,
-    setShowPhaseTwoIntro,
     setDistanceCircle,
-    updateGameState
+    updateGameState,
+    gameMode
   };
 }; 

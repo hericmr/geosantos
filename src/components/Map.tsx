@@ -12,6 +12,7 @@ import { MapProps } from '../types/game';
 import { useMapGame } from '../hooks/useMapGame';
 import { getProgressBarColor } from '../utils/gameConstants';
 import { calculateDistance, calculateScore } from '../utils/gameUtils';
+import { GameMode, FamousPlace } from '../types/famousPlaces';
 
 import { AudioControls } from './ui/AudioControls';
 import { GameControls } from './ui/GameControls';
@@ -21,8 +22,11 @@ import { MapEvents } from './game/MapEvents';
 import { GeoJSONLayer } from './game/GeoJSONLayer';
 import { DistanceCircle } from './game/DistanceCircle';
 import { NeighborhoodManager } from './game/NeighborhoodManager';
+import { FamousPlacesManager } from './game/FamousPlacesManager';
 import { GameAudioManager } from './game/GameAudioManager';
 import { DistanceDisplay } from './ui/DistanceDisplay';
+import { GameOverModal } from './ui/GameOverModal';
+import { usePlayerName } from '../hooks/usePlayerName';
 
 // Função para verificar se um ponto está dentro de um polígono
 // Implementação do algoritmo "ray casting" para determinar se um ponto está dentro de um polígono
@@ -63,9 +67,27 @@ const bandeira2Icon = new L.Icon({
   className: 'bandeira-marker'
 });
 
+const targetIcon = new L.Icon({
+  iconUrl: 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/images/target.png', // You'll need to create this image
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+  className: 'target-marker'
+});
+
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
+  const [showGameOver, setShowGameOver] = useState(false);
+  const [gameStats, setGameStats] = useState({
+    playTime: 0,
+    roundsPlayed: 0,
+    accuracy: 0
+  });
+  const [targetIconPosition, setTargetIconPosition] = useState<L.LatLng | null>(null);
+  const { playerName, initializePlayerName } = usePlayerName();
   
+  const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
+  const [currentFamousPlace, setCurrentFamousPlace] = useState<FamousPlace | null>(null);
+
   const {
     mapRef,
     geoJsonRef,
@@ -74,8 +96,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     errorSoundRef,
     isLoading,
     isPaused,
-    isPhaseTwo,
-    showPhaseTwoIntro,
     showPhaseOneMessage,
     distanceCircle,
     gameState,
@@ -85,10 +105,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     handlePauseGame,
     handleNextRound,
     handleStartGame,
-    setShowPhaseTwoIntro,
     setDistanceCircle,
-    updateGameState
-  } = useMapGame(geoJsonData);
+    updateGameState,
+    gameMode
+  } = useMapGame(geoJsonData, currentMode, currentFamousPlace, setTargetIconPosition);
 
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/hericmr/jogocaicara/refs/heads/main/public/data/bairros.geojson')
@@ -107,6 +127,25 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       (window as any).mapInstance = mapRef.current;
     }
   }, [mapRef.current]);
+
+  // Detectar game over e calcular estatísticas
+  useEffect(() => {
+    if (gameState.gameOver && !showGameOver) {
+      const startTime = Date.now();
+      const playTime = Math.floor((startTime - (gameState.lastClickTime || startTime)) / 1000);
+      
+      // Calcular precisão baseada na distância total
+      const accuracy = Math.max(0, Math.min(1, 1 - (gameState.totalDistance / 6000)));
+      
+      setGameStats({
+        playTime: Math.max(1, playTime), // Mínimo 1 segundo
+        roundsPlayed: gameState.roundNumber,
+        accuracy
+      });
+      
+      setShowGameOver(true);
+    }
+  }, [gameState.gameOver, showGameOver, gameState.lastClickTime, gameState.totalDistance, gameState.roundNumber]);
 
   return (
     <div style={{
@@ -175,12 +214,13 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
           /* Melhor contraste para textos */
           .game-text {
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+            font-family: 'VT323', monospace;
           }
 
           /* Indicador de foco melhorado */
           *:focus {
-            outline: 3px solid #32CD32;
+            outline: 3px solid var(--accent-green);
             outline-offset: 2px;
           }
 
@@ -191,11 +231,14 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 2000;
-            background: rgba(0, 0, 0, 0.8);
+            background: var(--bg-secondary);
+            border: 2px solid var(--text-primary);
             padding: 20px;
-            border-radius: 10px;
-            color: white;
+            border-radius: 2px;
+            color: var(--text-primary);
             text-align: center;
+            box-shadow: var(--shadow-md);
+            font-family: 'VT323', monospace;
           }
 
           @keyframes fadeInOut {
@@ -270,7 +313,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             zIndex: 1000
           }}>
             <ScoreDisplay 
-              icon="🎯"
+              icon="target"
               value={gameState.score}
               unit="pts"
             />
@@ -299,6 +342,12 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       >
         <MapEvents onClick={handleMapClick} />
         <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+        {targetIconPosition && (
+          <Marker
+            position={targetIconPosition}
+            icon={targetIcon}
+          />
+        )}
         {gameState.clickedPosition && (
           <Marker
             position={gameState.clickedPosition}
@@ -325,12 +374,19 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           />
         )}
         
-        <NeighborhoodManager
-          geoJsonData={geoJsonData}
-          geoJsonRef={geoJsonRef}
-          isPhaseTwo={isPhaseTwo}
-          updateGameState={updateGameState}
-        />
+        {currentMode === 'neighborhoods' ? (
+          <NeighborhoodManager
+            geoJsonData={geoJsonData}
+            geoJsonRef={geoJsonRef}
+            updateGameState={updateGameState}
+          />
+        ) : (
+          <FamousPlacesManager
+            onPlaceChange={setCurrentFamousPlace}
+            currentPlace={currentFamousPlace}
+            isGameActive={gameState.gameStarted}
+          />
+        )}
 
         {mapRef.current && (
           <DistanceCircle
@@ -360,6 +416,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         score={gameState.score}
         onStartGame={handleStartGame}
         getProgressBarColor={getProgressBarColor}
+        currentMode={currentMode}
+        onModeChange={setCurrentMode}
       />
 
       {gameState.showFeedback && (
@@ -379,77 +437,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           score={gameState.score}
           currentNeighborhood={gameState.currentNeighborhood}
         />
-      )}
-
-      {showPhaseTwoIntro && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: 'rgba(0, 0, 0, 0.9)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 2000,
-          padding: '20px',
-          textAlign: 'center',
-          color: 'white'
-        }}>
-          <h1 style={{
-            fontSize: window.innerWidth < 768 ? '2em' : '3em',
-            color: '#32CD32',
-            marginBottom: '20px',
-            animation: 'pulseText 1s infinite'
-          }}>
-            Fase 2 Desbloqueada!
-          </h1>
-          <p style={{
-            fontSize: window.innerWidth < 768 ? '1.2em' : '1.5em',
-            marginBottom: '30px',
-            maxWidth: '600px',
-            lineHeight: '1.4'
-          }}>
-            Parabéns, você é um verdadeiro caiçara! Agora as coisas vão ficar mais difíceis...
-          </p>
-          <ul style={{
-            fontSize: window.innerWidth < 768 ? '1em' : '1.2em',
-            marginBottom: '30px',
-            textAlign: 'left',
-            maxWidth: '500px'
-          }}>
-            <li style={{ marginBottom: '10px' }}>⚡ Tempo reduzido para 5 segundos</li>
-            <li style={{ marginBottom: '10px' }}>🎯 Todos os bairros de Santos agora!</li>
-            <li style={{ marginBottom: '10px' }}>⚠️ Game over com 40 pontos negativos</li>
-          </ul>
-          <button
-            onClick={() => {
-              setShowPhaseTwoIntro(false);
-              if (geoJsonData) {
-                handleNextRound(geoJsonData);
-              }
-            }}
-            style={{
-              padding: '15px 30px',
-              fontSize: window.innerWidth < 768 ? '1.2em' : '1.5em',
-              background: '#32CD32',
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              fontWeight: 'bold'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            Começar Fase 2
-          </button>
-        </div>
       )}
 
       {showPhaseOneMessage && (
@@ -473,10 +460,30 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             fontWeight: 700,
             animation: 'pulseText 0.8s infinite'
           }}>
-            Nível 1: Bairros Conhecidos
+            {currentMode === 'neighborhoods' ? 'Nível 1: Bairros Conhecidos' : 'Modo: Lugares Famosos'}
           </h2>
         </div>
       )}
+
+
+
+      {/* Modal de Game Over */}
+      <GameOverModal
+        isOpen={showGameOver}
+        onClose={() => {
+          setShowGameOver(false);
+          window.location.reload();
+        }}
+        onPlayAgain={() => {
+          setShowGameOver(false);
+          window.location.reload();
+        }}
+        score={gameState.score}
+        playTime={gameStats.playTime}
+        roundsPlayed={gameStats.roundsPlayed}
+        accuracy={gameStats.accuracy}
+        currentPlayerName={playerName || initializePlayerName()}
+      />
     </div>
   );
 };
