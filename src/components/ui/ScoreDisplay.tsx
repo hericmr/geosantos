@@ -69,7 +69,7 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
           animation: 'pulseText 1s infinite',
           boxShadow: '2px 2px 0px rgba(0, 0, 0, 0.8)'
         }}>
-          <ZapIcon size={16} color={getBonusColor(timeBonus)} /> +{timeBonus.toFixed(1)}s
+          <ZapIcon size={16} color="var(--accent-yellow)" /> +{timeBonus.toFixed(1)}s
         </div>
       )}
     </div>
