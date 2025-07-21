@@ -1,9 +1,11 @@
-@font-face {
-    font-family: 'Figtree';
-    font-style: normal;
-    font-display: swap;
-    font-weight: 300;
-    src: url(/assets/figtree-latin-ext-300-normal-Cpj3BkVl.woff2) format("woff2"),
-         url(/assets/figtree-latin-ext-300-normal-CrZRYx5M.woff) format("woff");
-    unicode-range: U+0100-02BA;
+/* Importar fontes pixel art do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323:wght@400&display=swap');
+
+/* Configurações de fonte para pixel art */
+* {
+  font-smooth: never;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
+  text-rendering: optimizeSpeed;
 } 

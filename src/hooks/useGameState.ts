@@ -7,9 +7,9 @@ export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>({
     currentNeighborhood: '',
     score: 0,
-    timeLeft: 10,
+    timeLeft: ROUND_TIME,
     totalTimeLeft: 300,
-    roundInitialTime: 10,
+    roundInitialTime: ROUND_TIME,
     roundNumber: 1,
     gameOver: false,
     gameStarted: false,
@@ -86,11 +86,6 @@ export const useGameState = () => {
 
     setGameState(prev => {
       const nextRoundNumber = prev.roundNumber + 1;
-      const timeUsedInPreviousRound = ROUND_TIME - prev.timeLeft;
-      const newTotalTimeLeft = Math.max(0, prev.totalTimeLeft - timeUsedInPreviousRound);
-      
-      const timeBonus = calculateTimeBonus(prev.score);
-      const newTimeLeft = newTotalTimeLeft + timeBonus;
       
       return {
         ...prev,
@@ -98,13 +93,13 @@ export const useGameState = () => {
         arrowPath: null,
         showFeedback: false,
         feedbackOpacity: 0,
-        timeLeft: newTimeLeft,
-        roundInitialTime: newTimeLeft,
+        timeLeft: ROUND_TIME,
+        roundInitialTime: ROUND_TIME,
         roundNumber: nextRoundNumber,
         isCountingDown: false,
         currentNeighborhood: neighborhood,
         revealedNeighborhoods: new Set(),
-        timeBonus: timeBonus
+        timeBonus: 0
       };
     });
 

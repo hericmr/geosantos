@@ -18,15 +18,15 @@ export const DigitRoller: React.FC<DigitRollerProps> = ({ targetDigit, delay }) 
 
   const styles = {
     container: {
-      background: 'rgba(0, 0, 0, 0.3)',
+      background: 'var(--bg-secondary)',
       padding: 'clamp(2px, 1vw, 4px) clamp(1px, 0.5vw, 2px)',
-      borderRadius: '4px',
+      borderRadius: '2px',
       width: 'clamp(30px, 8vw, 40px)',
       height: `${digitHeight}px`,
       overflow: 'hidden',
       position: 'relative' as const,
-      border: '1px solid rgba(255,255,255,0.15)',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+      border: '2px solid var(--text-primary)',
+      boxShadow: 'var(--shadow-sm)'
     },
     digitContainer: {
       position: 'absolute' as const,
@@ -43,13 +43,13 @@ export const DigitRoller: React.FC<DigitRollerProps> = ({ targetDigit, delay }) 
     digit: {
       height: `${digitHeight}px`,
       fontSize: 'clamp(24px, 6vw, 32px)',
-      fontWeight: 700,
-      color: '#fff',
-      fontFamily: "'Inter', monospace",
+      fontWeight: 400,
+      color: 'var(--text-primary)',
+      fontFamily: "'VT323', monospace",
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+      textShadow: '2px 2px 0px rgba(0, 0, 0, 0.8)'
     }
   };
 

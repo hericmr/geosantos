@@ -85,18 +85,16 @@ describe('useMapGame', () => {
   });
 
   it('should initialize with default values', () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     expect(result.current.isLoading).toBe(true);
     expect(result.current.isPaused).toBe(false);
-    expect(result.current.isPhaseTwo).toBe(false);
-    expect(result.current.showPhaseTwoIntro).toBe(false);
     expect(result.current.showPhaseOneMessage).toBe(false);
     expect(result.current.distanceCircle).toBe(null);
   });
 
   it('should handle start game correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     await act(async () => {
       result.current.handleStartGame();
@@ -108,7 +106,7 @@ describe('useMapGame', () => {
   });
 
   it('should handle volume change correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     await act(async () => {
       result.current.handleVolumeChange({
@@ -121,7 +119,7 @@ describe('useMapGame', () => {
   });
 
   it('should handle toggle mute correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     await act(async () => {
       result.current.handleToggleMute();
@@ -131,7 +129,7 @@ describe('useMapGame', () => {
   });
 
   it('should handle pause game correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     await act(async () => {
       result.current.handlePauseGame();
@@ -145,7 +143,7 @@ describe('useMapGame', () => {
   });
 
   it('should handle next round correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     await act(async () => {
       result.current.handleNextRound(mockGeoJsonData);
@@ -167,72 +165,10 @@ describe('useMapGame', () => {
     expect(mockStartNextRound).toHaveBeenCalledWith(mockGeoJsonData);
   });
 
-  it('should handle phase two next round correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
 
-    // Configurar o estado inicial para simular um jogo em andamento
-    mockGameState.gameStarted = true;
-    mockGameState.isCountingDown = true;
-    mockGameState.score = 9900; // Pontuação próxima do limite
-    mockGameState.timeLeft = 10; // Tempo máximo para maximizar a pontuação
-
-    // Configurar o geoJsonRef com um bairro diferente do atual
-    const mockGeoJsonLayerWithDifferentNeighborhood = {
-      getLayers: vi.fn().mockReturnValue([{
-        feature: {
-          properties: {
-            NOME: 'Different Neighborhood'
-          }
-        },
-        getBounds: vi.fn().mockReturnValue({
-          contains: vi.fn().mockReturnValue(true)
-        }),
-        getLatLngs: vi.fn().mockReturnValue([[
-          { lat: 0, lng: 0 },
-          { lat: 1, lng: 1 },
-          { lat: 0, lng: 1 }
-        ]]),
-        instanceof: vi.fn().mockReturnValue(true)
-      }])
-    };
-
-    Object.defineProperty(result.current.geoJsonRef, 'current', {
-      value: mockGeoJsonLayerWithDifferentNeighborhood,
-      writable: true
-    });
-
-    // Simular um clique no mapa que vai ativar a fase 2
-    await act(async () => {
-      result.current.handleMapClick({ lat: 0, lng: 0 } as L.LatLng);
-    });
-
-    // Simular o tempo necessário para a transição da fase 2
-    await act(async () => {
-      vi.advanceTimersByTime(200);
-    });
-
-    // Simular a atualização do estado após o clique
-    const lastCall = mockUpdateGameState.mock.calls[mockUpdateGameState.mock.calls.length - 1][0];
-    const newScore = lastCall.score;
-    mockGameState.score = newScore;
-
-    // Simular a próxima rodada na fase 2
-    await act(async () => {
-      // Forçar a fase 2
-      result.current.isPhaseTwo = true;
-      result.current.handleNextRound(mockGeoJsonData);
-    });
-
-    // Verificar se a próxima rodada foi configurada com o tempo da fase 2
-    const nextRoundCall = mockUpdateGameState.mock.calls[mockUpdateGameState.mock.calls.length - 1][0];
-    expect(nextRoundCall.roundInitialTime).toBe(5);
-    expect(nextRoundCall.timeLeft).toBe(5);
-    expect(nextRoundCall.isCountingDown).toBe(true);
-    expect(nextRoundCall.isPaused).toBe(false);
-  });
 
   it('should handle map click correctly when game is not started', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     // Garantir que o jogo não está iniciado
     mockGameState.gameStarted = false;
@@ -246,7 +182,7 @@ describe('useMapGame', () => {
   });
 
   it('should handle map click correctly when game is paused', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     await act(async () => {
       result.current.isPaused = true;
@@ -256,18 +192,10 @@ describe('useMapGame', () => {
     expect(mockUpdateGameState).not.toHaveBeenCalled();
   });
 
-  it('should handle setShowPhaseTwoIntro correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
 
-    await act(async () => {
-      result.current.setShowPhaseTwoIntro(true);
-    });
-
-    expect(result.current.showPhaseTwoIntro).toBe(true);
-  });
 
   it('should handle setDistanceCircle correctly', async () => {
-    const { result } = renderHook(() => useMapGame(mockGeoJsonData));
+    const { result } = renderHook(() => useMapGame(mockGeoJsonData, 'neighborhoods', null, vi.fn()));
 
     await act(async () => {
       result.current.setDistanceCircle({ center: { lat: 0, lng: 0 } as L.LatLng, radius: 100 });

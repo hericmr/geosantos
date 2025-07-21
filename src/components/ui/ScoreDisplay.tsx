@@ -1,8 +1,9 @@
 import React from 'react';
+import { TargetIcon, ClockIcon, ZapIcon } from './GameIcons';
 import { styles } from './FeedbackPanel.styles';
 
 interface ScoreDisplayProps {
-  icon: string;
+  icon: 'target' | 'clock';
   value: number;
   unit: string;
   timeBonus?: number;
@@ -16,21 +17,34 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
 }) => {
   // Determinar a cor do bônus de tempo com base no valor
   const getBonusColor = (bonus: number): string => {
-    if (bonus >= 3.0) return '#FFDF00'; // Dourado
-    if (bonus >= 2.0) return '#32CD32'; // Verde limão
-    if (bonus >= 1.0) return '#00BFFF'; // Azul claro
-    return '#FFD700'; // Amarelo para valores menores
+    if (bonus >= 3.0) return 'var(--accent-yellow)'; // Dourado
+    if (bonus >= 2.0) return 'var(--accent-green)'; // Verde limão
+    if (bonus >= 1.0) return 'var(--accent-blue)'; // Azul claro
+    return 'var(--accent-yellow)'; // Amarelo para valores menores
+  };
+
+  // Função para renderizar o ícone correto
+  const renderIcon = () => {
+    switch (icon) {
+      case 'target':
+        return <TargetIcon size={24} color="var(--accent-green)" />;
+      case 'clock':
+        return <ClockIcon size={24} color="var(--accent-orange)" />;
+      default:
+        return <TargetIcon size={24} color="var(--accent-green)" />;
+    }
   };
 
   return (
     <div style={styles.scoreDisplay}>
       <div style={{ 
-        fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
-        fontFamily: "'Inter', sans-serif",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         marginRight: 'clamp(2px, 0.5vw, 4px)',
         opacity: 0.9
       }}>
-        {icon}
+        {renderIcon()}
       </div>
       <div style={styles.scoreValue}>
         {Math.round(value)}
@@ -41,8 +55,8 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
       {timeBonus && timeBonus > 0 && (
         <div style={{
           fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-          fontFamily: "'Inter', sans-serif",
-          fontWeight: 600,
+          fontFamily: "'VT323', monospace",
+          fontWeight: 400,
           marginLeft: 'clamp(4px, 1vw, 8px)',
           color: getBonusColor(timeBonus),
           display: 'flex',
@@ -50,12 +64,12 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
           gap: '2px',
           background: `rgba(${timeBonus >= 2.0 ? '255, 215, 0' : '0, 255, 125'}, 0.15)`,
           padding: '3px 8px',
-          borderRadius: '4px',
-          border: `1px solid rgba(${timeBonus >= 2.0 ? '255, 215, 0' : '0, 255, 125'}, 0.3)`,
+          borderRadius: '2px',
+          border: `2px solid rgba(${timeBonus >= 2.0 ? '255, 215, 0' : '0, 255, 125'}, 0.3)`,
           animation: 'pulseText 1s infinite',
-          boxShadow: '0 0 8px rgba(255, 215, 0, 0.3)'
+          boxShadow: '2px 2px 0px rgba(0, 0, 0, 0.8)'
         }}>
-          <span style={{ fontSize: '120%' }}>⚡</span> +{timeBonus.toFixed(1)}s
+          <ZapIcon size={16} color={getBonusColor(timeBonus)} /> +{timeBonus.toFixed(1)}s
         </div>
       )}
     </div>

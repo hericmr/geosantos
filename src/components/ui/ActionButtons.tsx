@@ -1,5 +1,6 @@
 import React from 'react';
 import { styles } from './FeedbackPanel.styles';
+import { PauseIcon, NextIcon, RetryIcon } from './GameIcons';
 
 interface ActionButtonsProps {
   gameOver: boolean;
@@ -19,26 +20,38 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       {!gameOver && (
         <button
           onClick={onPauseGame}
+          className="pixel-btn pixel-btn--warning"
           style={styles.button('pause')}
-          onMouseOver={(e) => e.currentTarget.style.background = '#FF8C00'}
-          onMouseOut={(e) => e.currentTarget.style.background = '#FFA500'}
         >
+          <PauseIcon size={16} color="var(--text-primary)" />
           Pausar
         </button>
       )}
       <button
         onClick={onNextRound}
+        className={`pixel-btn ${gameOver ? 'pixel-btn--danger' : 'pixel-btn--success'}`}
         style={styles.button(gameOver ? 'retry' : 'next')}
-        onMouseOver={(e) => e.currentTarget.style.background = gameOver ? '#CC0000' : '#28a745'}
-        onMouseOut={(e) => e.currentTarget.style.background = gameOver ? '#FF0000' : '#32CD32'}
       >
         <div style={styles.progressBar(feedbackProgress, 'rgba(50, 205, 50, 0.3)')} />
         <div style={styles.progressBar(100 - feedbackProgress, 'rgba(255, 0, 0, 0.5)')} />
         <span style={{
           position: 'relative',
-          zIndex: 2
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px'
         }}>
-          {gameOver ? 'Tente Outra Vez' : 'Próximo'}
+          {gameOver ? (
+            <>
+              <RetryIcon size={16} color="var(--text-primary)" />
+              Tente Outra Vez
+            </>
+          ) : (
+            <>
+              <NextIcon size={16} color="var(--text-primary)" />
+              Próximo
+            </>
+          )}
         </span>
       </button>
     </div>

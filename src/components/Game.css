@@ -8,24 +8,26 @@
 }
 
 .game-header {
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--text-primary);
+    color: var(--text-primary);
     padding: 0.5rem;
     text-align: center;
     z-index: 1000;
     position: relative;
+    box-shadow: var(--shadow-md);
 }
 
 .game-header h1 {
     margin: 0;
     font-size: clamp(1.5rem, 5vw, 2.5rem);
     margin-bottom: 0.5rem;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
+    font-family: 'Press Start 2P', monospace;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    color: #32CD32;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+    color: var(--accent-green);
 }
 
 .game-stats {
@@ -33,22 +35,22 @@
     justify-content: space-around;
     margin-bottom: 0.5rem;
     font-size: clamp(1rem, 3vw, 1.2rem);
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    font-family: 'VT323', monospace;
+    font-weight: 400;
 }
 
 .game-stats span {
-    font-weight: 600;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    font-weight: 400;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
 }
 
 .game-instruction {
     font-size: clamp(1rem, 3vw, 1.5rem);
-    font-weight: 600;
-    color: #32CD32;
+    font-weight: 400;
+    color: var(--accent-green);
     margin-bottom: 0.5rem;
-    font-family: 'Inter', sans-serif;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    font-family: 'VT323', monospace;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
 }
 
 /* Leaflet map container styles */

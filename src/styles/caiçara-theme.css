@@ -1,0 +1,281 @@
+/* ===========================================
+   Tema Caiçara Pixel Art - Estilos Adicionais
+   Animações e efeitos especiais para o jogo
+   =========================================== */
+
+/* Animação especial para o marcador da bandeira */
+.bandeira-marker {
+  animation: plantBandeira 0.3s steps(3);
+  transform-origin: bottom center;
+  z-index: 1000 !important;
+}
+
+@keyframes plantBandeira {
+  0% {
+    transform: scale(0.1) translateY(50px);
+    opacity: 0;
+  }
+  33% {
+    transform: scale(0.5) translateY(25px);
+    opacity: 0.5;
+  }
+  66% {
+    transform: scale(0.8) translateY(10px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Efeito de ondas para representar o mar */
+.wave-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.wave-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(59, 130, 246, 0.1),
+    transparent
+  );
+  animation: wave 3s linear infinite;
+}
+
+@keyframes wave {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Cursor especial para o mapa - tema pixel art */
+.leaflet-container {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect x='15' y='0' width='2' height='32' fill='%23ffffff'/%3E%3Crect x='0' y='15' width='32' height='2' fill='%23ffffff'/%3E%3Crect x='14' y='14' width='4' height='4' fill='%23ffffff'/%3E%3C/svg%3E") 16 16, crosshair !important;
+}
+
+/* Efeito de brilho para elementos importantes */
+.glow-effect {
+  box-shadow: 
+    2px 2px 0px rgba(0, 0, 0, 0.8),
+    4px 4px 0px rgba(0, 0, 0, 0.6);
+  animation: pulse-glow 1s steps(2) infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    box-shadow: 
+      2px 2px 0px rgba(0, 0, 0, 0.8),
+      4px 4px 0px rgba(0, 0, 0, 0.6);
+  }
+  to {
+    box-shadow: 
+      4px 4px 0px rgba(0, 0, 0, 0.8),
+      6px 6px 0px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Estilo especial para a linha de distância (seta) */
+.arrow-path {
+  filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
+  animation: arrow-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes arrow-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Efeito de partículas para celebração */
+.celebration-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  animation: particle-float 3s ease-out forwards;
+}
+
+@keyframes particle-float {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) scale(0.3);
+  }
+}
+
+/* Tema marítimo para popups do mapa */
+.leaflet-popup-content-wrapper {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, #1e3a8a 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
+.leaflet-popup-content {
+  color: var(--text-primary) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500;
+}
+
+/* Animação especial para o target do jogo */
+.game-target {
+  animation: target-float 3s ease-in-out infinite;
+}
+
+@keyframes target-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Efeito de digitação para o nome do bairro */
+.game-target__name {
+  overflow: hidden;
+  border-right: 2px solid var(--accent-blue);
+  white-space: nowrap;
+  animation: 
+    typing 1.5s steps(20, end),
+    blink-caret 1s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--accent-blue); }
+}
+
+/* Estilo especial para indicar sucesso */
+.success-indicator {
+  background: var(--gradient-success) !important;
+  box-shadow: 
+    0 0 20px rgba(16, 185, 129, 0.4),
+    var(--shadow-xl) !important;
+  animation: success-bounce 0.6s ease-out;
+}
+
+@keyframes success-bounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.1); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* Estilo especial para indicar erro */
+.error-indicator {
+  background: var(--gradient-danger) !important;
+  box-shadow: 
+    0 0 20px rgba(239, 68, 68, 0.4),
+    var(--shadow-xl) !important;
+  animation: error-shake 0.6s ease-out;
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Loading spinner com tema marítimo */
+.maritime-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(59, 130, 246, 0.2);
+  border-top: 4px solid var(--accent-blue);
+  border-radius: 50%;
+  animation: maritime-spin 1s linear infinite;
+  position: relative;
+}
+
+.maritime-spinner::after {
+  content: '⚓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: var(--accent-blue);
+}
+
+@keyframes maritime-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsividade adicional */
+@media (max-width: 480px) {
+  .game-target__name {
+    font-size: 1.2rem;
+  }
+  
+  .maritime-spinner {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .maritime-spinner::after {
+    font-size: 12px;
+  }
+}
+
+/* Efeito especial para o modal de boas-vindas */
+.welcome-modal {
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    #1e3a8a 50%,
+    var(--bg-secondary) 100%
+  ) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-modal::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.05) 0%,
+    transparent 70%
+  );
+  animation: welcome-rotate 10s linear infinite;
+}
+
+@keyframes welcome-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Z-index para conteúdo do modal ficar acima do efeito */
+.modern-modal__title,
+.modern-modal__subtitle,
+.modern-modal__actions {
+  position: relative;
+  z-index: 1;
+} 

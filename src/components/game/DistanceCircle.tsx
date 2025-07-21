@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as L from 'leaflet';
 
 interface DistanceCircleProps {
   map: L.Map;
   distanceCircle: {
-    center: L.LatLng | {lat: number, lng: number};
+    center: L.LatLng | { lat: number; lng: number };
     radius: number;
   } | null;
   onAnimationComplete?: () => void;
@@ -15,64 +15,39 @@ export const DistanceCircle: React.FC<DistanceCircleProps> = ({
   distanceCircle,
   onAnimationComplete
 }) => {
+  const circleRef = useRef<L.Circle | null>(null);
+
   useEffect(() => {
-    if (map && distanceCircle) {
-      // Limpa círculos anteriores
-      map.eachLayer((layer: L.Layer) => {
-        if (layer instanceof L.Circle) {
-          map.removeLayer(layer);
-        }
-      });
+    if (!map || !distanceCircle) return;
 
-      // Converte o centro para L.LatLng se necessário
-      const circleCenter = distanceCircle.center instanceof L.LatLng 
-        ? distanceCircle.center 
-        : new L.LatLng(distanceCircle.center.lat, distanceCircle.center.lng);
-      
-      // Desenha o novo círculo
-      const circle = L.circle(circleCenter, {
-        radius: 0, // Começa com raio 0
-        color: '#ff6b6b', // Vermelho mais suave
-        fillColor: '#ff6b6b',
-        fillOpacity: 0.05, // Opacidade reduzida
-        weight: 1.5, // Borda mais fina
-        className: 'distance-circle'
-      }).addTo(map);
-
-      // Espera a animação da bandeira terminar (0.3s) antes de começar a animação do círculo
-      setTimeout(() => {
-        // Animação do círculo
-        const startTime = Date.now();
-        const duration = 500; // 0.5 segundos
-        const targetRadius = distanceCircle.radius;
-
-        const animate = () => {
-          const currentTime = Date.now();
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          
-          // Função de easing para suavizar a animação
-          const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-          const currentRadius = targetRadius * easeOutCubic;
-          
-          circle.setRadius(currentRadius);
-          
-          if (progress < 1) {
-            requestAnimationFrame(animate);
-          } else {
-            // Remove o círculo após a animação
-            setTimeout(() => {
-              if (map) {
-                map.removeLayer(circle);
-                onAnimationComplete?.();
-              }
-            }, 500); // Espera 0.5 segundos antes de remover
-          }
-        };
-        
-        animate();
-      }, 300); // Espera 0.3 segundos (duração da animação da bandeira)
+    // Remove círculo anterior se houver
+    if (circleRef.current) {
+      map.removeLayer(circleRef.current);
     }
+
+    const center =
+      distanceCircle.center instanceof L.LatLng
+        ? distanceCircle.center
+        : new L.LatLng(distanceCircle.center.lat, distanceCircle.center.lng);
+
+    // Cria o círculo com raio direto
+    const circle = L.circle(center, {
+      radius: distanceCircle.radius,
+      color: 'var(--accent-red)',
+      fillColor: 'var(--accent-red)',
+      fillOpacity: 0.15,
+      weight: 2,
+      className: 'distance-circle'
+    }).addTo(map);
+
+    circleRef.current = circle;
+
+    // Aguarda um pequeno tempo e remove
+    setTimeout(() => {
+      map.removeLayer(circle);
+      onAnimationComplete?.();
+    }, 800); // Tempo que o círculo permanece visível
+
   }, [map, distanceCircle, onAnimationComplete]);
 
   return null;

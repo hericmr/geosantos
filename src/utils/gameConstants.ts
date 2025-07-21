@@ -1,5 +1,5 @@
-export const ROUND_TIME = 10; // 10 seconds per round
-export const PHASE_TWO_TIME = 5; // 5 seconds per round in phase 2
+export const ROUND_TIME = 15; // 15 seconds per round (mais fácil)
+export const PHASE_TWO_TIME = 8; // 8 seconds per round in phase 2 (mais fácil)
 export const TIME_BONUS = 1.5; // Time bonus for correct neighborhood
 export const MAX_DISTANCE_METERS = 2000; // Maximum distance considered for scoring
 
@@ -15,20 +15,20 @@ export const TIME_BONUS_THRESHOLDS = {
 };
 
 export const TIME_BONUS_AMOUNTS = {
-  PERFECT: 3.0,     // 3 segundos de bônus para acerto perfeito
-  EXCELLENT: 2.5,   // 2.5 segundos de bônus
-  GREAT: 2.0,       // 2 segundos de bônus
-  GOOD: 1.5,        // 1.5 segundos de bônus
-  DECENT: 1.25,     // 1.25 segundos de bônus
-  FAIR: 1.0,        // 1 segundo de bônus
-  CLOSE: 0.5        // 0.5 segundos de bônus
+  PERFECT: 4.0,     // 4 segundos de bônus para acerto perfeito (mais fácil)
+  EXCELLENT: 3.5,   // 3.5 segundos de bônus
+  GREAT: 3.0,       // 3 segundos de bônus
+  GOOD: 2.5,        // 2.5 segundos de bônus
+  DECENT: 2.0,      // 2 segundos de bônus
+  FAIR: 1.5,        // 1.5 segundos de bônus
+  CLOSE: 1.0        // 1 segundo de bônus
 };
 
 // Função para calcular o bônus de tempo baseado na pontuação
 export const calculateTimeBonus = (score: number): number => {
   // Pontuação máxima possível é 3000 (clique direto no bairro)
   const maxScore = 3000;
-  const maxBonus = 3.0; // Máximo de 3 segundos de bônus
+  const maxBonus = 4.0; // Máximo de 4 segundos de bônus (mais fácil)
   
   // Calcula o bônus proporcional à pontuação
   // Quanto maior a pontuação, maior o bônus

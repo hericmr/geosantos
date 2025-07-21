@@ -1,4 +1,5 @@
 import React from 'react';
+import { MapPinIcon } from './GameIcons';
 
 interface DistanceDisplayProps {
   totalDistance: number;
@@ -10,9 +11,9 @@ export const DistanceDisplay: React.FC<DistanceDisplayProps> = ({ totalDistance,
   const progress = (totalDistance / maxDistance) * 100;
   
   const getProgressBarColor = (progress: number) => {
-    if (progress >= 90) return '#ff4444';
-    if (progress >= 70) return '#ffbb33';
-    return '#00C851';
+    if (progress >= 90) return 'var(--accent-red)';
+    if (progress >= 70) return 'var(--accent-orange)';
+    return 'var(--accent-green)';
   };
 
   return (
@@ -21,15 +22,17 @@ export const DistanceDisplay: React.FC<DistanceDisplayProps> = ({ totalDistance,
       flexDirection: 'column',
       alignItems: 'center',
       gap: '2px',
-      background: 'rgba(0, 0, 0, 0.5)',
+      background: 'var(--bg-secondary)',
+      border: '2px solid var(--text-primary)',
       padding: '4px 8px',
-      borderRadius: '4px',
-      color: 'white',
-      fontFamily: 'Figtree',
-      fontSize: '14px'
+      borderRadius: '2px',
+      color: 'var(--text-primary)',
+      fontFamily: "'VT323', monospace",
+      fontSize: '14px',
+      boxShadow: 'var(--shadow-sm)'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-        <span style={{ fontSize: '16px' }}>🚶</span>
+        <MapPinIcon size={16} color="var(--accent-green)" />
         <span>{distanceKm}km</span>
       </div>
       <div style={{

@@ -135,8 +135,6 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         </div>
 
         <GameRanking 
-          isVisible={true} 
-          onToggleVisibility={() => {}} 
           variant="startScreen" 
         />
 

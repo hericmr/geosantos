@@ -1,3 +1,6 @@
+/* Importar estilos pixel art */
+@import './styles/pixel-art-ui.css';
+
 * {
   margin: 0;
   padding: 0;

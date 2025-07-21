@@ -53,15 +53,15 @@ export const calculateScore = (distance: number, timeLeft: number): ScoreCalcula
   
   // Pontuação baseada na distância
   // Quanto menor a distância, maior a pontuação
-  // Máximo de 1000 pontos para distância de 0km
-  // Mínimo de 0 pontos para distância de 10km ou mais
-  const distanceScore = Math.max(0, 1000 * (1 - (distanceKm / 10)));
+  // Máximo de 1200 pontos para distância de 0km (mais fácil)
+  // Mínimo de 0 pontos para distância de 12km ou mais (mais tolerante)
+  const distanceScore = Math.max(0, 1200 * (1 - (distanceKm / 12)));
   
   // Bônus de tempo
   // Quanto mais tempo restante, maior o bônus
-  // Máximo de 500 pontos de bônus
-  // Só dá bônus se o tempo for menor que 2 segundos
-  const timeBonus = timeLeft <= 2 ? Math.round((timeLeft / 2) * 500) : 0;
+  // Máximo de 600 pontos de bônus (mais fácil)
+  // Só dá bônus se o tempo for menor que 3 segundos (mais tolerante)
+  const timeBonus = timeLeft <= 3 ? Math.round((timeLeft / 3) * 600) : 0;
   
   return {
     total: Math.round(distanceScore + timeBonus),
@@ -76,21 +76,21 @@ export const getNeighborhoodStyle = (feature: any, revealedNeighborhoods: Set<st
 
   if (isCurrent && isRevealed) {
     return {
-      fillColor: '#00FF00',
-      weight: 2,
+      fillColor: 'var(--accent-green)',
+      weight: 3,
       opacity: 1,
-      color: '#000000',
-      fillOpacity: 0.7,
-      dashArray: '3'
+      color: 'var(--text-primary)',
+      fillOpacity: 0.8,
+      dashArray: '5'
     };
   }
 
   return {
-    fillColor: '#32CD32',
-    weight: 2,
+    fillColor: 'var(--accent-green)',
+    weight: 3,
     opacity: isRevealed ? 1 : 0,
-    color: '#000000',
-    fillOpacity: isRevealed ? 0.3 : 0,
-    dashArray: '3'
+    color: 'var(--text-primary)',
+    fillOpacity: isRevealed ? 0.4 : 0,
+    dashArray: '5'
   };
 }; 

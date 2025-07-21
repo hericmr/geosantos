@@ -23,22 +23,21 @@ export const styles: FeedbackPanelStyles = {
     transform: gameOver ? 'none' : isMobile ? 'none' : 'translate(-50%, -50%)',
     width: isMobile ? '100%' : '90%',
     maxWidth: gameOver ? '100%' : '400px',
-    background: 'rgba(0, 25, 0, 0.95)',
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-    color: 'white',
+    background: 'var(--bg-secondary)',
+    color: 'var(--text-primary)',
     zIndex: 9999,
     padding: 'clamp(16px, 3vw, 24px)',
-    borderRadius: isMobile ? '24px 24px 0 0' : '16px',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: isMobile ? '4px 4px 0 0' : '4px',
+    boxShadow: 'var(--shadow-xl)',
+    border: '3px solid var(--text-primary)',
     margin: isMobile ? '0' : '10px',
     animation: gameOver ? 'slideUp 0.3s ease-out' : isMobile ? 'slideUp 0.3s ease-out' : 'fadeInScale 0.3s ease-out',
     maxHeight: isMobile ? '90vh' : '90vh',
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: 'clamp(12px, 2vw, 16px)'
+    gap: 'clamp(12px, 2vw, 16px)',
+    fontFamily: "'VT323', monospace"
   }),
 
   contentContainer: {
@@ -60,10 +59,10 @@ export const styles: FeedbackPanelStyles = {
 
   scoreValue: {
     fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)',
-    fontFamily: "'Inter', sans-serif",
-    fontWeight: 700,
-    color: '#fff',
-    textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+    fontFamily: "'VT323', monospace",
+    fontWeight: 400,
+    color: 'var(--text-primary)',
+    textShadow: '2px 2px 0px rgba(0, 0, 0, 0.8)'
   },
 
   scoreUnit: {
@@ -118,28 +117,30 @@ export const styles: FeedbackPanelStyles = {
   button: (variant) => ({
     padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
     fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-    background: variant === 'pause' ? '#FFA500' : variant === 'next' ? '#32CD32' : '#FF0000',
+    background: variant === 'pause' ? 'var(--accent-orange)' : variant === 'next' ? 'var(--accent-green)' : 'var(--accent-red)',
     color: variant === 'pause' ? '#000000' : '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
+    border: '2px solid var(--text-primary)',
+    borderRadius: '2px',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+    transition: 'all 0.1s steps(1)',
+    fontWeight: 400,
+    fontFamily: "'Press Start 2P', monospace",
+    boxShadow: 'var(--shadow-md)',
     flex: variant === 'pause' ? '0.4' : '0.6',
     maxWidth: variant === 'retry' ? '100%' : 'none',
     position: 'relative',
     overflow: 'hidden',
     textTransform: 'uppercase',
-    letterSpacing: '0.5px',
+    letterSpacing: '1px',
     minWidth: variant === 'pause' ? '100px' : '120px',
     zIndex: 1,
     '&:hover': {
-      transform: 'translateY(-1px)',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+      transform: 'translate(-1px, -1px)',
+      boxShadow: 'var(--shadow-lg)'
     },
     '&:active': {
-      transform: 'translateY(1px)'
+      transform: 'translate(1px, 1px)',
+      boxShadow: 'var(--shadow-sm)'
     }
   }),
 

@@ -67,11 +67,21 @@ const bandeira2Icon = new L.Icon({
   className: 'bandeira-marker'
 });
 
-const targetIcon = new L.Icon({
-  iconUrl: 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/images/target.png', // You'll need to create this image
-  iconSize: [40, 40],
-  iconAnchor: [20, 20],
-  className: 'target-marker'
+import { renderToStaticMarkup } from 'react-dom/server';
+import { TargetIcon } from './ui/GameIcons';
+
+// ... (keep existing imports)
+
+// Create custom icon for the target marker using Lucide Target icon
+const targetIcon = new L.DivIcon({
+  html: renderToStaticMarkup(
+    <div style={{ animation: 'pulse 1s infinite' }}>
+      <TargetIcon size={30} color="var(--accent-green)" />
+    </div>
+  ),
+  className: 'target-marker-icon',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
 });
 
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
@@ -181,6 +191,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               opacity: 1;
             }
           }
+
+          
 
           /* Forçar cursor crosshair em todos os elementos do mapa */
           .leaflet-container,

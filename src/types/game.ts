@@ -1,6 +1,7 @@
 import { Feature, FeatureCollection } from 'geojson';
 import { LatLng } from 'leaflet';
 import { GeoJSON as ReactGeoJSON } from 'react-leaflet';
+import { GameMode } from './famousPlaces';
 
 export interface MapProps {
   center: [number, number];
@@ -56,6 +57,8 @@ export interface GameControlsProps {
   score: number;
   onStartGame: () => void;
   getProgressBarColor: (timeLeft: number, roundInitialTime: number) => string;
+  currentMode?: GameMode;
+  onModeChange?: (mode: GameMode) => void;
 }
 
 export interface FeedbackPanelProps {

@@ -6,13 +6,13 @@ describe('ScoreDisplay', () => {
   it('renders basic score display correctly', () => {
     render(
       <ScoreDisplay
-        icon="🎯"
+        icon="target"
         value={1000}
         unit="pts"
       />
     );
 
-    expect(screen.getByText('🎯')).toBeInTheDocument();
+    expect(screen.getByText('1000')).toBeInTheDocument();
     expect(screen.getByText('1000')).toBeInTheDocument();
     expect(screen.getByText('pts')).toBeInTheDocument();
   });
@@ -20,14 +20,14 @@ describe('ScoreDisplay', () => {
   it('renders time bonus when provided', () => {
     render(
       <ScoreDisplay
-        icon="⏱️"
+        icon="clock"
         value={500}
         unit="pts"
         timeBonus={2.5}
       />
     );
 
-    expect(screen.getByText('⏱️')).toBeInTheDocument();
+    expect(screen.getByText('500')).toBeInTheDocument();
     expect(screen.getByText('500')).toBeInTheDocument();
     expect(screen.getByText('pts')).toBeInTheDocument();
     expect(screen.getByText('+2.50s')).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('ScoreDisplay', () => {
   it('does not render time bonus when zero', () => {
     render(
       <ScoreDisplay
-        icon="⏱️"
+        icon="clock"
         value={500}
         unit="pts"
         timeBonus={0}
@@ -49,7 +49,7 @@ describe('ScoreDisplay', () => {
   it('rounds the value to nearest integer', () => {
     render(
       <ScoreDisplay
-        icon="🎯"
+        icon="target"
         value={1000.6}
         unit="pts"
       />

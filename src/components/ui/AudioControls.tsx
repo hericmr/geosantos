@@ -1,4 +1,5 @@
 import React from 'react';
+import { Volume2Icon, Volume1Icon, VolumeXIcon } from './GameIcons';
 import { AudioControlsProps } from '../../types/game';
 
 export const AudioControls: React.FC<AudioControlsProps> = ({
@@ -12,15 +13,17 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
       position: 'absolute',
       top: 'clamp(10px, 2vw, 20px)',
       left: 'clamp(10px, 2vw, 20px)',
-      background: 'rgba(0, 0, 0, 0.8)',
-      color: 'white',
+      background: 'var(--bg-secondary)',
+      border: '2px solid var(--text-primary)',
+      color: 'var(--text-primary)',
       padding: 'clamp(8px, 1.5vw, 12px)',
-      borderRadius: '10px',
+      borderRadius: '2px',
       display: 'flex',
       alignItems: 'center',
       gap: 'clamp(5px, 1vw, 10px)',
       zIndex: 1000,
-      touchAction: 'manipulation'
+      touchAction: 'manipulation',
+      boxShadow: 'var(--shadow-md)'
     }}>
       <button
         onClick={onToggleMute}
@@ -36,13 +39,13 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
         }}
       >
         {isMuted ? (
-          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔇</span>
+          <VolumeXIcon size={24} color="var(--text-primary)" />
         ) : volume > 0.3 ? (
-          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔊</span>
+          <Volume2Icon size={24} color="var(--text-primary)" />
         ) : volume > 0 ? (
-          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔉</span>
+          <Volume1Icon size={24} color="var(--text-primary)" />
         ) : (
-          <span style={{ fontSize: 'clamp(20px, 4vw, 24px)' }}>🔈</span>
+          <Volume1Icon size={24} color="var(--text-primary)" />
         )}
       </button>
       <input
@@ -54,7 +57,7 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
         onChange={onVolumeChange}
         style={{
           width: 'clamp(60px, 15vw, 100px)',
-          accentColor: '#32CD32',
+          accentColor: 'var(--accent-green)',
           touchAction: 'manipulation'
         }}
       />

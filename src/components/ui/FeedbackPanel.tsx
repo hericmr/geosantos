@@ -7,6 +7,7 @@ import { FeedbackMessage } from './FeedbackMessage';
 import { ActionButtons } from './ActionButtons';
 import { styles } from './FeedbackPanel.styles';
 import { capitalizeWords } from '../../utils/textUtils';
+import { ShareIcon } from './GameIcons';
 
 export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   showFeedback,
@@ -160,7 +161,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   textAlign: 'center',
                   textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
                 }}>
-                   INCRÍVEL! 🎯
+                   INCRÍVEL!
                 </div>
                 <div style={{
                   fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
@@ -179,12 +180,12 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 flexWrap: 'wrap'
               }}>
                 <ScoreDisplay
-                  icon="🎯"
+                  icon="target"
                   value={score}
                   unit="pts"
                 />
                 <ScoreDisplay
-                  icon="⏱️"
+                  icon="clock"
                   value={1000 - (clickTime * 100)}
                   unit="pts"
                   timeBonus={timeBonus}
@@ -238,12 +239,12 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 width: '100%'
               }}>
                 <ScoreDisplay
-                  icon="📍"
+                  icon="target"
                   value={displayedDistance / 1000}
                   unit="km"
                 />
                 <ScoreDisplay
-                  icon="⏱️"
+                  icon="clock"
                   value={1000 - (clickTime * 100)}
                   unit="pts"
                   timeBonus={timeBonus}
@@ -297,7 +298,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
                score >= 8000 ? "MESTRE DOS BAIRROS!  Você é um GPS ambulante!" :
                score >= 5000 ? "IMPRESSIONANTE!  Quase um GPS humano!!" :
-               score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
+               score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA!" :
                score >= 3000 ? "SANTISTA DE CORAÇÃO!  Você manja dos bairros!" :
                score >= 2000 ? "MUITO BOM!  Você é deve ter ido em algumas aulas de geografia!" :
                score >= 1000 ? "BOM JOGO!  Mas ainda precisa andar mais pela zona noroeste!" :
@@ -315,59 +316,66 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             flexWrap: 'wrap'
           }}>
             <ScoreDisplay
-              icon="🏆"
+              icon="target"
               value={score}
               unit="pts"
             />
-            <button
-              onClick={() => {
-                const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Eu conheço Santos!" :
-                  score >= 15000 ? "MITO SANTISTA! Até as ondas do mar me aplaudem!" :
-                  score >= 10000 ? "LENDÁRIO! Eu sou um Pelé da geografia santista!" :
-                  score >= 8000 ? "MESTRE DOS BAIRROS! Eu sou um GPS ambulante!" :
-                  score >= 5000 ? "IMPRESSIONANTE! Quase um GPS humano!!" :
-                  score >= 4000 ? "SOU MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA! 🥟" :
-                  score >= 3000 ? "SANTISTA DE CORAÇÃO! Eu manjo dos bairros!" :
-                  score >= 2000 ? "MUITO BOM! Eu devo ter ido em algumas aulas de geografia!" :
-                  score >= 1000 ? "BOM JOGO! Mas ainda preciso andar mais na zona noroeste!" :
-                  score >= 500 ? "QUASE LÁ! Vou dar um rolê no bondinho pra pegar mais dicas!" :
-                  score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! " :
-                  "Eita! Parece que eu não sei nada de Santos!";
+                          <button
+                onClick={() => {
+                  const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Eu conheço Santos!" :
+                    score >= 15000 ? "MITO SANTISTA! Até as ondas do mar me aplaudem!" :
+                    score >= 10000 ? "LENDÁRIO! Eu sou um Pelé da geografia santista!" :
+                    score >= 8000 ? "MESTRE DOS BAIRROS! Eu sou um GPS ambulante!" :
+                    score >= 5000 ? "IMPRESSIONANTE! Quase um GPS humano!!" :
+                    score >= 4000 ? "SOU MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA!" :
+                    score >= 3000 ? "SANTISTA DE CORAÇÃO! Eu manjo dos bairros!" :
+                    score >= 2000 ? "MUITO BOM! Eu devo ter ido em algumas aulas de geografia!" :
+                    score >= 1000 ? "BOM JOGO! Mas ainda preciso andar mais na zona noroeste!" :
+                    score >= 500 ? "QUASE LÁ! Vou dar um rolê no bondinho pra pegar mais dicas!" :
+                    score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! " :
+                    "Eita! Parece que eu não sei nada de Santos!";
 
-                const shareText = `${score >= 100 ? '🏆' : '🎮'} ${mensagem} Joguei O Caiçara e fiz ${score} pontos! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
+                  const shareText = `${mensagem} Joguei O Caiçara e fiz ${score} pontos! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
 
-                if (navigator.share) {
-                  navigator.share({
-                    text: shareText
-                  }).catch(console.error);
-                } else {
-                  navigator.clipboard.writeText(shareText)
-                    .then(() => alert('Texto copiado para a área de transferência!'))
-                    .catch(console.error);
-                }
-              }}
-              style={{
-                padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
-                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                background: '#4267B2',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontWeight: 600,
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginTop: '16px'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.background = '#365899'}
-              onMouseOut={(e) => e.currentTarget.style.background = '#4267B2'}
-            >
-              <span style={{ fontSize: '1.2em' }}>📢</span>
-              Compartilhar
-            </button>
+                  if (navigator.share) {
+                    navigator.share({
+                      text: shareText
+                    }).catch(console.error);
+                  } else {
+                    navigator.clipboard.writeText(shareText)
+                      .then(() => alert('Texto copiado para a área de transferência!'))
+                      .catch(console.error);
+                  }
+                }}
+                style={{
+                  padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
+                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                  background: 'var(--accent-blue)',
+                  color: 'var(--text-primary)',
+                  border: '2px solid var(--text-primary)',
+                  borderRadius: '2px',
+                  cursor: 'pointer',
+                  transition: 'all 0.1s steps(1)',
+                  fontWeight: 400,
+                  fontFamily: "'Press Start 2P', monospace",
+                  boxShadow: 'var(--shadow-md)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginTop: '16px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translate(-1px, -1px)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                }}
+              >
+                <ShareIcon size={16} color="var(--text-primary)" />
+                Compartilhar
+              </button>
           </div>
         </div>
       )}

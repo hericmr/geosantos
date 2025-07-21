@@ -24,12 +24,11 @@ describe('NeighborhoodManager', () => {
     vi.clearAllMocks();
   });
 
-  it('should select random neighborhood from phase 1 bairros', () => {
+  it('should select random neighborhood from available bairros', () => {
     render(
       <NeighborhoodManager
         geoJsonData={mockGeoJsonData as any}
         geoJsonRef={mockGeoJsonRef as any}
-        isPhaseTwo={false}
         updateGameState={mockUpdateGameState}
       />
     );
@@ -45,26 +44,11 @@ describe('NeighborhoodManager', () => {
     expect(FASE_1_BAIRROS).toContain(call.currentNeighborhood);
   });
 
-  it('should select any neighborhood in phase 2', () => {
-    render(
-      <NeighborhoodManager
-        geoJsonData={mockGeoJsonData as any}
-        geoJsonRef={mockGeoJsonRef as any}
-        isPhaseTwo={true}
-        updateGameState={mockUpdateGameState}
-      />
-    );
-
-    const call = mockUpdateGameState.mock.calls[0][0];
-    expect(call.currentNeighborhood).toBeDefined();
-  });
-
   it('should not select neighborhood when geoJsonData is null', () => {
     render(
       <NeighborhoodManager
         geoJsonData={null}
         geoJsonRef={mockGeoJsonRef as any}
-        isPhaseTwo={false}
         updateGameState={mockUpdateGameState}
       />
     );

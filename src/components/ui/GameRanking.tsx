@@ -67,40 +67,64 @@ export const GameRanking: React.FC<GameRankingProps> = ({
     }
   };
 
-  const getPosition = () => {
-    if (variant === 'startScreen') {
-      return {
-        position: 'fixed' as const,
-        top: '80px',
-        left: '40px',
-        right: 'auto',
-        zIndex: 1001
-      };
-    }
-    return {
-      position: 'fixed' as const,
-      top: '20px',
-      left: '20px',
-      zIndex: 1001
-    };
-  };
+  const [isMobile, setIsMobile] = useState(false);
 
-  return (
-    <div style={{
-      ...getPosition(),
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const getContainerStyle = (): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {
       fontFamily: "'VT323', monospace",
       transition: 'all 0.3s ease',
       pointerEvents: 'auto',
-      ...(variant === 'startScreen' ? {
+    };
+
+    if (variant === 'startScreen') {
+      if (isMobile) {
+        return {
+          ...baseStyle,
+          position: 'relative',
+          width: '100%',
+          marginBottom: '20px',
+          border: '4px solid var(--accent-yellow)',
+          borderRadius: '12px',
+          background: 'rgba(30, 30, 30, 0.98)',
+        };
+      }
+      // Desktop
+      return {
+        ...baseStyle,
+        position: 'fixed',
+        top: '80px',
+        left: '40px',
+        zIndex: 2002,
         minWidth: '340px',
         maxWidth: '400px',
         boxShadow: '0 0 24px 6px rgba(255, 215, 0, 0.25), 0 4px 32px 0 rgba(0,0,0,0.4)',
         border: '4px solid var(--accent-yellow)',
         borderRadius: '12px',
         background: 'rgba(30, 30, 30, 0.98)',
-        zIndex: 2002
-      } : {})
-    }}>
+      };
+    }
+
+    // Game variant
+    return {
+      ...baseStyle,
+      position: 'fixed',
+      top: '20px',
+      left: '20px',
+      zIndex: 1001,
+    };
+  };
+
+  return (
+    <div style={getContainerStyle()}>
       <style>
         {`
           @keyframes slideIn {

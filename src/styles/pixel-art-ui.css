@@ -1,0 +1,649 @@
+/* ===========================================
+   Sistema de UI Pixel Art - Estilo Retrô
+   Interface pixelada para jogos de geografia
+   =========================================== */
+
+/* Importar fonte pixel art */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323:wght@400&display=swap');
+
+/* ===========================================
+   VARIÁVEIS CSS - Design System Pixel Art
+   =========================================== */
+:root {
+  /* Cores pixel art */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-accent: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  
+  /* Cores de ação pixel art */
+  --accent-blue: #0066ff;
+  --accent-green: #00ff00;
+  --accent-orange: #ff6600;
+  --accent-red: #ff0000;
+  --accent-yellow: #ffff00;
+  --accent-purple: #ff00ff;
+  
+  /* Gradientes pixel art */
+  --gradient-primary: linear-gradient(45deg, #0066ff 0%, #00ffff 100%);
+  --gradient-success: linear-gradient(45deg, #00ff00 0%, #00aa00 100%);
+  --gradient-warning: linear-gradient(45deg, #ff6600 0%, #ffaa00 100%);
+  --gradient-danger: linear-gradient(45deg, #ff0000 0%, #aa0000 100%);
+  
+  /* Sombras pixel art */
+  --shadow-sm: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  --shadow-md: 4px 4px 0px rgba(0, 0, 0, 0.8);
+  --shadow-lg: 6px 6px 0px rgba(0, 0, 0, 0.8);
+  --shadow-xl: 8px 8px 0px rgba(0, 0, 0, 0.8);
+  
+  /* Bordas pixel art */
+  --radius-sm: 0px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+  
+  /* Espaçamentos */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* Transições */
+  --transition-fast: 0.1s steps(1);
+  --transition-normal: 0.2s steps(2);
+  --transition-slow: 0.3s steps(3);
+}
+
+/* ===========================================
+   RESET E BASE
+   =========================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'VT323', monospace;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* ===========================================
+   LAYOUT PRINCIPAL DO JOGO
+   =========================================== */
+.game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* ===========================================
+   COMPONENTES DE UI PIXEL ART
+   =========================================== */
+
+/* Card pixel art */
+.pixel-card {
+  background: var(--bg-secondary);
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.pixel-card::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.05) 2px,
+    rgba(255, 255, 255, 0.05) 4px
+  );
+  pointer-events: none;
+}
+
+.pixel-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Botão pixel art */
+.pixel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  font-family: 'Press Start 2P', monospace;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1;
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  image-rendering: pixelated;
+}
+
+.pixel-btn::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.1) 2px,
+    rgba(255, 255, 255, 0.1) 4px
+  );
+  pointer-events: none;
+}
+
+.pixel-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+}
+
+.pixel-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.pixel-btn--primary {
+  background: var(--accent-blue);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.pixel-btn--success {
+  background: var(--accent-green);
+  border-color: #ffffff;
+  color: #000000;
+}
+
+.pixel-btn--warning {
+  background: var(--accent-orange);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.pixel-btn--danger {
+  background: var(--accent-red);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.pixel-btn--secondary {
+  background: var(--bg-accent);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+/* ===========================================
+   LAYOUT DO JOGO
+   =========================================== */
+
+/* Header do jogo */
+.game-header {
+  position: absolute;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  right: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 1000;
+  gap: var(--space-lg);
+}
+
+.game-header__left,
+.game-header__center,
+.game-header__right {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.game-header__center {
+  flex: 1;
+  justify-content: center;
+}
+
+/* Estatísticas do jogo */
+.game-stat {
+  background: var(--bg-secondary);
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md) var(--space-lg);
+  min-width: 120px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  font-family: 'VT323', monospace;
+}
+
+.game-stat::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.05) 2px,
+    rgba(255, 255, 255, 0.05) 4px
+  );
+  pointer-events: none;
+}
+
+.game-stat__label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-xs);
+  font-family: 'Press Start 2P', monospace;
+}
+
+.game-stat__value {
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1;
+  font-family: 'VT323', monospace;
+}
+
+.game-stat--score .game-stat__value {
+  color: var(--accent-green);
+}
+
+.game-stat--time .game-stat__value {
+  color: var(--accent-orange);
+}
+
+/* Barra de progresso pixel art */
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: var(--accent-green);
+  transition: width var(--transition-normal);
+  position: relative;
+}
+
+.progress-bar__fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 4px,
+    rgba(255, 255, 255, 0.3) 4px,
+    rgba(255, 255, 255, 0.3) 8px
+  );
+  animation: shimmer 0.5s steps(2) infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-8px); }
+  100% { transform: translateX(0px); }
+}
+
+/* Alvo do jogo */
+.game-target {
+  background: var(--bg-secondary);
+  border: 2px solid var(--accent-green);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.game-target__label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-xs);
+  font-family: 'Press Start 2P', monospace;
+}
+
+.game-target__name {
+  font-size: 18px;
+  color: var(--accent-green);
+  font-weight: 400;
+  font-family: 'VT323', monospace;
+}
+
+/* Controles do jogo */
+.game-controls {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+/* Modal pixel art */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: var(--space-lg);
+}
+
+.pixel-modal {
+  background: var(--bg-secondary);
+  border: 3px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xl);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+  animation: modalSlideIn var(--transition-normal);
+}
+
+@keyframes modalSlideIn {
+  0% {
+    transform: scale(0.8) translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.pixel-modal__title {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  text-transform: uppercase;
+}
+
+.pixel-modal__subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+  font-family: 'VT323', monospace;
+}
+
+.pixel-modal__actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  margin-top: var(--space-lg);
+}
+
+/* Tela de carregamento pixel art */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--text-secondary);
+  border-top: 3px solid var(--accent-green);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--space-lg);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 16px;
+  color: var(--text-primary);
+  font-family: 'VT323', monospace;
+  text-align: center;
+}
+
+/* Painel de feedback pixel art */
+.feedback-panel {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 3px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  z-index: 9999;
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-xl);
+  animation: feedbackSlideIn var(--transition-normal);
+  font-family: 'VT323', monospace;
+}
+
+@keyframes feedbackSlideIn {
+  0% {
+    transform: scale(0.8) translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.feedback-panel--success {
+  border-color: var(--accent-green);
+}
+
+.feedback-panel--error {
+  border-color: var(--accent-red);
+}
+
+.feedback-panel--warning {
+  border-color: var(--accent-orange);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .game-header {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .game-header__left,
+  .game-header__center,
+  .game-header__right {
+    justify-content: center;
+  }
+  
+  .game-stat {
+    min-width: 100px;
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .game-controls {
+    flex-direction: column;
+  }
+  
+  .pixel-modal {
+    margin: var(--space-md);
+    padding: var(--space-lg);
+  }
+  
+  .pixel-modal__title {
+    font-size: 16px;
+  }
+}
+
+/* Animações pixel art */
+.fade-in {
+  animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.slide-up {
+  animation: slideUp var(--transition-normal);
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pulse {
+  animation: pulse var(--transition-slow) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Utilitários */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+.text-2xl { font-size: 24px; }
+.text-3xl { font-size: 28px; }
+
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+
+.pointer-events-none { pointer-events: none; }
+.cursor-pointer { cursor: pointer; }
+
+/* Estilos para ícones do jogo */
+.game-icon {
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8));
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.game-icon:hover {
+  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.8));
+  transform: translate(-1px, -1px);
+}
+
+/* Estilos específicos para o mapa */
+.leaflet-container {
+  font-family: 'VT323', monospace;
+}
+
+.leaflet-control-attribution {
+  font-family: 'VT323', monospace;
+  font-size: 12px;
+}
+
+.leaflet-control-attribution a {
+  color: var(--accent-blue);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-secondary);
+  border: 2px solid var(--text-primary);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'VT323', monospace;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-secondary);
+  border: 2px solid var(--text-primary);
+} 

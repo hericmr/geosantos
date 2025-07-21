@@ -70,7 +70,7 @@ export const useMapGame = (
     setTimeout(() => {
       setTargetIconPosition(null);
       updateGameState({ clickedPosition: latlng });
-    }, 300); // Delay for target icon to show before flag
+    }, 1000); // Delay for target icon to show before flag
 
     // Se for modo lugares famosos, usar coordenadas do lugar
     if (gameMode === 'famous_places' && currentFamousPlace) {
