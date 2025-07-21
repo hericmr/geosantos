@@ -39,6 +39,18 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [rankingData, setRankingData] = useState<any[]>([]);
+
+  const fetchRanking = async () => {
+    try {
+      const data = await rankingService.getTopPlayers(3);
+      if (data) {
+        setRankingData(data.slice(0, 3)); // Get top 3
+      }
+    } catch (err) {
+      console.error("Erro ao buscar ranking:", err);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -70,6 +82,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
       if (success) {
         setIsSubmitted(true);
         setShowConfetti(true);
+        fetchRanking(); // Fetch ranking after successful submission
         
         // Parar confetti após 3 segundos
         setTimeout(() => setShowConfetti(false), 3000);
@@ -402,25 +415,58 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
             )}
           </div>
         ) : (
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '24px',
-            padding: '16px',
-            background: 'var(--accent-green)',
-            border: '2px solid var(--text-primary)',
-            borderRadius: '4px'
-          }}>
-            <CheckIcon size={24} color="var(--text-primary)" />
-            <p style={{
-              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-              fontFamily: "'VT323', monospace",
-              color: 'var(--text-primary)',
-              margin: '8px 0 0 0',
-              fontWeight: 'bold'
+          <>
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '24px',
+              padding: '16px',
+              background: 'var(--accent-green)',
+              border: '2px solid var(--text-primary)',
+              borderRadius: '4px'
             }}>
-              PONTUAÇÃO SALVA COM SUCESSO!
-            </p>
-          </div>
+              <CheckIcon size={24} color="var(--text-primary)" />
+              <p style={{
+                fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                fontFamily: "'VT323', monospace",
+                color: 'var(--text-primary)',
+                margin: '8px 0 0 0',
+                fontWeight: 'bold'
+              }}>
+                PONTUAÇÃO SALVA COM SUCESSO!
+              </p>
+            </div>
+            {isSubmitted && rankingData.length > 0 && (
+              <div style={{
+                marginTop: '24px',
+                textAlign: 'center',
+                background: 'var(--bg-primary)',
+                border: '2px solid var(--accent-yellow)',
+                borderRadius: '4px',
+                padding: '16px',
+                boxShadow: 'var(--shadow-md)'
+              }}>
+                <h3 style={{
+                  fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                  margin: '0 0 12px 0',
+                  fontFamily: "'Press Start 2P', monospace",
+                  color: 'var(--accent-yellow)',
+                  textTransform: 'uppercase'
+                }}>
+                  TOP 3 DO RANKING
+                </h3>
+                {rankingData.map((entry, index) => (
+                  <p key={index} style={{
+                    fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+                    fontFamily: "'VT323', monospace",
+                    color: 'var(--text-primary)',
+                    margin: '4px 0'
+                  }}>
+                    {index + 1}. {entry.player_name} - {entry.score.toLocaleString()} pontos
+                  </p>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Botões de ação */}
@@ -484,7 +530,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                 }).catch(console.error);
               } else {
                 navigator.clipboard.writeText(shareText)
-                  .then(() => alert('Texto copiado para a área de transferência!'))
+                  .then(() => alert('Texto copiado para a área de transferência! Desafie uma pessoa, compartilhe o jogo!'))
                   .catch(console.error);
               }
             }}
