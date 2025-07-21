@@ -91,6 +91,7 @@ export const getNeighborhoodStyle = (feature: any, revealedNeighborhoods: Set<st
     opacity: isRevealed ? 1 : 0,
     color: 'var(--text-primary)',
     fillOpacity: isRevealed ? 0.4 : 0,
-    dashArray: '5'
+    // Removed dashArray for jagged border
+    filter: isRevealed ? 'drop-shadow(0 0 4px rgba(16, 185, 129, 0.5))': 'none', // Subtle glow for revealed neighborhoods
   };
 }; 
