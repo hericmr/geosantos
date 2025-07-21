@@ -106,7 +106,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
         zIndex: 2002,
         minWidth: '340px',
         maxWidth: '400px',
-        boxShadow: '0 0 24px 6px rgba(255, 215, 0, 0.25), 0 4px 32px 0 rgba(0,0,0,0.4)',
+        boxShadow: 'none',
         border: '4px solid var(--accent-yellow)',
         borderRadius: '12px',
         background: 'rgba(30, 30, 30, 0.98)',
@@ -173,7 +173,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
             borderTopLeftRadius: variant === 'startScreen' ? '8px' : '0',
             borderTopRightRadius: variant === 'startScreen' ? '8px' : '0',
             letterSpacing: '1px',
-            boxShadow: variant === 'startScreen' ? '0 2px 12px 0 rgba(255,215,0,0.25)' : 'none'
+            boxShadow: 'none'
           }}
         >
           <span style={{
@@ -247,7 +247,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
                     alignItems: 'center',
                     gap: '8px',
                     padding: '6px 8px',
-                    background: index === 0 ? 'rgba(255, 215, 0, 0.2)' : 
+                    background: index === 0 ? 'rgba(16, 185, 129, 0.2)' : 
                                index === 1 ? 'rgba(192, 192, 192, 0.2)' :
                                index === 2 ? 'rgba(205, 127, 50, 0.2)' : 'transparent',
                     border: index < 3 ? '1px solid var(--accent-green)' : '1px solid transparent',
