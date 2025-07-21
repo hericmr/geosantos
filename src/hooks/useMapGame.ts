@@ -67,11 +67,6 @@ export const useMapGame = (
     // Primeiro, apenas atualiza a posição da bandeira
     setTargetIconPosition(latlng);
 
-    setTimeout(() => {
-      setTargetIconPosition(null);
-      updateGameState({ clickedPosition: latlng });
-    }, 1000); // Delay for target icon to show before flag
-
     // Se for modo lugares famosos, usar coordenadas do lugar
     if (gameMode === 'famous_places' && currentFamousPlace) {
       const targetLatLng = L.latLng(currentFamousPlace.latitude, currentFamousPlace.longitude);
@@ -80,7 +75,9 @@ export const useMapGame = (
       const newScore = gameState.score + Math.round(score);
       
       setTimeout(() => {
+        setTargetIconPosition(null); // Clear target icon after delay
         updateGameState({
+          clickedPosition: latlng, // Set clickedPosition here
           clickTime: clickDuration,
           score: newScore,
           showFeedback: true,
@@ -184,7 +181,9 @@ export const useMapGame = (
         const newScore = gameState.score + Math.round(score);
         
         setTimeout(() => {
+          setTargetIconPosition(null); // Clear target icon after delay
           updateGameState({
+            clickedPosition: latlng, // Set clickedPosition here
             clickTime: clickDuration,
             score: newScore,
             showFeedback: true,
@@ -278,8 +277,10 @@ export const useMapGame = (
         }
 
         setTimeout(() => {
+          setTargetIconPosition(null); // Clear target icon after delay
           const newTotalDistance = gameState.totalDistance + distance;
           updateGameState({
+            clickedPosition: latlng, // Set clickedPosition here
             clickTime: clickDuration,
             score: newScore,
             showFeedback: true,
