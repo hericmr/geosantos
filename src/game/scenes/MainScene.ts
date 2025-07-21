@@ -282,7 +282,7 @@ export class MainScene extends Phaser.Scene {
                 // Animação da pontuação
                 const textoPontos = this.add.text(pointer.x, pointer.y - 50, `+${Math.floor(pontosGanhos)}`, {
                     fontSize: '24px',
-                    color: '#00ff00',
+                    color: '#10b981',
                     stroke: '#000000',
                     strokeThickness: 4
                 });

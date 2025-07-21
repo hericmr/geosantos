@@ -21,7 +21,7 @@
   
   /* Cores de ação pixel art */
   --accent-blue: #0066ff;
-  --accent-green: #00ff00;
+  --accent-green: #10b981;
   --accent-orange: #ff6600;
   --accent-red: #ff0000;
   --accent-yellow: #ffff00;
@@ -29,7 +29,7 @@
   
   /* Gradientes pixel art */
   --gradient-primary: linear-gradient(45deg, #0066ff 0%, #00ffff 100%);
-  --gradient-success: linear-gradient(45deg, #00ff00 0%, #00aa00 100%);
+  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --gradient-warning: linear-gradient(45deg, #ff6600 0%, #ffaa00 100%);
   --gradient-danger: linear-gradient(45deg, #ff0000 0%, #aa0000 100%);
   

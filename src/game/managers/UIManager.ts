@@ -121,7 +121,7 @@ export class UIManager {
 
         const textoPontos = this.scene.add.text(x, y - 50, `+${Math.floor(points)}`, {
             fontSize: '24px',
-            color: '#00ff00',
+            color: '#10b981',
             stroke: '#000000',
             strokeThickness: 4
         });
