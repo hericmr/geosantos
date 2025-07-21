@@ -19,7 +19,7 @@ A tabela `famous_places` no Supabase já contém os dados necessários.
 - **`src/components/ui/GameModeSelector.tsx`**: Adicionar uma opção para selecionar "Lugares Famosos" como modo de jogo. Isso provavelmente envolverá a adição de um novo botão ou item de menu.
 
 ### 3.2. Exibição do Alvo
-- **`src/components/ui/Game.tsx` / `src/components/ui/GameControls.tsx`**: O componente que exibe o nome do bairro (`game-target__name`) precisará ser adaptado para exibir o nome do lugar famoso e, opcionalmente, sua categoria ou uma breve descrição.
+- **`src/components/ui/Game.tsx` / `src/components/ui/GameControls.tsx`**: O componente que exibe o nome do bairro (`game-target__name`) precisará ser adaptado para exibir o nome do lugar famoso e, opcionalmente, sua categoria ou uma breve descrição. **Além disso, uma imagem do lugar famoso (obtida do bucket `famous-places-images` do Supabase) deverá ser exibida junto ao nome.**
 - **`src/components/ui/FeedbackPanel.tsx`**: Adaptar mensagens de feedback para o novo contexto (e.g., "Você acertou o [Nome do Lugar]!").
 
 ### 3.3. Marcadores e Visualização no Mapa
