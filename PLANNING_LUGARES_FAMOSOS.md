@@ -1,269 +1,70 @@
-# 🏛️ PLANEJAMENTO: MODO LUGARES FAMOSOS DE SANTOS
+# Planejamento: Implementação do Modo de Jogo "Lugares Famosos"
 
-## 📋 Visão Geral
-Implementar um novo modo de jogo focado em lugares famosos e pontos turísticos de Santos, expandindo a experiência do jogo além dos bairros.
+## 1. Visão Geral do Novo Modo
 
-## 🎯 Objetivos
-- Criar uma nova modalidade de jogo com lugares icônicos de Santos
-- Expandir o conhecimento geográfico dos jogadores sobre pontos turísticos
-- Manter a mesma mecânica de jogo (clique no mapa + pontuação por proximidade)
-- Adicionar elementos visuais (imagens dos lugares)
+O modo "Lugares Famosos" permitirá aos jogadores adivinhar a localização de pontos turísticos e históricos pré-definidos na cidade, em vez de bairros. A mecânica central de adivinhação no mapa e cálculo de pontuação por distância será mantida, mas adaptada para os novos alvos.
 
-## 🗄️ ESTRUTURA DO BANCO DE DADOS (SUPABASE)
+## 2. Integração de Dados (Supabase)
 
-### Tabela: `famous_places`
-```sql
-CREATE TABLE famous_places (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  latitude DECIMAL(10, 8) NOT NULL,
-  longitude DECIMAL(11, 8) NOT NULL,
-  category VARCHAR(100), -- 'monumento', 'museu', 'praia', 'igreja', etc.
-  address TEXT,
-  image_url TEXT, -- URL da imagem no bucket
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+A tabela `famous_places` no Supabase já contém os dados necessários.
 
--- Índices para performance
-CREATE INDEX idx_famous_places_location ON famous_places(latitude, longitude);
-CREATE INDEX idx_famous_places_category ON famous_places(category);
-```
+### Tarefas:
+- **`src/types/famousPlaces.ts`**: Definir uma interface TypeScript para `FamousPlace` que corresponda à estrutura da tabela `famous_places` (id, name, description, latitude, longitude, category, address, image_url).
+- **`src/lib/supabase.ts`**: Criar uma função para buscar uma lista de lugares famosos do Supabase.
+- **`src/hooks/useFamousPlaces.ts`**: Desenvolver um hook para gerenciar o estado dos lugares famosos, incluindo a seleção de um lugar aleatório para cada rodada.
 
-### Bucket: `famous-places-images`
-- Configurar bucket público para imagens
-- Política de acesso: leitura pública, escrita apenas para usuários autenticados
-- Estrutura de pastas: `/places/{place_id}/main.jpg`
+## 3. Modificações na UI/UX
 
-## 📊 DADOS INICIAIS
+### 3.1. Seleção de Modo de Jogo
+- **`src/components/ui/GameModeSelector.tsx`**: Adicionar uma opção para selecionar "Lugares Famosos" como modo de jogo. Isso provavelmente envolverá a adição de um novo botão ou item de menu.
 
-### Lugares para inserir:
-```json
-[
-  {
-    "name": "Escultura 100 Anos da Imigração Japonesa",
-    "description": "Monumento criado pela artista Tomie Ohtake em homenagem aos 100 anos da imigração japonesa no Brasil",
-    "latitude": -23.9829486,
-    "longitude": -46.3705368,
-    "category": "monumento",
-    "address": "Praça da Independência, Santos - SP"
-  },
-  {
-    "name": "Monumento aos Andradas",
-    "description": "Monumento em homenagem aos irmãos Andradas, importantes figuras da independência do Brasil",
-    "latitude": -23.9735,
-    "longitude": -46.3092,
-    "category": "monumento",
-    "address": "Praça Barão do Rio Branco, Santos - SP"
-  },
-  {
-    "name": "Museu do Café",
-    "description": "Museu histórico localizado no antigo Palácio da Bolsa Oficial de Café",
-    "latitude": -23.9735,
-    "longitude": -46.3092,
-    "category": "museu",
-    "address": "Rua XV de Novembro, 95, Santos - SP"
-  },
-  {
-    "name": "Aquário Municipal",
-    "description": "Um dos maiores aquários da América Latina",
-    "latitude": -23.9735,
-    "longitude": -46.3092,
-    "category": "turismo",
-    "address": "Av. Bartolomeu de Gusmão, s/n, Santos - SP"
-  },
-  {
-    "name": "Orquidário Municipal",
-    "description": "Jardim botânico com orquídeas e outras plantas exóticas",
-    "latitude": -23.9735,
-    "longitude": -46.3092,
-    "category": "turismo",
-    "address": "Praça Washington, s/n, Santos - SP"
-  }
-]
-```
+### 3.2. Exibição do Alvo
+- **`src/components/ui/Game.tsx` / `src/components/ui/GameControls.tsx`**: O componente que exibe o nome do bairro (`game-target__name`) precisará ser adaptado para exibir o nome do lugar famoso e, opcionalmente, sua categoria ou uma breve descrição.
+- **`src/components/ui/FeedbackPanel.tsx`**: Adaptar mensagens de feedback para o novo contexto (e.g., "Você acertou o [Nome do Lugar]!").
 
-## 🎮 IMPLEMENTAÇÃO DO JOGO
+### 3.3. Marcadores e Visualização no Mapa
+- **`src/components/Map.tsx` / `src/components/game/FamousPlacesManager.tsx`**:
+    - Ao iniciar uma rodada no modo "Lugares Famosos", um marcador (ou ícone representativo) do lugar famoso deve ser exibido no mapa.
+    - Após a adivinhação, a localização correta do lugar famoso deve ser claramente indicada, talvez com um ícone diferente ou um círculo de precisão.
+    - Considerar a exibição de informações adicionais do lugar famoso (descrição, imagem) em um popup ou painel lateral após a adivinhação.
 
-### 1. Estrutura de Arquivos
-```
-src/
-├── components/
-│   ├── game/
-│   │   ├── FamousPlacesManager.tsx
-│   │   └── FamousPlaceMarker.tsx
-│   └── ui/
-│       ├── GameModeSelector.tsx
-│       └── FamousPlaceInfo.tsx
-├── hooks/
-│   └── useFamousPlaces.ts
-├── types/
-│   └── famousPlaces.ts
-└── utils/
-    └── famousPlacesUtils.ts
-```
+## 4. Lógica do Jogo
 
-### 2. Tipos TypeScript
-```typescript
-// src/types/famousPlaces.ts
-export interface FamousPlace {
-  id: string;
-  name: string;
-  description: string;
-  latitude: number;
-  longitude: number;
-  category: string;
-  address: string;
-  image_url?: string;
-  created_at: string;
-  updated_at: string;
-}
+### 4.1. Gerenciamento de Estado
+- **`src/hooks/useGameState.ts`**:
+    - Adicionar um novo estado para o modo de jogo atual (e.g., `gameMode: 'neighborhoods' | 'famousPlaces'`).
+    - Modificar a lógica de seleção de alvo para escolher entre bairros e lugares famosos com base no `gameMode`.
+    - Ajustar a lógica de pontuação e cálculo de distância para usar as coordenadas do lugar famoso.
 
-export interface FamousPlaceGameState {
-  currentPlace: FamousPlace | null;
-  places: FamousPlace[];
-  isLoading: boolean;
-  error: string | null;
-}
-```
+### 4.2. Fluxo da Rodada
+- **`src/components/Game.tsx`**:
+    - Adaptar o fluxo de início de rodada para o modo "Lugares Famosos":
+        1. Selecionar um lugar famoso aleatório.
+        2. Exibir o nome do lugar famoso.
+        3. Aguardar a adivinhação do jogador.
+        4. Calcular distância e pontuação.
+        5. Exibir feedback e a localização correta.
+        6. Transitar para a próxima rodada.
 
-### 3. Hook para Gerenciar Lugares
-```typescript
-// src/hooks/useFamousPlaces.ts
-export const useFamousPlaces = () => {
-  const [places, setPlaces] = useState<FamousPlace[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+### 4.3. Cálculo de Distância e Pontuação
+- **`src/utils/gameUtils.ts`**: A função `calculateDistance` pode ser reutilizada. A função `calculateScore` pode precisar de ajustes finos para o novo contexto de distâncias (lugares famosos podem estar mais distantes que bairros).
 
-  const fetchPlaces = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('famous_places')
-        .select('*')
-        .order('name');
-      
-      if (error) throw error;
-      setPlaces(data || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+## 5. Testes
 
-  const getRandomPlace = () => {
-    if (places.length === 0) return null;
-    return places[Math.floor(Math.random() * places.length)];
-  };
+### 5.1. Testes Unitários
+- **`src/hooks/__tests__/useFamousPlaces.test.ts`**: Testar a busca e seleção de lugares famosos.
+- **`src/components/ui/__tests__/GameModeSelector.test.tsx`**: Testar a seleção do novo modo.
+- **`src/utils/__tests__/gameUtils.test.ts`**: Se `calculateScore` for ajustado, testar a nova lógica.
 
-  return { places, isLoading, error, fetchPlaces, getRandomPlace };
-};
-```
+### 5.2. Testes de Integração
+- Testar o fluxo completo de uma rodada no modo "Lugares Famosos", garantindo que a UI, a lógica e a integração de dados funcionem corretamente.
 
-### 4. Componente de Seleção de Modo
-```typescript
-// src/components/ui/GameModeSelector.tsx
-export const GameModeSelector: React.FC = () => {
-  return (
-    <div className="game-mode-selector">
-      <button className="mode-btn neighborhoods">
-        <MapIcon />
-        <span>Bairros</span>
-      </button>
-      <button className="mode-btn famous-places">
-        <LandmarkIcon />
-        <span>Lugares Famosos</span>
-      </button>
-    </div>
-  );
-};
-```
+## 6. Implantação
 
-## 🎨 INTERFACE DO USUÁRIO
+- Após a implementação e testes, o novo modo será incluído no processo de build e deploy existente (`npm run build` e `npm run deploy`).
 
-### 1. Tela de Seleção de Modo
-- Botões para escolher entre "Bairros" e "Lugares Famosos"
-- Preview de cada modo com ícones e descrições
-- Manter design consistente com o tema atual
+## 7. Considerações Adicionais
 
-### 2. Modificações na StartScreen
-- Adicionar seletor de modo de jogo
-- Ajustar instruções baseado no modo selecionado
-- Manter ranking separado por modo
-
-### 3. Modificações no Jogo
-- Mostrar imagem do lugar famoso quando disponível
-- Exibir nome e descrição do lugar
-- Manter mecânica de pontuação por proximidade
-
-## 📊 SISTEMA DE PONTUAÇÃO
-
-### Estrutura da Tabela de Ranking
-```sql
--- Modificar tabela existente ou criar nova
-ALTER TABLE game_scores ADD COLUMN game_mode VARCHAR(50) DEFAULT 'neighborhoods';
--- Ou criar nova tabela
-CREATE TABLE famous_places_scores (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  player_name VARCHAR(255) NOT NULL,
-  score INTEGER NOT NULL,
-  place_id UUID REFERENCES famous_places(id),
-  distance_meters DECIMAL(10, 2),
-  time_taken DECIMAL(10, 2),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-```
-
-## 🔧 TAREFAS DE IMPLEMENTAÇÃO
-
-### Fase 1: Infraestrutura (1-2 dias)
-- [ ] Criar tabela `famous_places` no Supabase
-- [ ] Configurar bucket para imagens
-- [ ] Inserir dados iniciais dos lugares
-- [ ] Criar tipos TypeScript
-
-### Fase 2: Backend e Hooks (2-3 dias)
-- [ ] Implementar `useFamousPlaces` hook
-- [ ] Criar funções utilitárias para lugares famosos
-- [ ] Implementar sistema de pontuação
-- [ ] Configurar upload de imagens
-
-### Fase 3: Componentes UI (3-4 dias)
-- [ ] Criar `GameModeSelector`
-- [ ] Implementar `FamousPlacesManager`
-- [ ] Criar `FamousPlaceMarker`
-- [ ] Implementar `FamousPlaceInfo`
-
-### Fase 4: Integração (2-3 dias)
-- [ ] Integrar modo lugares famosos no jogo principal
-- [ ] Modificar StartScreen para suportar seleção de modo
-- [ ] Ajustar sistema de ranking
-- [ ] Testes e refinamentos
-
-### Fase 5: Polimento (1-2 dias)
-- [ ] Otimizações de performance
-- [ ] Ajustes de UI/UX
-- [ ] Testes finais
-- [ ] Documentação
-
-## 🎯 CRITÉRIOS DE SUCESSO
-- [ ] Jogadores podem alternar entre modos de jogo
-- [ ] Sistema de pontuação funciona corretamente
-- [ ] Imagens dos lugares são exibidas adequadamente
-- [ ] Ranking separado por modo de jogo
-- [ ] Performance mantida com novos dados
-- [ ] Interface consistente com design atual
-
-## 🔮 PRÓXIMOS PASSOS
-1. Revisar e aprovar o planejamento
-2. Configurar infraestrutura no Supabase
-3. Começar implementação pela Fase 1
-4. Coletar feedback durante desenvolvimento
-5. Implementar melhorias baseadas em testes
-
-## 📝 NOTAS ADICIONAIS
-- Considerar adicionar mais categorias de lugares (restaurantes, shoppings, etc.)
-- Implementar sistema de conquistas específicas para lugares famosos
-- Adicionar informações históricas detalhadas
-- Considerar integração com APIs de turismo locais 
+- **Imagens dos Lugares Famosos**: Se `image_url` for preenchido no Supabase, considerar exibir essas imagens na UI para enriquecer a experiência.
+- **Categorias**: Utilizar a `category` dos lugares famosos para futuras expansões (e.g., modos de jogo por categoria).
+- **Internacionalização**: Se o jogo for expandido para outros idiomas, garantir que os nomes e descrições dos lugares famosos possam ser traduzidos.
