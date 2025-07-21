@@ -151,7 +151,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
               margin: 0,
               fontFamily: "'Press Start 2P', monospace",
-              color: '#10b981',
+              color: 'var(--accent-green)',
               textTransform: 'uppercase'
             }}>
               RANKING GLOBAL
