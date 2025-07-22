@@ -125,17 +125,21 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const selectNextFamousPlace = useCallback(() => {
     if (!famousPlaces || famousPlaces.length === 0) return;
     let idx = Math.floor(Math.random() * famousPlaces.length);
-    // Evita repetir o mesmo lugar imediatamente usando a ref
-    if (famousPlaces.length > 1 && lastFamousPlaceId.current) {
+    // Evita repetir o mesmo lugar imediatamente usando o estado atual
+    if (famousPlaces.length > 1 && currentFamousPlace) {
       let tentativas = 0;
-      while (famousPlaces[idx].id === lastFamousPlaceId.current && tentativas < 10) {
+      while (famousPlaces[idx].id === currentFamousPlace.id && tentativas < 10) {
         idx = Math.floor(Math.random() * famousPlaces.length);
         tentativas++;
       }
     }
     setCurrentFamousPlace(famousPlaces[idx]);
-    lastFamousPlaceId.current = famousPlaces[idx].id;
-  }, [famousPlaces]);
+  }, [famousPlaces, currentFamousPlace]);
+
+  // Atualiza a ref sempre que currentFamousPlace mudar
+  useEffect(() => {
+    lastFamousPlaceId.current = currentFamousPlace?.id ?? null;
+  }, [currentFamousPlace]);
 
   // Desestruturação do useMapGame deve vir antes do useEffect que usa gameState
   const {
@@ -222,12 +226,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     }
     handleNextRound(geoJsonData);
   }, [currentMode, handleNextRound, selectNextFamousPlace]);
-
-  useEffect(() => {
-    if (currentMode !== 'famous_places') {
-      lastFamousPlaceId.current = null;
-    }
-  }, [currentMode]);
 
   return (
     <div style={{
