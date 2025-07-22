@@ -17,6 +17,31 @@ export interface RankingEntry {
 }
 
 // Funções para interagir com o ranking
+export const famousPlacesService = {
+  async getFamousPlaces(): Promise<FamousPlace[]> {
+    const { data, error } = await supabase
+      .from('famous_places')
+      .select('*');
+
+    if (error) {
+      console.error('Erro ao buscar lugares famosos:', error);
+      return [];
+    }
+
+    // Mapear os dados para o tipo FamousPlace, ajustando image_url para imageUrl
+    return data.map(place => ({
+      id: place.id,
+      name: place.name,
+      description: place.description,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      category: place.category,
+      address: place.address,
+      imageUrl: (place.image_url && place.image_url !== '') ? place.image_url : 'https://via.placeholder.com/56', // Mapear image_url do Supabase para imageUrl, garantindo que seja string e não vazia
+    })) || [];
+  },
+};
+
 export const rankingService = {
   // Buscar top 10 jogadores
   async getTopPlayers(limit: number = 10): Promise<RankingEntry[]> {

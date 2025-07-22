@@ -1,56 +1,52 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 import { FamousPlace } from '../types/famousPlaces';
+import { famousPlacesService } from '../lib/supabase';
 
-export const useFamousPlaces = () => {
+export function useFamousPlaces() {
   const [places, setPlaces] = useState<FamousPlace[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPlaces = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const { data, error: supabaseError } = await supabase
-        .from('famous_places')
-        .select('*')
-        .order('name');
-      
-      if (supabaseError) throw supabaseError;
-      setPlaces(data || []);
-    } catch (err) {
-      console.error('Erro ao carregar lugares famosos:', err);
-      setError(err instanceof Error ? err.message : 'Erro desconhecido');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getRandomPlace = (): FamousPlace | null => {
-    if (places.length === 0) return null;
-    return places[Math.floor(Math.random() * places.length)];
-  };
-
-  const getPlaceById = (id: string): FamousPlace | null => {
-    return places.find(place => place.id === id) || null;
-  };
-
-  const getPlacesByCategory = (category: string): FamousPlace[] => {
-    return places.filter(place => place.category === category);
-  };
-
   useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedPlaces = await famousPlacesService.getFamousPlaces();
+        setPlaces(fetchedPlaces);
+        console.log("useFamousPlaces: Places after fetch:", fetchedPlaces);
+      } catch (err) {
+        console.error("Failed to fetch famous places:", err);
+        setError("Failed to load famous places.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchPlaces();
   }, []);
 
+  function getRandomPlace(): FamousPlace {
+    if (places.length === 0) {
+      // Fallback or handle error if no places are loaded
+      return { 
+        id: 'mock-id',
+        name: 'Placeholder',
+        description: 'No famous places loaded.',
+        latitude: 0,
+        longitude: 0,
+        category: 'unknown',
+        address: 'unknown',
+        imageUrl: 'https://via.placeholder.com/56'
+      };
+    }
+    const idx = Math.floor(Math.random() * places.length);
+    return places[idx];
+  }
+
   return {
     places,
+    getRandomPlace,
     isLoading,
     error,
-    fetchPlaces,
-    getRandomPlace,
-    getPlaceById,
-    getPlacesByCategory
   };
-}; 
+} 

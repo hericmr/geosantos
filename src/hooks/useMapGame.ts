@@ -51,7 +51,7 @@ export const useMapGame = (
     startNextRound,
     clearFeedbackTimer,
     feedbackTimerRef
-  } = useGameState();
+  } = useGameState(gameMode);
 
   const handleMapClick = (latlng: L.LatLng) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
@@ -67,13 +67,23 @@ export const useMapGame = (
     // Primeiro, apenas atualiza a posição da bandeira
     setTargetIconPosition(latlng);
 
-    // Se for modo lugares famosos, usar coordenadas do lugar
+    // NOVA LÓGICA PARA MODO LUGARES FAMOSOS
     if (gameMode === 'famous_places' && currentFamousPlace) {
       const targetLatLng = L.latLng(currentFamousPlace.latitude, currentFamousPlace.longitude);
       const distance = calculateDistance(latlng, targetLatLng);
-      const score = calculateScore(distance, gameState.timeLeft).total;
+      const acerto = distance <= 25; // raio de 25 metros para considerar acerto
+      let feedbackMessage = '';
+      let arrowPath: [L.LatLng, L.LatLng] | null = null;
+      let score = 0;
+      if (acerto) {
+        score = 3000 * Math.pow(gameState.timeLeft / 10, 2); // bônus de acerto rápido
+        feedbackMessage = 'Acertou!';
+      } else {
+        score = calculateScore(distance, gameState.timeLeft, 'famous_places').total;
+        feedbackMessage = distance < 200 ? 'Quase lá!' : 'Tente novamente!';
+        arrowPath = [latlng, targetLatLng];
+      }
       const newScore = gameState.score + Math.round(score);
-      
       setTimeout(() => {
         setTargetIconPosition(null); // Clear target icon after delay
         updateGameState({
@@ -83,40 +93,33 @@ export const useMapGame = (
           showFeedback: true,
           feedbackOpacity: 1,
           feedbackProgress: 100,
-          feedbackMessage: "",
+          feedbackMessage: feedbackMessage,
           gameOver: false,
-          revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, currentFamousPlace.name]),
-          arrowPath: null,
-          totalDistance: gameState.totalDistance
+          revealedNeighborhoods: acerto ? new Set([...gameState.revealedNeighborhoods, currentFamousPlace.name]) : gameState.revealedNeighborhoods,
+          arrowPath: arrowPath,
+          totalDistance: gameState.totalDistance + distance
         });
-        
-        if (successSoundRef.current) {
+        if (successSoundRef.current && acerto) {
           successSoundRef.current.currentTime = 0;
           successSoundRef.current.play().catch(() => {});
         }
-        
         setTimeout(() => {
           const duration = 4000;
           const interval = 100;
           let timeElapsed = 0;
-          
           if (progressIntervalRef.current) {
             clearInterval(progressIntervalRef.current);
           }
-          
           progressIntervalRef.current = setInterval(() => {
             timeElapsed += interval;
             const progress = 100 - (timeElapsed / duration * 100);
-            
             if (progress <= 0) {
               if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current);
               }
-              
               handleNextRound(geoJsonData!);
               return;
             }
-            
             updateGameState({
               feedbackProgress: progress,
               feedbackOpacity: progress / 100
@@ -124,7 +127,6 @@ export const useMapGame = (
           }, interval);
         }, 1000);
       }, 0);
-      
       return;
     }
 
@@ -316,7 +318,7 @@ export const useMapGame = (
                   clearInterval(progressIntervalRef.current);
                   progressIntervalRef.current = null;
                 }
-                startNextRound(geoJsonData);
+                startNextRound(geoJsonData!);
               }
             }, interval);
             
@@ -325,7 +327,7 @@ export const useMapGame = (
                 clearInterval(progressIntervalRef.current);
                 progressIntervalRef.current = null;
               }
-              startNextRound(geoJsonData);
+              startNextRound(geoJsonData!);
             }, duration);
           }, 300);
 
@@ -400,12 +402,12 @@ export const useMapGame = (
     startNextRound(geoJsonData);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = (selectedGameMode: GameMode) => {
     if (geoJsonData) {
       setShowPhaseOneMessage(true);
       setTimeout(() => {
         setShowPhaseOneMessage(false);
-        startGame();
+        startGame(selectedGameMode);
       }, 1000);
     }
   };

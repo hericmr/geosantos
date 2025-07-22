@@ -1,7 +1,7 @@
 import { Feature, FeatureCollection } from 'geojson';
 import { LatLng } from 'leaflet';
 import { GeoJSON as ReactGeoJSON } from 'react-leaflet';
-import { GameMode } from './famousPlaces';
+import { GameMode, FamousPlace } from './famousPlaces';
 
 export interface MapProps {
   center: [number, number];
@@ -32,6 +32,7 @@ export interface GameState {
   arrowPath: [LatLng, LatLng] | null;
   lastClickTime: number;
   totalDistance: number;
+  gameMode?: GameMode; // novo campo opcional para modo de jogo
 }
 
 export interface ScoreCalculation {
@@ -59,6 +60,7 @@ export interface GameControlsProps {
   getProgressBarColor: (timeLeft: number, roundInitialTime: number) => string;
   currentMode?: GameMode;
   onModeChange?: (mode: GameMode) => void;
+  currentFamousPlace?: FamousPlace;
 }
 
 export interface FeedbackPanelProps {

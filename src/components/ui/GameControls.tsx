@@ -17,12 +17,14 @@ export const GameControls: React.FC<GameControlsProps> = ({
   roundInitialTime,
   score,
   onStartGame,
-  getProgressBarColor
+  getProgressBarColor,
+  currentMode,
+  onModeChange,
+  currentFamousPlace
 }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { stats, resetStats } = useGameStats();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
   const { playerName, initializePlayerName } = usePlayerName();
 
   useEffect(() => {
@@ -77,6 +79,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
           highScore={stats.highScore}
           totalGames={stats.totalGames}
           averageScore={stats.averageScore}
+          onSelectMode={onModeChange}
         />
       ) : (
         <div style={{
@@ -84,6 +87,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
           display: 'flex',
           flexDirection: 'column'
         }}>
+          {/* Removido bloco de resumo do lugar famoso, pois agora existe um modal dedicado */}
           <div style={{
             width: '100vw',
             height: isMobile ? 'clamp(110px, 22vw, 130px)' : 'clamp(90px, 18vw, 110px)',
@@ -178,8 +182,8 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 }}>
                   {currentMode === 'neighborhoods' 
                     ? currentNeighborhood.charAt(0).toUpperCase() + currentNeighborhood.slice(1).toLowerCase()
-                    : currentNeighborhood
-                  }!
+                    : currentFamousPlace?.name || 'NOME INDISPONÍVEL'
+                  }
                 </span>
               </div>
             </div>
@@ -208,7 +212,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
               {currentMode === 'neighborhoods' 
                 ? 'Encontre o bairro no mapa!'
                 : currentMode === 'famous_places'
-                ? 'Descubra o lugar famoso!'
+                ? 'Encontre o lugar famoso!'
                 : 'Quão bem você conhece a sua cidade?'
               }
             </p>

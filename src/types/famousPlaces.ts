@@ -6,9 +6,7 @@ export interface FamousPlace {
   longitude: number;
   category: string;
   address: string;
-  image_url?: string;
-  created_at: string;
-  updated_at: string;
+  imageUrl: string; // caminho local ou URL
 }
 
 export interface FamousPlaceGameState {

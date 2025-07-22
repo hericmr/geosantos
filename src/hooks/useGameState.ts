@@ -27,7 +27,8 @@ export const useGameState = () => {
     volume: 0.5,
     arrowPath: null,
     lastClickTime: 0,
-    totalDistance: 0
+    totalDistance: 0,
+    gameMode: 'neighborhoods', // valor padrão
   });
 
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -56,53 +57,73 @@ export const useGameState = () => {
   };
 
   const startGame = () => {
-    setGameState(prev => ({
-      ...prev,
-      gameStarted: true,
-      score: 0,
-      gameOver: false,
-      timeLeft: ROUND_TIME,
-      totalTimeLeft: ROUND_TIME,
-      roundInitialTime: ROUND_TIME,
-      roundNumber: 1,
-      isCountingDown: false,
-      isPaused: false,
-      revealedNeighborhoods: new Set(),
-      totalDistance: 0
-    }));
-
+    setGameState(prev => {
+      const isFamousPlaces = (prev.gameMode === 'famous_places');
+      return {
+        ...prev,
+        gameStarted: true,
+        score: 0,
+        gameOver: false,
+        timeLeft: ROUND_TIME,
+        totalTimeLeft: ROUND_TIME,
+        roundInitialTime: ROUND_TIME,
+        roundNumber: 1,
+        isCountingDown: false,
+        isPaused: false,
+        revealedNeighborhoods: new Set(),
+        totalDistance: 0,
+        gameMode: prev.gameMode || 'neighborhoods',
+        currentNeighborhood: isFamousPlaces ? '' : prev.currentNeighborhood,
+      };
+    });
+    // O controle do lugar famoso é feito pelo FamousPlacesManager
     setTimeout(() => {
       setGameState(prev => ({
         ...prev,
-        isCountingDown: true
+        isCountingDown: true,
       }));
     }, 100);
   };
 
   const startNextRound = (geoJsonData: any) => {
-    const features = geoJsonData.features;
-    const randomIndex = Math.floor(Math.random() * features.length);
-    const neighborhood = features[randomIndex].properties?.NOME;
-
     setGameState(prev => {
       const nextRoundNumber = prev.roundNumber + 1;
-      
-      return {
-        ...prev,
-        clickedPosition: null,
-        arrowPath: null,
-        showFeedback: false,
-        feedbackOpacity: 0,
-        timeLeft: ROUND_TIME,
-        roundInitialTime: ROUND_TIME,
-        roundNumber: nextRoundNumber,
-        isCountingDown: false,
-        currentNeighborhood: neighborhood,
-        revealedNeighborhoods: new Set(),
-        timeBonus: 0
-      };
+      if (prev.gameMode === 'famous_places') {
+        // O controle do lugar famoso é feito pelo FamousPlacesManager
+        return {
+          ...prev,
+          clickedPosition: null,
+          arrowPath: null,
+          showFeedback: false,
+          feedbackOpacity: 0,
+          timeLeft: ROUND_TIME,
+          roundInitialTime: ROUND_TIME,
+          roundNumber: nextRoundNumber,
+          isCountingDown: false,
+          currentNeighborhood: '',
+          revealedNeighborhoods: new Set(),
+          timeBonus: 0
+        };
+      } else {
+        const features = geoJsonData.features;
+        const randomIndex = Math.floor(Math.random() * features.length);
+        const neighborhood = features[randomIndex].properties?.NOME;
+        return {
+          ...prev,
+          clickedPosition: null,
+          arrowPath: null,
+          showFeedback: false,
+          feedbackOpacity: 0,
+          timeLeft: ROUND_TIME,
+          roundInitialTime: ROUND_TIME,
+          roundNumber: nextRoundNumber,
+          isCountingDown: false,
+          currentNeighborhood: neighborhood,
+          revealedNeighborhoods: new Set(),
+          timeBonus: 0
+        };
+      }
     });
-
     setTimeout(() => {
       setGameState(prev => ({
         ...prev,
@@ -124,6 +145,6 @@ export const useGameState = () => {
     startGame,
     startNextRound,
     clearFeedbackTimer,
-    feedbackTimerRef
+    feedbackTimerRef,
   };
 }; 

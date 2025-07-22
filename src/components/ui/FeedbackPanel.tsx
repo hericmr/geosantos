@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { FeedbackPanelProps } from '../../types/game';
 import { getFeedbackMessage, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS } from '../../utils/gameConstants';
 import { DigitRoller } from './DigitRoller';
 import { ScoreDisplay } from './ScoreDisplay';
@@ -8,6 +7,25 @@ import { ActionButtons } from './ActionButtons';
 import { styles } from './FeedbackPanel.styles';
 import { capitalizeWords } from '../../utils/textUtils';
 import { ShareIcon } from './GameIcons';
+import { GameMode } from '../../types/famousPlaces';
+
+export interface FeedbackPanelProps {
+  showFeedback: boolean;
+  clickedPosition: any;
+  arrowPath: any;
+  clickTime: number;
+  feedbackProgress: number;
+  onNextRound: (geoJsonData: any) => void;
+  calculateDistance: (...args: any[]) => number;
+  calculateScore: (...args: any[]) => any;
+  getProgressBarColor: (...args: any[]) => any;
+  geoJsonData: any;
+  gameOver: boolean;
+  onPauseGame: () => void;
+  score: number;
+  currentNeighborhood: string;
+  currentMode?: GameMode;
+}
 
 export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   showFeedback,
@@ -23,7 +41,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   gameOver,
   onPauseGame,
   score,
-  currentNeighborhood
+  currentNeighborhood,
+  currentMode = 'neighborhoods',
 }) => {
   const [displayedDistance, setDisplayedDistance] = useState(0);
   const [displayedTime, setDisplayedTime] = useState(0);
@@ -168,7 +187,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   color: '#fff',
                   lineHeight: 1.1
                 }}>
-                  Em {clickTime.toFixed(2)} seg você acertou na mosca o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>!
+                  {currentMode === 'famous_places'
+                    ? `Em ${clickTime.toFixed(2)} seg você acertou o lugar famoso!`
+                    : `Em ${clickTime.toFixed(2)} seg você acertou na mosca o bairro `}
+                  {currentMode === 'neighborhoods' && (
+                    <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>
+                  )}
+                  {currentMode === 'neighborhoods' && '!' }
                 </div>
               </div>
 
@@ -201,7 +226,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                 opacity: 0.9,
                 marginBottom: '2px'
               }}>
-                Em {displayedTime.toFixed(2)} seg você clicou
+                {currentMode === 'famous_places'
+                  ? `Em ${displayedTime.toFixed(2)} seg você clicou`
+                  : `Em ${displayedTime.toFixed(2)} seg você clicou`}
               </div>
               <div style={{
                 display: 'flex',
@@ -228,7 +255,14 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   fontWeight: 500,
                   marginLeft: 'clamp(4px, 1vw, 8px)',
                   opacity: 0.9
-                }}>metros até o bairro <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span></div>
+                }}>{currentMode === 'famous_places'
+                  ? 'metros até o ponto famoso'
+                  : `metros até o bairro `}
+                  {currentMode === 'neighborhoods' && (
+                    <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>
+                  )}
+                  {currentMode === 'neighborhoods' && '!' }
+                </div>
               </div>
               <div style={{
                 display: 'flex',

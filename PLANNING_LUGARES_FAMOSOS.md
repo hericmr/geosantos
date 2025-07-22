@@ -1,70 +1,164 @@
-# Planejamento: Implementação do Modo de Jogo "Lugares Famosos"
+# Planejamento Metapista: Modo "Lugares Famosos" (Fase Local e Supabase)
 
-## 1. Visão Geral do Novo Modo
+## Princípios
+- **Pequenas etapas:** Cada passo deve ser implementável e testável isoladamente.
+- **Reversibilidade:** Cada etapa pode ser revertida facilmente (ex: via git revert).
+- **Segurança:** Mudanças não quebram funcionalidades existentes; feature flags ou toggles quando possível.
+- **Validação:** Critérios claros de “pronto” e testes para cada etapa.
 
-O modo "Lugares Famosos" permitirá aos jogadores adivinhar a localização de pontos turísticos e históricos pré-definidos na cidade, em vez de bairros. A mecânica central de adivinhação no mapa e cálculo de pontuação por distância será mantida, mas adaptada para os novos alvos.
+---
 
-## 2. Integração de Dados (Supabase)
+## Fase 1: Implementação Local (Mock)
 
-A tabela `famous_places` no Supabase já contém os dados necessários.
+### Etapa 1: Definir tipos e contratos de dados
+**Objetivo:** Criar a interface TypeScript `FamousPlace`.
+**Passos:**
+- Criar/atualizar `src/types/famousPlaces.ts` com a interface.
+**Critério de pronto:** Interface criada, build passa.
+**Reversão:** Remover/voltar o arquivo de tipos.
 
-### Tarefas:
-- **`src/types/famousPlaces.ts`**: Definir uma interface TypeScript para `FamousPlace` que corresponda à estrutura da tabela `famous_places` (id, name, description, latitude, longitude, category, address, image_url).
-- **`src/lib/supabase.ts`**: Criar uma função para buscar uma lista de lugares famosos do Supabase.
-- **`src/hooks/useFamousPlaces.ts`**: Desenvolver um hook para gerenciar o estado dos lugares famosos, incluindo a seleção de um lugar aleatório para cada rodada.
+---
 
-## 3. Modificações na UI/UX
+### Etapa 2: Criar dados locais mockados
+**Objetivo:** Disponibilizar um array de lugares famosos localmente.
+**Passos:**
+- Criar `src/data/famousPlacesMock.ts` com pelo menos o monumento Tomiotake (imagem: `escultura.webp`).
+**Critério de pronto:** Dados disponíveis para uso local.
+**Reversão:** Remover arquivo de mock.
 
-### 3.1. Seleção de Modo de Jogo
-- **`src/components/ui/GameModeSelector.tsx`**: Adicionar uma opção para selecionar "Lugares Famosos" como modo de jogo. Isso provavelmente envolverá a adição de um novo botão ou item de menu.
+---
 
-### 3.2. Exibição do Alvo
-- **`src/components/ui/Game.tsx` / `src/components/ui/GameControls.tsx`**: O componente que exibe o nome do bairro (`game-target__name`) precisará ser adaptado para exibir o nome do lugar famoso e, opcionalmente, sua categoria ou uma breve descrição. **Além disso, uma imagem do lugar famoso (obtida do bucket `famous-places-images` do Supabase) deverá ser exibida junto ao nome.**
-- **`src/components/ui/FeedbackPanel.tsx`**: Adaptar mensagens de feedback para o novo contexto (e.g., "Você acertou o [Nome do Lugar]!").
+### Etapa 3: Criar hook useFamousPlaces para dados locais
+**Objetivo:** Gerenciar estado dos lugares famosos usando mock.
+**Passos:**
+- Implementar hook em `src/hooks/useFamousPlaces.ts` consumindo o mock.
+**Critério de pronto:** Hook retorna dados e seleciona lugar aleatório.
+**Reversão:** Remover hook e testes.
 
-### 3.3. Marcadores e Visualização no Mapa
-- **`src/components/Map.tsx` / `src/components/game/FamousPlacesManager.tsx`**:
-    - Ao iniciar uma rodada no modo "Lugares Famosos", um marcador (ou ícone representativo) do lugar famoso deve ser exibido no mapa.
-    - Após a adivinhação, a localização correta do lugar famoso deve ser claramente indicada, talvez com um ícone diferente ou um círculo de precisão.
-    - Considerar a exibição de informações adicionais do lugar famoso (descrição, imagem) em um popup ou painel lateral após a adivinhação.
+---
 
-## 4. Lógica do Jogo
+### Etapa 4: Adicionar modo no seletor de jogo
+**Objetivo:** Permitir seleção do modo "Lugares Famosos" na UI.
+**Passos:**
+- Adicionar opção no `GameModeSelector.tsx`.
+**Critério de pronto:** Novo modo aparece, sem alterar lógica do jogo.
+**Reversão:** Remover opção do seletor.
 
-### 4.1. Gerenciamento de Estado
-- **`src/hooks/useGameState.ts`**:
-    - Adicionar um novo estado para o modo de jogo atual (e.g., `gameMode: 'neighborhoods' | 'famousPlaces'`).
-    - Modificar a lógica de seleção de alvo para escolher entre bairros e lugares famosos com base no `gameMode`.
-    - Ajustar a lógica de pontuação e cálculo de distância para usar as coordenadas do lugar famoso.
+---
 
-### 4.2. Fluxo da Rodada
-- **`src/components/Game.tsx`**:
-    - Adaptar o fluxo de início de rodada para o modo "Lugares Famosos":
-        1. Selecionar um lugar famoso aleatório.
-        2. Exibir o nome do lugar famoso.
-        3. Aguardar a adivinhação do jogador.
-        4. Calcular distância e pontuação.
-        5. Exibir feedback e a localização correta.
-        6. Transitar para a próxima rodada.
+### Etapa 5: Gerenciar estado do modo de jogo
+**Objetivo:** Adicionar campo `gameMode` ao estado global.
+**Passos:**
+- Atualizar `useGameState.ts` para incluir `gameMode`.
+**Critério de pronto:** Estado pode ser lido/alterado.
+**Reversão:** Remover campo e referências.
 
-### 4.3. Cálculo de Distância e Pontuação
-- **`src/utils/gameUtils.ts`**: A função `calculateDistance` pode ser reutilizada. A função `calculateScore` pode precisar de ajustes finos para o novo contexto de distâncias (lugares famosos podem estar mais distantes que bairros).
+---
 
-## 5. Testes
+### Etapa 6: Integrar lógica de seleção de alvo usando dados locais
+**Objetivo:** Usar hook para selecionar alvo quando modo "Lugares Famosos" estiver ativo.
+**Passos:**
+- Alterar lógica de seleção de alvo em `useGameState.ts`.
+**Critério de pronto:** Modo bairros inalterado; modo lugares famosos seleciona alvo do mock.
+**Reversão:** Restaurar lógica anterior.
 
-### 5.1. Testes Unitários
-- **`src/hooks/__tests__/useFamousPlaces.test.ts`**: Testar a busca e seleção de lugares famosos.
-- **`src/components/ui/__tests__/GameModeSelector.test.tsx`**: Testar a seleção do novo modo.
-- **`src/utils/__tests__/gameUtils.test.ts`**: Se `calculateScore` for ajustado, testar a nova lógica.
+---
 
-### 5.2. Testes de Integração
-- Testar o fluxo completo de uma rodada no modo "Lugares Famosos", garantindo que a UI, a lógica e a integração de dados funcionem corretamente.
+### Etapa 7: Adaptar UI para exibir nome, categoria e imagem (usando escultura.webp)
+**Objetivo:** Exibir informações do lugar famoso na UI.
+**Passos:**
+- Atualizar `Game.tsx` e/ou `GameControls.tsx`.
+**Critério de pronto:** UI mostra corretamente informações do lugar famoso.
+**Reversão:** Restaurar UI anterior.
 
-## 6. Implantação
+---
 
-- Após a implementação e testes, o novo modo será incluído no processo de build e deploy existente (`npm run build` e `npm run deploy`).
+### Etapa 8: Ajustar feedback e mensagens
+**Objetivo:** Personalizar feedback para o novo modo.
+**Passos:**
+- Atualizar `FeedbackPanel.tsx` e mensagens relacionadas.
+**Critério de pronto:** Mensagens refletem o contexto de lugares famosos.
+**Reversão:** Restaurar mensagens anteriores.
 
-## 7. Considerações Adicionais
+---
 
-- **Imagens dos Lugares Famosos**: Se `image_url` for preenchido no Supabase, considerar exibir essas imagens na UI para enriquecer a experiência.
-- **Categorias**: Utilizar a `category` dos lugares famosos para futuras expansões (e.g., modos de jogo por categoria).
-- **Internacionalização**: Se o jogo for expandido para outros idiomas, garantir que os nomes e descrições dos lugares famosos possam ser traduzidos.
+### Etapa 9: Visualização no mapa com marcador local
+**Objetivo:** Exibir marcador/ícone do lugar famoso no mapa.
+**Passos:**
+- Atualizar `Map.tsx` e/ou `FamousPlacesManager.tsx`.
+**Critério de pronto:** Marcador aparece corretamente, sem afetar outros modos.
+**Reversão:** Remover lógica de marcador.
+
+---
+
+### Etapa 10: Ajustar cálculo de distância e pontuação
+**Objetivo:** Ajustar funções para considerar distâncias típicas de lugares famosos.
+**Passos:**
+- Revisar `calculateScore` em `gameUtils.ts`.
+**Critério de pronto:** Pontuação faz sentido para ambos os modos.
+**Reversão:** Restaurar funções anteriores.
+
+---
+
+### Etapa 11: Testes de integração com dados locais
+**Objetivo:** Testar o fluxo completo do novo modo com mock.
+**Passos:**
+- Criar testes de integração para o modo "Lugares Famosos".
+**Critério de pronto:** Todos os testes passam, fluxo validado.
+**Reversão:** Desabilitar testes e feature flag do modo.
+
+---
+
+### Etapa 12: Deploy do modo local (sem Supabase)
+**Objetivo:** Ativar modo para todos os usuários e publicar.
+**Passos:**
+- Rodar build e deploy.
+**Critério de pronto:** Modo disponível em produção, sem regressões.
+**Reversão:** Reverter deploy.
+
+---
+
+## Fase 2: Integração com Supabase
+
+### Etapa 13: Implementar função de fetch do Supabase
+**Objetivo:** Buscar lugares famosos do Supabase (sem ativar na UI).
+**Passos:**
+- Adicionar função em `src/lib/supabase.ts`.
+**Critério de pronto:** Função retorna dados corretamente.
+**Reversão:** Remover função e eventuais imports.
+
+---
+
+### Etapa 14: Alterar hook/useFamousPlaces para buscar do Supabase (feature flag)
+**Objetivo:** Permitir alternar entre mock e Supabase.
+**Passos:**
+- Atualizar hook para buscar do Supabase se flag estiver ativa.
+**Critério de pronto:** Hook funciona com ambas as fontes.
+**Reversão:** Desativar flag ou restaurar hook.
+
+---
+
+### Etapa 15: Testes de integração com Supabase
+**Objetivo:** Testar o fluxo completo do novo modo com Supabase.
+**Passos:**
+- Criar testes de integração para o modo "Lugares Famosos" com Supabase.
+**Critério de pronto:** Todos os testes passam, fluxo validado.
+**Reversão:** Desabilitar testes e feature flag do modo.
+
+---
+
+### Etapa 16: Deploy com Supabase ativado
+**Objetivo:** Ativar modo Supabase para todos os usuários e publicar.
+**Passos:**
+- Remover feature flag (se usada).
+- Rodar build e deploy.
+**Critério de pronto:** Modo Supabase disponível em produção, sem regressões.
+**Reversão:** Reverter deploy ou desabilitar feature flag.
+
+---
+
+## Observações Gerais
+- **Feature Flags:** Use toggles para alternar entre mock e Supabase.
+- **Commits Pequenos:** Faça commits atômicos e descritivos para facilitar rollback.
+- **Testes:** Priorize testes automatizados em cada etapa.
+- **Documentação:** Atualize README e comentários conforme avança.

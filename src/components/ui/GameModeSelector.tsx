@@ -119,7 +119,7 @@ export const GameModeSelector: React.FC<GameModeSelectorProps> = ({
             textAlign: 'center',
             opacity: 0.8
           }}>
-            Descubra pontos turísticos<br/>e monumentos icônicos
+            Descubra pontos icônicos<br/>e monumentos de Santos
           </div>
         </button>
       </div>

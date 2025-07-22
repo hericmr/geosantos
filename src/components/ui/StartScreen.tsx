@@ -13,6 +13,7 @@ interface StartScreenProps {
   highScore?: number;
   totalGames?: number;
   averageScore?: number;
+  onSelectMode?: (mode: GameMode) => void;
 }
 
 export const StartScreen: React.FC<StartScreenProps> = ({
@@ -20,44 +21,35 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   onShowLeaderboard,
   highScore = 0,
   totalGames = 0,
-  averageScore = 0
+  averageScore = 0,
+  onSelectMode
 }) => {
   const [selectedOption, setSelectedOption] = useState(0);
 
 
 
   const menuOptions = useMemo(() => [
-    { id: 'famous_places', label: 'LUGARES FAMOSOS', icon: LandmarkIcon, action: () => {}, isMode: true, disabled: true },
+    { id: 'famous_places', label: 'LUGARES FAMOSOS', icon: LandmarkIcon, action: () => { onSelectMode?.('famous_places'); onStartGame(); }, isMode: true },
     { id: 'play', label: 'JOGAR', icon: PlayIcon, action: onStartGame },
     { id: 'leaderboard', label: 'RANKING', icon: TrophyIcon, action: onShowLeaderboard }
-  ], [onStartGame, onShowLeaderboard]);
+  ], [onStartGame, onShowLeaderboard, onSelectMode]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedOption(prev => {
         let newOption = prev > 0 ? prev - 1 : menuOptions.length - 1;
-        // Pular opções desabilitadas
-        while (menuOptions[newOption]?.disabled && newOption !== prev) {
-          newOption = newOption > 0 ? newOption - 1 : menuOptions.length - 1;
-        }
         return newOption;
       });
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedOption(prev => {
         let newOption = prev < menuOptions.length - 1 ? prev + 1 : 0;
-        // Pular opções desabilitadas
-        while (menuOptions[newOption]?.disabled && newOption !== prev) {
-          newOption = newOption < menuOptions.length - 1 ? newOption + 1 : 0;
-        }
         return newOption;
       });
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      if (!menuOptions[selectedOption]?.disabled) {
-        menuOptions[selectedOption].action?.();
-      }
+      menuOptions[selectedOption].action?.();
     }
   }, [menuOptions, selectedOption]);
 
@@ -242,56 +234,42 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           {menuOptions.map((option, index) => {
             const IconComponent = option.icon;
             const isSelected = index === selectedOption;
-            const isDisabled = option.disabled;
-            
+            // const isDisabled = option.disabled; // REMOVIDO
             return (
               <button
                 key={option.id}
-                onClick={isDisabled ? undefined : option.action}
+                onClick={option.action}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '16px',
                   padding: '16px 24px',
-                  background: isDisabled ? 'var(--bg-muted)' : (isSelected ? 'var(--accent-green)' : 'var(--bg-secondary)'),
+                  background: isSelected ? 'var(--accent-green)' : 'var(--bg-secondary)',
                   border: '3px solid var(--text-primary)',
                   borderRadius: '4px',
-                  color: isDisabled ? 'var(--text-muted)' : (isSelected ? 'var(--bg-primary)' : 'var(--text-primary)'),
-                  cursor: isDisabled ? 'not-allowed' : 'pointer',
+                  color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
+                  cursor: 'pointer',
                   transition: 'all 0.1s steps(1)',
                   fontFamily: "'Press Start 2P', monospace",
                   fontSize: 'clamp(0.8rem, 2vw, 1rem)',
                   fontWeight: 400,
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
-                  boxShadow: isSelected && !isDisabled ? 'var(--shadow-lg)' : 'var(--shadow-md)',
-                  transform: isSelected && !isDisabled ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+                  boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
+                  transform: isSelected ? 'translate(-2px, -2px)' : 'translate(0, 0)',
                   position: 'relative',
                   overflow: 'hidden',
-                  opacity: isDisabled ? 0.5 : 1
+                  opacity: 1
                 }}
-                onMouseEnter={() => !isDisabled && setSelectedOption(index)}
+                onMouseEnter={() => setSelectedOption(index)}
                 onMouseLeave={() => setSelectedOption(0)}
               >
                 <IconComponent 
                   size={24} 
-                  color={isDisabled ? 'var(--text-muted)' : (isSelected ? 'var(--bg-primary)' : 'var(--text-primary)')} 
+                  color={isSelected ? 'var(--bg-primary)' : 'var(--text-primary)'} 
                 />
                 {option.label}
-                
-                {isDisabled && (
-                  <span style={{
-                    marginLeft: 'auto',
-                    fontSize: '0.7rem',
-                    opacity: 0.8,
-                    color: 'var(--accent-orange)',
-                    fontFamily: "'VT323', monospace"
-                  }}>
-                    EM CONSTRUÇÃO
-                  </span>
-                )}
-                
-                {isSelected && !isDisabled && (
+                {isSelected && (
                   <div style={{
                     position: 'absolute',
                     right: '16px'
