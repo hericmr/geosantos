@@ -14,9 +14,9 @@ export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({ open, onClos
   return (
     <div style={{
       position: 'fixed',
-      top: '50%',
-      right: 32,
-      transform: 'translateY(-50%)',
+      top: 20, // alinhado ao topo
+      right: 20, // alinhado à direita
+      transform: 'none', // remover centralização vertical
       height: 'auto',
       maxHeight: '84vh',
       width: 'min(380px, 92vw)',
@@ -68,10 +68,10 @@ export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({ open, onClos
         alt={famousPlace.name}
         style={{
           width: '100%',
-          maxWidth: 240,
+          maxWidth: 360, // aumentado de 300 para 360
           borderRadius: 0,
           boxShadow: '4px 4px 0 #222',
-          marginBottom: 16,
+          marginBottom: 24, // aumentado de 18 para 24
           border: '3px solid #222',
           background: '#fff'
         }}
@@ -96,21 +96,7 @@ export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({ open, onClos
         textTransform: 'uppercase',
         textShadow: '1px 1px 0 #fff'
       }}>{famousPlace.category}</span>
-      <p style={{
-        color: '#444',
-        fontSize: 13,
-        margin: '6px 0 0 0',
-        textAlign: 'center',
-        fontFamily: "'VT323', monospace",
-        background: '#fff',
-        border: '2px solid #222',
-        padding: 8,
-        borderRadius: 0,
-        boxShadow: '2px 2px 0 #222',
-        lineHeight: '1.5'
-      }}>
-        {famousPlace.description}
-      </p>
+      {/* Removido o campo de descrição */}
     </div>
   );
 };

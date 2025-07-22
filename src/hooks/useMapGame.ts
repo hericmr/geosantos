@@ -82,6 +82,13 @@ export const useMapGame = (
         score = calculateScore(distance, gameState.timeLeft, 'famous_places').total;
         feedbackMessage = distance < 200 ? 'Quase lá!' : 'Tente novamente!';
         arrowPath = [latlng, targetLatLng];
+        // Exibir círculo de feedback como no modo normal
+        setTimeout(() => {
+          setDistanceCircle({
+            center: latlng,
+            radius: distance
+          });
+        }, 200); // delay para sincronizar com a animação da bandeira
       }
       const newScore = gameState.score + Math.round(score);
       setTimeout(() => {
