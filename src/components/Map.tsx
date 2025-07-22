@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
@@ -27,6 +27,8 @@ import { GameAudioManager } from './game/GameAudioManager';
 import { DistanceDisplay } from './ui/DistanceDisplay';
 import { GameOverModal } from './ui/GameOverModal';
 import { usePlayerName } from '../hooks/usePlayerName';
+import { XIcon } from './ui/GameIcons';
+import { FamousPlaceModal } from './ui/FamousPlaceModal';
 
 // Função para verificar se um ponto está dentro de um polígono
 // Implementação do algoritmo "ray casting" para determinar se um ponto está dentro de um polígono
@@ -67,10 +69,26 @@ const bandeira2Icon = new L.Icon({
   className: 'bandeira-marker'
 });
 
+// Create custom icon for bandeira1
+const bandeira1Icon = new L.Icon({
+  iconUrl: 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/images/bandeira1.png', // Corrigido para usar o caminho público
+  iconSize: [70, 70],
+  iconAnchor: [30, 60],
+  popupAnchor: [0, -50],
+  className: 'bandeira-marker'
+});
+
 import { renderToStaticMarkup } from 'react-dom/server';
 import { TargetIcon } from './ui/GameIcons';
 
-// ... (keep existing imports)
+// Função utilitária para criar um ícone customizado para lugares famosos
+const createFamousPlaceIcon = (imageUrl: string) => new L.Icon({
+  iconUrl: imageUrl || 'https://via.placeholder.com/56', // Use placeholder if imageUrl is empty
+  iconSize: [56, 56],
+  iconAnchor: [28, 54],
+  popupAnchor: [0, -50],
+  className: 'famous-place-marker'
+});
 
 // Create custom icon for the target marker using Lucide Target icon
 const targetIcon = new L.DivIcon({
@@ -97,6 +115,15 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   
   const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
   const [currentFamousPlace, setCurrentFamousPlace] = useState<FamousPlace | null>(null);
+  const [showFamousPlaceModal, setShowFamousPlaceModal] = useState(false);
+
+  useEffect(() => {
+    if (currentMode === 'famous_places' && currentFamousPlace) {
+      setShowFamousPlaceModal(true);
+    } else {
+      setShowFamousPlaceModal(false);
+    }
+  }, [currentMode, currentFamousPlace]);
 
   const {
     mapRef,
@@ -156,6 +183,14 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       setShowGameOver(true);
     }
   }, [gameState.gameOver, showGameOver, gameState.lastClickTime, gameState.totalDistance, gameState.roundNumber]);
+
+  // Função para avançar rodada e limpar currentFamousPlace no modo lugares famosos
+  const handleNextRoundWithFamousPlaceReset = useCallback((geoJsonData: any) => {
+    if (currentMode === 'famous_places') {
+      setCurrentFamousPlace(null);
+    }
+    handleNextRound(geoJsonData);
+  }, [currentMode, handleNextRound]);
 
   return (
     <div style={{
@@ -366,6 +401,15 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             icon={bandeira2Icon}
           />
         )}
+        {/* Marcador do local correto do lugar famoso (bandeira1) */}
+        {currentMode === 'famous_places' && gameState.showFeedback && currentFamousPlace && (
+          <Marker
+            position={[currentFamousPlace.latitude, currentFamousPlace.longitude]}
+            icon={bandeira1Icon}
+          />
+        )}
+        {/* Marcador do lugar famoso */}
+        {/* Removido o marcador do lugar famoso do mapa, pois agora a referência visual é apenas o modal */}
         {gameState.arrowPath && (
           <Polyline
             positions={gameState.arrowPath}
@@ -426,10 +470,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         roundNumber={gameState.roundNumber}
         roundInitialTime={gameState.roundInitialTime}
         score={gameState.score}
-        onStartGame={handleStartGame}
+        onStartGame={() => handleStartGame(currentMode)}
         getProgressBarColor={getProgressBarColor}
         currentMode={currentMode}
         onModeChange={setCurrentMode}
+        currentFamousPlace={currentFamousPlace || undefined}
       />
 
       {gameState.showFeedback && (
@@ -439,7 +484,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           arrowPath={gameState.arrowPath}
           clickTime={gameState.clickTime}
           feedbackProgress={gameState.feedbackProgress}
-          onNextRound={handleNextRound}
+          onNextRound={handleNextRoundWithFamousPlaceReset}
           calculateDistance={calculateDistance}
           calculateScore={calculateScore}
           getProgressBarColor={getProgressBarColor}
@@ -448,6 +493,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           onPauseGame={handlePauseGame}
           score={gameState.score}
           currentNeighborhood={gameState.currentNeighborhood}
+          currentMode={currentMode}
         />
       )}
 
@@ -495,6 +541,13 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         roundsPlayed={gameStats.roundsPlayed}
         accuracy={gameStats.accuracy}
         currentPlayerName={playerName || initializePlayerName()}
+      />
+
+      {/* Modal do Lugar Famoso */}
+      <FamousPlaceModal
+        open={showFamousPlaceModal}
+        onClose={() => setShowFamousPlaceModal(false)}
+        famousPlace={currentFamousPlace}
       />
     </div>
   );
