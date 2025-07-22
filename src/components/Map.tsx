@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
@@ -29,6 +29,7 @@ import { GameOverModal } from './ui/GameOverModal';
 import { usePlayerName } from '../hooks/usePlayerName';
 import { XIcon } from './ui/GameIcons';
 import { FamousPlaceModal } from './ui/FamousPlaceModal';
+import { useFamousPlaces } from '../hooks/useFamousPlaces';
 
 // Função para verificar se um ponto está dentro de um polígono
 // Implementação do algoritmo "ray casting" para determinar se um ponto está dentro de um polígono
@@ -116,15 +117,27 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
   const [currentFamousPlace, setCurrentFamousPlace] = useState<FamousPlace | null>(null);
   const [showFamousPlaceModal, setShowFamousPlaceModal] = useState(false);
+  // Controle de lugares famosos já usados
+  const { places: famousPlaces, isLoading: famousPlacesLoading, error: famousPlacesError, getRandomPlace } = useFamousPlaces();
+  const lastFamousPlaceId = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (currentMode === 'famous_places' && currentFamousPlace) {
-      setShowFamousPlaceModal(true);
-    } else {
-      setShowFamousPlaceModal(false);
+  // Função para selecionar próximo lugar famoso (pode repetir, sempre aleatório)
+  const selectNextFamousPlace = useCallback(() => {
+    if (!famousPlaces || famousPlaces.length === 0) return;
+    let idx = Math.floor(Math.random() * famousPlaces.length);
+    // Evita repetir o mesmo lugar imediatamente usando a ref
+    if (famousPlaces.length > 1 && lastFamousPlaceId.current) {
+      let tentativas = 0;
+      while (famousPlaces[idx].id === lastFamousPlaceId.current && tentativas < 10) {
+        idx = Math.floor(Math.random() * famousPlaces.length);
+        tentativas++;
+      }
     }
-  }, [currentMode, currentFamousPlace]);
+    setCurrentFamousPlace(famousPlaces[idx]);
+    lastFamousPlaceId.current = famousPlaces[idx].id;
+  }, [famousPlaces]);
 
+  // Desestruturação do useMapGame deve vir antes do useEffect que usa gameState
   const {
     mapRef,
     geoJsonRef,
@@ -146,6 +159,24 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     updateGameState,
     gameMode
   } = useMapGame(geoJsonData, currentMode, currentFamousPlace, setTargetIconPosition);
+
+  // Quando iniciar o jogo ou trocar para modo lugares famosos, seleciona o primeiro lugar
+  useEffect(() => {
+    if (currentMode === 'famous_places' && gameState.gameStarted && famousPlaces.length > 0 && !currentFamousPlace) {
+      selectNextFamousPlace();
+    }
+    if (currentMode !== 'famous_places') {
+      setCurrentFamousPlace(null);
+    }
+  }, [currentMode, gameState.gameStarted, famousPlaces, selectNextFamousPlace]);
+
+  useEffect(() => {
+    if (currentMode === 'famous_places' && currentFamousPlace) {
+      setShowFamousPlaceModal(true);
+    } else {
+      setShowFamousPlaceModal(false);
+    }
+  }, [currentMode, currentFamousPlace]);
 
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/hericmr/jogocaicara/refs/heads/main/public/data/bairros.geojson')
@@ -184,13 +215,19 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     }
   }, [gameState.gameOver, showGameOver, gameState.lastClickTime, gameState.totalDistance, gameState.roundNumber]);
 
-  // Função para avançar rodada e limpar currentFamousPlace no modo lugares famosos
+  // Função para avançar rodada e trocar lugar famoso
   const handleNextRoundWithFamousPlaceReset = useCallback((geoJsonData: any) => {
     if (currentMode === 'famous_places') {
-      setCurrentFamousPlace(null);
+      selectNextFamousPlace();
     }
     handleNextRound(geoJsonData);
-  }, [currentMode, handleNextRound]);
+  }, [currentMode, handleNextRound, selectNextFamousPlace]);
+
+  useEffect(() => {
+    if (currentMode !== 'famous_places') {
+      lastFamousPlaceId.current = null;
+    }
+  }, [currentMode]);
 
   return (
     <div style={{
@@ -438,7 +475,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           />
         ) : (
           <FamousPlacesManager
-            onPlaceChange={setCurrentFamousPlace}
+            onPlaceChange={() => {}} // Não faz mais nada
             currentPlace={currentFamousPlace}
             isGameActive={gameState.gameStarted}
           />
