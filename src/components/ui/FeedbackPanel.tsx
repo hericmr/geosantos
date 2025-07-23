@@ -456,9 +456,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           background: 'rgba(0, 0, 0, 0.7)',
           borderRadius: '8px',
           padding: '12px',
-          margin: '12px 0 0 0',
-          maxHeight: '120px',
-          overflowY: 'auto'
+          margin: '12px 0 0 0'
         }}>
           <div style={{
             fontSize: 'clamp(0.8rem, 2vw, 1rem)',
