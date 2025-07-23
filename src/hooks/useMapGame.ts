@@ -51,7 +51,7 @@ export const useMapGame = (
     startNextRound,
     clearFeedbackTimer,
     feedbackTimerRef
-  } = useGameState(gameMode);
+  } = useGameState();
 
   const handleMapClick = (latlng: L.LatLng) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
@@ -117,21 +117,24 @@ export const useMapGame = (
           if (progressIntervalRef.current) {
             clearInterval(progressIntervalRef.current);
           }
-          progressIntervalRef.current = setInterval(() => {
-            timeElapsed += interval;
-            const progress = 100 - (timeElapsed / duration * 100);
-            if (progress <= 0) {
-              if (progressIntervalRef.current) {
-                clearInterval(progressIntervalRef.current);
+          // Só faz preenchimento automático se NÃO for modo famous_places
+          if (gameMode !== 'famous_places') {
+            progressIntervalRef.current = setInterval(() => {
+              timeElapsed += interval;
+              const progress = 100 - (timeElapsed / duration * 100);
+              if (progress <= 0) {
+                if (progressIntervalRef.current) {
+                  clearInterval(progressIntervalRef.current);
+                }
+                handleNextRound(geoJsonData!);
+                return;
               }
-              handleNextRound(geoJsonData!);
-              return;
-            }
-            updateGameState({
-              feedbackProgress: progress,
-              feedbackOpacity: progress / 100
-            });
-          }, interval);
+              updateGameState({
+                feedbackProgress: progress,
+                feedbackOpacity: progress / 100
+              });
+            }, interval);
+          }
         }, 1000);
       }, 0);
       return;
@@ -409,12 +412,12 @@ export const useMapGame = (
     startNextRound(geoJsonData);
   };
 
-  const handleStartGame = (selectedGameMode: GameMode) => {
+  const handleStartGame = () => {
     if (geoJsonData) {
       setShowPhaseOneMessage(true);
       setTimeout(() => {
         setShowPhaseOneMessage(false);
-        startGame(selectedGameMode);
+        startGame();
       }, 1000);
     }
   };

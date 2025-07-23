@@ -133,7 +133,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         tentativas++;
       }
     }
+    console.log('[selectNextFamousPlace] currentFamousPlace antes:', currentFamousPlace);
     setCurrentFamousPlace(famousPlaces[idx]);
+    setTimeout(() => {
+      console.log('[selectNextFamousPlace] currentFamousPlace depois:', famousPlaces[idx]);
+    }, 0);
   }, [famousPlaces, currentFamousPlace]);
 
   // Atualiza a ref sempre que currentFamousPlace mudar
@@ -176,6 +180,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   useEffect(() => {
     if (currentMode === 'famous_places' && currentFamousPlace) {
+      console.log('[useEffect] Abrindo modal do lugar famoso:', currentFamousPlace);
       setShowFamousPlaceModal(true);
     } else {
       setShowFamousPlaceModal(false);
@@ -221,11 +226,15 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   // Função para avançar rodada e trocar lugar famoso
   const handleNextRoundWithFamousPlaceReset = useCallback((geoJsonData: any) => {
-    if (currentMode === 'famous_places') {
-      selectNextFamousPlace();
-    }
+    console.log('[handleNextRoundWithFamousPlaceReset] chamada. currentFamousPlace:', currentFamousPlace);
     handleNextRound(geoJsonData);
-  }, [currentMode, handleNextRound, selectNextFamousPlace]);
+    if (currentMode === 'famous_places') {
+      setTimeout(() => {
+        console.log('[handleNextRoundWithFamousPlaceReset] chamando selectNextFamousPlace');
+        selectNextFamousPlace();
+      }, 0);
+    }
+  }, [currentMode, handleNextRound, selectNextFamousPlace, currentFamousPlace]);
 
   return (
     <div style={{
@@ -473,7 +482,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           />
         ) : (
           <FamousPlacesManager
-            onPlaceChange={() => {}} // Não faz mais nada
+            onPlaceChange={setCurrentFamousPlace}
             currentPlace={currentFamousPlace}
             isGameActive={gameState.gameStarted}
           />
@@ -505,7 +514,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         roundNumber={gameState.roundNumber}
         roundInitialTime={gameState.roundInitialTime}
         score={gameState.score}
-        onStartGame={() => handleStartGame(currentMode)}
+        onStartGame={() => handleStartGame()}
         getProgressBarColor={getProgressBarColor}
         currentMode={currentMode}
         onModeChange={setCurrentMode}
@@ -529,6 +538,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           score={gameState.score}
           currentNeighborhood={gameState.currentNeighborhood}
           currentMode={currentMode}
+          currentFamousPlace={currentFamousPlace}
         />
       )}
 

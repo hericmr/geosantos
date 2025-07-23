@@ -25,6 +25,7 @@ export interface FeedbackPanelProps {
   score: number;
   currentNeighborhood: string;
   currentMode?: GameMode;
+  currentFamousPlace?: any;
 }
 
 export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
@@ -43,6 +44,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   score,
   currentNeighborhood,
   currentMode = 'neighborhoods',
+  currentFamousPlace,
 }) => {
   const [displayedDistance, setDisplayedDistance] = useState(0);
   const [displayedTime, setDisplayedTime] = useState(0);
@@ -154,10 +156,23 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
     }
   }, [clickedPosition, arrowPath, isMobile, gameOver]);
 
+  useEffect(() => {
+    if (showFeedback) {
+      console.log('[FeedbackPanel] showFeedback TRUE. currentMode:', currentMode, 'currentNeighborhood:', currentNeighborhood);
+    }
+  }, [showFeedback, currentMode, currentNeighborhood]);
+
+  useEffect(() => {
+    console.log('[FeedbackPanel] Renderizou. currentMode:', currentMode, 'currentNeighborhood:', currentNeighborhood);
+  }, [currentMode, currentNeighborhood]);
+
   const isCorrectNeighborhood = displayedDistance === 0;
 
   return (
-    <div style={styles.container(gameOver, isMobile, popupPosition)}>
+    <div style={{
+      ...styles.container(gameOver, isMobile, popupPosition),
+      zIndex: 10020 // Maior que o modal do lugar famoso (10010)
+    }}>
       {!gameOver && clickedPosition && (
         <div style={styles.contentContainer}>
           {isCorrectNeighborhood ? (
@@ -196,6 +211,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   {currentMode === 'neighborhoods' && '!' }
                 </div>
               </div>
+              
+              {/* Remover a descrição que estava aqui, pois agora ela aparece abaixo do botão Próximo */}
 
               <div style={{
                 display: 'flex',
@@ -256,10 +273,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
                   marginLeft: 'clamp(4px, 1vw, 8px)',
                   opacity: 0.9
                 }}>{currentMode === 'famous_places'
-                  ? 'metros até o ponto famoso'
+                  ? 'metros até'
                   : `metros até o bairro `}
                   {currentMode === 'neighborhoods' && (
                     <span style={{ color: '#32CD32', fontWeight: 600 }}>{capitalizeWords(currentNeighborhood)}</span>
+                  )}
+                  {currentMode === 'famous_places' && currentFamousPlace && (
+                    <span style={{ color: '#32CD32', fontWeight: 600 }}> {currentFamousPlace.name}</span>
                   )}
                   {currentMode === 'neighborhoods' && '!' }
                 </div>
@@ -356,6 +376,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             />
                           <button
                 onClick={() => {
+                  console.log('[FeedbackPanel] Botão Compartilhar clicado. Chamando navigator.share.');
                   const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Eu conheço Santos!" :
                     score >= 15000 ? "MITO SANTISTA! Até as ondas do mar me aplaudem!" :
                     score >= 10000 ? "LENDÁRIO! Eu sou um Pelé da geografia santista!" :
@@ -418,6 +439,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         gameOver={gameOver}
         onPauseGame={onPauseGame}
         onNextRound={() => {
+          console.log('[FeedbackPanel] Botão Próximo clicado. Chamando onNextRound.');
           if (gameOver) {
             window.location.reload();
           } else if (geoJsonData) {
@@ -425,7 +447,30 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
           }
         }}
         feedbackProgress={feedbackProgress}
+        currentMode={currentMode}
       />
+
+      {/* Descrição do lugar famoso abaixo do botão Próximo */}
+      {currentMode === 'famous_places' && currentFamousPlace && (
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.7)',
+          borderRadius: '8px',
+          padding: '12px',
+          margin: '12px 0 0 0',
+          maxHeight: '120px',
+          overflowY: 'auto'
+        }}>
+          <div style={{
+            fontSize: 'clamp(0.8rem, 2vw, 1rem)',
+            color: '#fff',
+            fontFamily: "'Inter', sans-serif",
+            lineHeight: 1.4,
+            textAlign: 'center'
+          }}>
+            {currentFamousPlace.description}
+          </div>
+        </div>
+      )}
 
       <style>
         {`

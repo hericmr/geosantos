@@ -1,23 +1,26 @@
 import React from 'react';
 import { styles } from './FeedbackPanel.styles';
 import { PauseIcon, NextIcon, RetryIcon } from './GameIcons';
+import { GameMode } from '../../types/famousPlaces';
 
 interface ActionButtonsProps {
   gameOver: boolean;
   onPauseGame: () => void;
   onNextRound: () => void;
   feedbackProgress: number;
+  currentMode?: GameMode;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
   gameOver,
   onPauseGame,
   onNextRound,
-  feedbackProgress
+  feedbackProgress,
+  currentMode = 'neighborhoods'
 }) => {
   return (
     <div style={styles.buttonContainer}>
-      {!gameOver && (
+      {!gameOver && currentMode !== 'famous_places' && (
         <button
           onClick={onPauseGame}
           className="pixel-btn pixel-btn--warning"
