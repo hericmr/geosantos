@@ -30,6 +30,7 @@ import { usePlayerName } from '../hooks/usePlayerName';
 import { XIcon } from './ui/GameIcons';
 import { FamousPlaceModal } from './ui/FamousPlaceModal';
 import { useFamousPlaces } from '../hooks/useFamousPlaces';
+import { Home, Landmark } from 'lucide-react';
 
 // Função para verificar se um ponto está dentro de um polígono
 // Implementação do algoritmo "ray casting" para determinar se um ponto está dentro de um polígono
@@ -244,7 +245,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       height: '100vh',
       overflow: 'hidden'
     }}>
-      <audio ref={audioRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/musica.ogg" preload="auto" />
+      <audio ref={audioRef} preload="auto" />
       <audio ref={successSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/success.mp3" preload="auto" />
       <audio ref={errorSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/error.mp3" preload="auto" />
       
@@ -339,30 +340,39 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
           }
 
-          @keyframes popInOut {
+          @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+          }
+
+          @keyframes slideInUp {
             0% { 
               opacity: 0; 
-              transform: translate(-50%, -50%) scale(0.5);
-            }
-            20% { 
-              opacity: 1; 
-              transform: translate(-50%, -50%) scale(1.2);
-            }
-            40% { 
-              opacity: 1; 
-              transform: translate(-50%, -50%) scale(1);
-            }
-            60% { 
-              opacity: 1; 
-              transform: translate(-50%, -50%) scale(1);
-            }
-            80% { 
-              opacity: 0.8; 
-              transform: translate(-50%, -50%) scale(0.9);
+              transform: translateY(30px);
             }
             100% { 
+              opacity: 1; 
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes bounceIn {
+            0% { 
               opacity: 0; 
-              transform: translate(-50%, -50%) scale(0.8);
+              transform: scale(0.3);
+            }
+            50% { 
+              opacity: 1; 
+              transform: scale(1.05);
+            }
+            70% { 
+              transform: scale(0.9);
+            }
+            100% { 
+              opacity: 1; 
+              transform: scale(1);
             }
           }
 
@@ -545,26 +555,58 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       {showPhaseOneMessage && (
         <div style={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          color: 'white',
-          animation: 'popInOut 2s forwards',
-          background: 'rgba(0, 0, 0, 0.9)',
-          padding: '30px',
-          borderRadius: '15px',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.95)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'fadeInOut 3s forwards',
           zIndex: 2000
         }}>
-          <h2 style={{
-            fontSize: window.innerWidth < 768 ? '2.5em' : '3.5em',
-            color: '#32CD32',
-            marginBottom: '20px',
-            fontWeight: 700,
-            animation: 'pulseText 0.8s infinite'
+          <div style={{
+            textAlign: 'center',
+            maxWidth: '90%',
+            animation: 'slideInUp 0.8s ease-out 0.3s both'
           }}>
-            {currentMode === 'neighborhoods' ? 'Nível 1: Bairros Conhecidos' : 'Modo: Lugares Famosos'}
-          </h2>
+            <div style={{
+              fontSize: window.innerWidth < 768 ? '3rem' : '4rem',
+              marginBottom: '20px',
+              animation: 'bounceIn 1s ease-out 0.5s both'
+            }}>
+              {currentMode === 'neighborhoods' 
+                ? <Home size={window.innerWidth < 768 ? 48 : 64} color="#32CD32" />
+                : <Landmark size={window.innerWidth < 768 ? 48 : 64} color="#FFD700" />}
+            </div>
+            
+            <h1 style={{
+              fontSize: window.innerWidth < 768 ? '2rem' : '3rem',
+              color: '#32CD32',
+              marginBottom: '15px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              animation: 'slideInUp 0.8s ease-out 0.7s both'
+            }}>
+              {currentMode === 'neighborhoods' ? 'Nível 1: Bairros Conhecidos' : 'Lugares Famosos'}
+            </h1>
+            
+            <p style={{
+              fontSize: window.innerWidth < 768 ? '1rem' : '1.3rem',
+              color: '#FFD700',
+              marginBottom: '25px',
+              fontWeight: 600,
+              animation: 'slideInUp 0.8s ease-out 0.9s both'
+            }}>
+              {currentMode === 'neighborhoods' 
+                ? 'Clique no mapa onde você acha que está o bairro!'
+                : 'Encontre o lugar famoso no mapa!'
+              }
+            </p>
+          </div>
         </div>
       )}
 
