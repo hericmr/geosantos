@@ -6,7 +6,6 @@ import { FeedbackMessage } from './FeedbackMessage';
 import { ActionButtons } from './ActionButtons';
 import { styles } from './FeedbackPanel.styles';
 import { capitalizeWords } from '../../utils/textUtils';
-import { ShareIcon } from './GameIcons';
 import { GameMode } from '../../types/famousPlaces';
 
 export interface FeedbackPanelProps {
@@ -150,11 +149,11 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   };
 
   useEffect(() => {
-    if (clickedPosition && !gameOver) {
+    if (clickedPosition) {
       const optimalPosition = calculateOptimalPosition();
       setPopupPosition(optimalPosition);
     }
-  }, [clickedPosition, arrowPath, isMobile, gameOver]);
+  }, [clickedPosition, arrowPath, isMobile]);
 
   useEffect(() => {
     if (showFeedback) {
@@ -168,12 +167,17 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
   const isCorrectNeighborhood = displayedDistance === 0;
 
+  // Não renderizar o FeedbackPanel quando gameOver é true
+  if (gameOver) {
+    return null;
+  }
+
   return (
     <div style={{
-      ...styles.container(gameOver, isMobile, popupPosition),
+      ...styles.container(false, isMobile, popupPosition),
       zIndex: 10020 // Maior que o modal do lugar famoso (10010)
     }}>
-      {!gameOver && clickedPosition && (
+      {clickedPosition && (
         <div style={styles.contentContainer}>
           {isCorrectNeighborhood ? (
             <>
@@ -309,140 +313,21 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         </div>
       )}
 
-      {feedbackMessage && !gameOver && (
+      {feedbackMessage && (
         <FeedbackMessage
           message={feedbackMessage}
           isExcellent={feedbackMessage.includes("Muito bem")}
         />
       )}
 
-      {gameOver && (
-        <div style={styles.contentContainer}>
-          <h2 style={{
-            fontSize: 'clamp(2rem, 5vw, 3rem)',
-            color: '#FF0000',
-            margin: '0',
-            fontWeight: 800,
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-            textTransform: 'uppercase',
-            letterSpacing: '2px'
-          }}>
-            Game Over!
-          </h2>
-          <div style={{
-            textAlign: 'center',
-            color: '#fff',
-            fontSize: 'clamp(1.1rem, 2.8vw, 1.4rem)',
-            fontFamily: "'Inter', sans-serif",
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '2px',
-            opacity: 0.95,
-            marginBottom: '4px'
-          }}>
-            <div style={{ 
-              fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
-              color: '#FFD700', 
-              fontWeight: 700,
-              textAlign: 'center',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-            }}>
-              {score >= 20000 ? "REI DA GEOGRAFIA! Você conhece Santos!" :
-               score >= 15000 ? "MITO SANTISTA! Até as ondas do mar te aplaudem!" :
-               score >= 10000 ? "LENDÁRIO! Você é um Pelé da geografia santista!" :
-               score >= 8000 ? "MESTRE DOS BAIRROS!  Você é um GPS ambulante!" :
-               score >= 5000 ? "IMPRESSIONANTE!  Quase um GPS humano!!" :
-               score >= 4000 ? "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA!" :
-               score >= 3000 ? "SANTISTA DE CORAÇÃO!  Você manja dos bairros!" :
-               score >= 2000 ? "MUITO BOM!  Você é deve ter ido em algumas aulas de geografia!" :
-               score >= 1000 ? "BOM JOGO!  Mas ainda precisa andar mais pela zona noroeste!" :
-               score >= 500 ? "QUASE LÁ!  Dá um role no bondinho pra pegar umas dicas!" :
-               score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! " :
-               "Eita! Parece que você não sabe nada de Santos!"}
-            </div>
-          </div>
 
-          <div style={{
-            display: 'flex',
-            gap: 'clamp(10px, 2vw, 20px)',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap'
-          }}>
-            <ScoreDisplay
-              icon="target"
-              value={score}
-              unit="pts"
-            />
-                          <button
-                onClick={() => {
-                  console.log('[FeedbackPanel] Botão Compartilhar clicado. Chamando navigator.share.');
-                  const mensagem = score >= 20000 ? "REI DA GEOGRAFIA! Eu conheço Santos!" :
-                    score >= 15000 ? "MITO SANTISTA! Até as ondas do mar me aplaudem!" :
-                    score >= 10000 ? "LENDÁRIO! Eu sou um Pelé da geografia santista!" :
-                    score >= 8000 ? "MESTRE DOS BAIRROS! Eu sou um GPS ambulante!" :
-                    score >= 5000 ? "IMPRESSIONANTE! Quase um GPS humano!!" :
-                    score >= 4000 ? "SOU MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA!" :
-                    score >= 3000 ? "SANTISTA DE CORAÇÃO! Eu manjo dos bairros!" :
-                    score >= 2000 ? "MUITO BOM! Eu devo ter ido em algumas aulas de geografia!" :
-                    score >= 1000 ? "BOM JOGO! Mas ainda preciso andar mais na zona noroeste!" :
-                    score >= 500 ? "QUASE LÁ! Vou dar um rolê no bondinho pra pegar mais dicas!" :
-                    score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA! " :
-                    "Eita! Parece que eu não sei nada de Santos!";
-
-                  const shareText = `${mensagem} Joguei O Caiçara e fiz ${score} pontos! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
-
-                  if (navigator.share) {
-                    navigator.share({
-                      text: shareText
-                    }).catch(console.error);
-                  } else {
-                    navigator.clipboard.writeText(shareText)
-                      .then(() => alert('Texto copiado para a área de transferência!'))
-                      .catch(console.error);
-                  }
-                }}
-                style={{
-                  padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
-                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                  background: 'var(--accent-blue)',
-                  color: 'var(--text-primary)',
-                  border: '2px solid var(--text-primary)',
-                  borderRadius: '2px',
-                  cursor: 'pointer',
-                  transition: 'all 0.1s steps(1)',
-                  fontWeight: 400,
-                  fontFamily: "'Press Start 2P', monospace",
-                  boxShadow: 'var(--shadow-md)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginTop: '16px'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translate(-1px, -1px)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'translate(0, 0)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-                }}
-              >
-                <ShareIcon size={16} color="var(--text-primary)" />
-                Compartilhar
-              </button>
-          </div>
-        </div>
-      )}
 
       <ActionButtons
-        gameOver={gameOver}
+        gameOver={false}
         onPauseGame={onPauseGame}
         onNextRound={() => {
           console.log('[FeedbackPanel] Botão Próximo clicado. Chamando onNextRound.');
-          if (gameOver) {
-            window.location.reload();
-          } else if (geoJsonData) {
+          if (geoJsonData) {
             onNextRound(geoJsonData);
           }
         }}

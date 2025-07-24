@@ -22,31 +22,12 @@ export const usePlayerName = () => {
     }
   };
 
-  // Gerar nome aleatório se não houver nome salvo
-  const generateRandomName = () => {
-    const adjectives = [
-      'Veloz', 'Sábio', 'Destemido', 'Astuto', 'Valente', 'Esperto',
-      'Corajoso', 'Intrépido', 'Perspicaz', 'Audaz', 'Hábil', 'Vigoroso'
-    ];
-    
-    const nouns = [
-      'Caiçara', 'Navegador', 'Explorador', 'Aventureiro', 'Guerreiro',
-      'Mestre', 'Campeão', 'Herói', 'Líder', 'Estrategista', 'Vencedor'
-    ];
 
-    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    const randomNumber = Math.floor(Math.random() * 999) + 1;
-
-    const generatedName = `${randomAdjective} ${randomNoun} ${randomNumber}`;
-    savePlayerName(generatedName);
-    return generatedName;
-  };
 
   // Inicializar nome se não existir
   const initializePlayerName = () => {
     if (!playerName) {
-      return generateRandomName();
+      return 'Seu nome';
     }
     return playerName;
   };
@@ -54,7 +35,6 @@ export const usePlayerName = () => {
   return {
     playerName,
     savePlayerName,
-    generateRandomName,
     initializePlayerName
   };
 }; 

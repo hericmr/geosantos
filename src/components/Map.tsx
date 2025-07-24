@@ -521,7 +521,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         currentFamousPlace={currentFamousPlace || undefined}
       />
 
-      {gameState.showFeedback && (
+      {gameState.showFeedback && !showGameOver && (
         <FeedbackPanel
           showFeedback={gameState.showFeedback}
           clickedPosition={gameState.clickedPosition}
