@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AdminFamousPlaces } from './components/admin/AdminFamousPlaces';
 import Map from './components/Map'
 import './App.css'
+import { FamousPlacesWiki } from './components/ui/FamousPlacesWiki';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         {/* Outras rotas do seu app */}
         {/* <Route path="/" element={<AppMain />} /> */}
         <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
+        <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
         <Route path="/" element={
           <div style={{
             margin: 0,

@@ -433,79 +433,81 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         </>
       )}
 
-      <MapContainer
-        center={center}
-        zoom={zoom}
-        style={{ width: '100%', height: '100%', zIndex: 1 }}
-        zoomControl={false}
-        attributionControl={false}
-        ref={mapRef}
-      >
-        <MapEvents onClick={handleMapClick} />
-        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
-        {targetIconPosition && (
-          <Marker
-            position={targetIconPosition}
-            icon={targetIcon}
-          />
-        )}
-        {gameState.clickedPosition && (
-          <Marker
-            position={gameState.clickedPosition}
-            icon={bandeira2Icon}
-          />
-        )}
-        {/* Marcador do local correto do lugar famoso (bandeira1) */}
-        {currentMode === 'famous_places' && gameState.showFeedback && currentFamousPlace && (
-          <Marker
-            position={[currentFamousPlace.latitude, currentFamousPlace.longitude]}
-            icon={bandeira1Icon}
-          />
-        )}
-        {/* Marcador do lugar famoso */}
-        {/* Removido o marcador do lugar famoso do mapa, pois agora a referência visual é apenas o modal */}
-        {gameState.arrowPath && (
-          <Polyline
-            positions={gameState.arrowPath}
-            color="#FF0000"
-            weight={3}
-            opacity={0.8}
-            dashArray="10, 10"
-            className="arrow-path"
-          />
-        )}
-        {geoJsonData && (
-          <GeoJSONLayer
-            geoJsonData={geoJsonData}
-            revealedNeighborhoods={gameState.revealedNeighborhoods}
-            currentNeighborhood={gameState.currentNeighborhood}
-            onMapClick={handleMapClick}
-            geoJsonRef={geoJsonRef}
-          />
-        )}
-        
-        {currentMode === 'neighborhoods' ? (
-          <NeighborhoodManager
-            geoJsonData={geoJsonData}
-            geoJsonRef={geoJsonRef}
-            updateGameState={updateGameState}
-          />
-        ) : (
-          <FamousPlacesManager
-            onPlaceChange={setCurrentFamousPlace}
-            currentPlace={currentFamousPlace}
-            isGameActive={gameState.gameStarted}
-          />
-        )}
+      {gameState.gameStarted && (
+        <MapContainer
+          center={center}
+          zoom={zoom}
+          style={{ width: '100%', height: '100%', zIndex: 1 }}
+          zoomControl={false}
+          attributionControl={false}
+          ref={mapRef}
+        >
+          <MapEvents onClick={handleMapClick} />
+          <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+          {targetIconPosition && (
+            <Marker
+              position={targetIconPosition}
+              icon={targetIcon}
+            />
+          )}
+          {gameState.clickedPosition && (
+            <Marker
+              position={gameState.clickedPosition}
+              icon={bandeira2Icon}
+            />
+          )}
+          {/* Marcador do local correto do lugar famoso (bandeira1) */}
+          {currentMode === 'famous_places' && gameState.showFeedback && currentFamousPlace && (
+            <Marker
+              position={[currentFamousPlace.latitude, currentFamousPlace.longitude]}
+              icon={bandeira1Icon}
+            />
+          )}
+          {/* Marcador do lugar famoso */}
+          {/* Removido o marcador do lugar famoso do mapa, pois agora a referência visual é apenas o modal */}
+          {gameState.arrowPath && (
+            <Polyline
+              positions={gameState.arrowPath}
+              color="#FF0000"
+              weight={3}
+              opacity={0.8}
+              dashArray="10, 10"
+              className="arrow-path"
+            />
+          )}
+          {geoJsonData && (
+            <GeoJSONLayer
+              geoJsonData={geoJsonData}
+              revealedNeighborhoods={gameState.revealedNeighborhoods}
+              currentNeighborhood={gameState.currentNeighborhood}
+              onMapClick={handleMapClick}
+              geoJsonRef={geoJsonRef}
+            />
+          )}
+          
+          {currentMode === 'neighborhoods' ? (
+            <NeighborhoodManager
+              geoJsonData={geoJsonData}
+              geoJsonRef={geoJsonRef}
+              updateGameState={updateGameState}
+            />
+          ) : (
+            <FamousPlacesManager
+              onPlaceChange={setCurrentFamousPlace}
+              currentPlace={currentFamousPlace}
+              isGameActive={gameState.gameStarted}
+            />
+          )}
 
-        {mapRef.current && (
-          <DistanceCircle
-            map={mapRef.current}
-            distanceCircle={distanceCircle}
-            onAnimationComplete={() => setDistanceCircle(null)}
-          />
-        )}
-      </MapContainer>
+          {mapRef.current && (
+            <DistanceCircle
+              map={mapRef.current}
+              distanceCircle={distanceCircle}
+              onAnimationComplete={() => setDistanceCircle(null)}
+            />
+          )}
+        </MapContainer>
+      )}
 
       {gameState.gameStarted && (
         <AudioControls

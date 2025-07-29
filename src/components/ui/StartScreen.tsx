@@ -6,6 +6,8 @@ import {
 } from './GameIcons';
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
+import { BookOpenIcon } from 'lucide-react';
+import bgImage from '../../../public/assets/images/bg.png';
 
 interface StartScreenProps {
   onStartGame: () => void;
@@ -31,7 +33,8 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   const menuOptions = useMemo(() => [
     { id: 'famous_places', label: 'LUGARES FAMOSOS', icon: LandmarkIcon, action: () => { onSelectMode?.('famous_places'); onStartGame(); }, isMode: true },
     { id: 'play', label: 'JOGAR', icon: PlayIcon, action: onStartGame },
-    { id: 'leaderboard', label: 'RANKING', icon: TrophyIcon, action: onShowLeaderboard }
+    { id: 'leaderboard', label: 'RANKING', icon: TrophyIcon, action: onShowLeaderboard },
+    { id: 'wiki', label: 'CONHEÇA OS LUGARES', icon: BookOpenIcon, action: () => { window.location.href = '/jogocaicara/lugares-famosos'; } }
   ], [onStartGame, onShowLeaderboard, onSelectMode]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -65,7 +68,10 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       left: 0,
       width: '100vw',
       height: '100vh',
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+      background: `url(${bgImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -74,24 +80,14 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       padding: '20px',
       boxSizing: 'border-box'
     }}>
-      {/* Overlay escuro para melhorar legibilidade */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 2,
-        pointerEvents: 'none'
-      }} />
+
 
       {/* Container principal */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '40px',
+        gap: '0px',
         maxWidth: '800px',
         width: '100%',
         position: 'relative',
@@ -103,32 +99,29 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           textAlign: 'center'
         }}>
           <h1 style={{
-            fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+            fontSize: 'clamp(4.5rem, 10vw, 8rem)',
             margin: '0',
-            fontFamily: "'Press Start 2P', monospace",
-            fontWeight: 400,
-            color: 'var(--accent-green)',
+            fontFamily: "'LaCartoonerie', sans-serif",
+            fontWeight: 800,
+            color: '#000000',
             lineHeight: 1.2,
             textTransform: 'uppercase',
-            letterSpacing: '2px'
+            letterSpacing: '0px',
+            textShadow: '3px 3px 0px #fff, -3px -3px 0px #fff, 3px -3px 0px #fff, -3px 3px 0px #fff'
           }}>
             O CAIÇARA
           </h1>
           
           <p style={{
             fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
-            margin: '10px 0 0 0',
+            margin: '10px 0 40px 0',
             fontFamily: "'VT323', monospace",
-            color: 'var(--text-secondary)',
-            textShadow: '2px 2px 0px rgba(0, 0, 0, 0.8)'
+            color: '#FFFFFF',
+            textShadow: '2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000'
           }}>
             DESAFIO GEOGRÁFICO DE SANTOS
           </p>
         </div>
-
-        <GameRanking 
-          variant="startScreen" 
-        />
 
         {/* Estatísticas do jogador */}
         {(highScore > 0 || totalGames > 0) && (
@@ -250,7 +243,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                   color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
                   cursor: 'pointer',
                   transition: 'all 0.1s steps(1)',
-                  fontFamily: "'Press Start 2P', monospace",
+                  fontFamily: "'LaCartoonerie', sans-serif",
                   fontSize: 'clamp(0.8rem, 2vw, 1rem)',
                   fontWeight: 400,
                   textTransform: 'uppercase',
@@ -290,12 +283,13 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           background: 'var(--bg-secondary)',
           border: '2px solid var(--text-primary)',
           borderRadius: '4px',
-          boxShadow: 'var(--shadow-md)'
+          boxShadow: 'var(--shadow-md)',
+          marginTop: '40px'
         }}>
           <h3 style={{
             fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
             margin: '0 0 12px 0',
-            fontFamily: "'Press Start 2P', monospace",
+            fontFamily: "'LaCartoonerie', sans-serif",
             color: 'var(--accent-yellow)',
             textTransform: 'uppercase'
           }}>
@@ -303,7 +297,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           </h3>
           <div style={{
             fontSize: 'clamp(1rem, 2vw, 1.1rem)',
-            fontFamily: "'VT323', monospace",
+            fontFamily: "'LaCartoonerie', sans-serif",
             color: 'var(--text-primary)',
             lineHeight: 1.4
           }}>
@@ -322,16 +316,43 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           </div>
         </div>
 
+        <GameRanking 
+          variant="startScreen" 
+        />
+
         {/* Créditos */}
         <div style={{
           textAlign: 'center',
-          fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-          fontFamily: "'VT323', monospace",
-          color: 'var(--text-muted)',
+          fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+          fontFamily: "'LaCartoonerie', sans-serif",
+          color: '#000000',
           marginTop: '20px'
         }}>
-          <p style={{ margin: '4px 0' }}>
-            Desenvolvido por hericmr
+          <p style={{ 
+            margin: '4px 0',
+            textShadow: '2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff'
+          }}>
+            Desenvolvido por{' '}
+            <a 
+              href="https://hericmr.github.io/me/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                color: '#000000',
+                textDecoration: 'none',
+                textShadow: '2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#0066CC';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#000000';
+              }}
+            >
+              hericmr
+            </a>
           </p>
         </div>
       </div>

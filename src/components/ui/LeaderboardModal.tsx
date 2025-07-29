@@ -150,7 +150,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             <h2 style={{
               fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
               margin: 0,
-              fontFamily: "'Press Start 2P', monospace",
+              fontFamily: "'LaCartoonerie', sans-serif",
               color: 'var(--accent-green)',
               textTransform: 'uppercase'
             }}>
@@ -208,7 +208,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             <h3 style={{
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
               margin: '0 0 8px 0',
-              fontFamily: "'Press Start 2P', monospace",
+              fontFamily: "'LaCartoonerie', sans-serif",
               color: 'var(--text-primary)',
               textTransform: 'uppercase'
             }}>
@@ -223,7 +223,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             }}>
               <div style={{
                 fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-                fontFamily: "'VT323', monospace",
+                fontFamily: "'LaCartoonerie', sans-serif",
                 color: 'var(--text-primary)',
                 fontWeight: 'bold'
               }}>
@@ -231,7 +231,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               </div>
               <div style={{
                 fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-                fontFamily: "'VT323', monospace",
+                fontFamily: "'LaCartoonerie', sans-serif",
                 color: 'var(--text-primary)'
               }}>
                 Posição #{playerPosition}
@@ -254,7 +254,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               justifyContent: 'center',
               padding: '40px',
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-              fontFamily: "'VT323', monospace",
+              fontFamily: "'LaCartoonerie', sans-serif",
               color: 'var(--text-secondary)'
             }}>
               <RefreshCwIcon size={24} color="var(--text-secondary)" />
@@ -267,7 +267,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               justifyContent: 'center',
               padding: '40px',
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-              fontFamily: "'VT323', monospace",
+              fontFamily: "'LaCartoonerie', sans-serif",
               color: 'var(--accent-red)',
               textAlign: 'center'
             }}>
@@ -278,14 +278,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               {/* Cabeçalho da tabela */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '60px 1fr 120px 100px 100px 100px',
+                gridTemplateColumns: '60px 1fr 120px 100px',
                 gap: '8px',
                 padding: '12px',
                 background: 'var(--bg-primary)',
                 border: '2px solid var(--text-primary)',
                 borderRadius: '4px',
                 marginBottom: '8px',
-                fontFamily: "'Press Start 2P', monospace",
+                fontFamily: "'LaCartoonerie', sans-serif",
                 fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
                 color: 'var(--text-primary)',
                 textTransform: 'uppercase'
@@ -293,9 +293,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                 <div>POS</div>
                 <div>JOGADOR</div>
                 <div>PONTOS</div>
-                <div>TEMPO</div>
                 <div>RODADAS</div>
-                <div>PRECISÃO</div>
               </div>
 
               {/* Lista de jogadores */}
@@ -311,7 +309,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                     textAlign: 'center',
                     padding: '40px',
                     fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-                    fontFamily: "'VT323', monospace",
+                    fontFamily: "'LaCartoonerie', sans-serif",
                     color: 'var(--text-secondary)'
                   }}>
                     Nenhum jogador ainda!
@@ -322,14 +320,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                       key={player.id || index}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '60px 1fr 120px 100px 100px 100px',
+                        gridTemplateColumns: '60px 1fr 120px 100px',
                         gap: '8px',
                         padding: '8px 12px',
                         background: index % 2 === 0 ? 'var(--bg-primary)' : 'var(--bg-secondary)',
                         border: '1px solid var(--text-primary)',
                         borderRadius: '2px',
                         alignItems: 'center',
-                        fontFamily: "'VT323', monospace",
+                        fontFamily: "'LaCartoonerie', sans-serif",
                         fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
                         color: 'var(--text-primary)'
                       }}
@@ -356,13 +354,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                         {player.score.toLocaleString()}
                       </div>
                       <div>
-                        {formatTime(player.play_time)}
-                      </div>
-                      <div>
                         {player.rounds_played}
-                      </div>
-                      <div>
-                        {formatAccuracy(player.accuracy)}
                       </div>
                     </div>
                   ))
@@ -382,7 +374,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         }}>
           <p style={{
             fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-            fontFamily: "'VT323', monospace",
+            fontFamily: "'LaCartoonerie', sans-serif",
             color: 'var(--text-muted)',
             margin: 0,
             textAlign: 'center'

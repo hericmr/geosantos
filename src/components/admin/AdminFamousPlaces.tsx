@@ -193,90 +193,121 @@ export const AdminFamousPlaces: React.FC = () => {
 
   return (
     <div style={{
-      maxWidth: 520,
+      maxWidth: 1400,
+      minWidth: 320,
+      width: '100%',
       margin: '40px auto',
       background: 'var(--bg-secondary)',
       border: '4px solid var(--accent-green)',
       borderRadius: 0,
       boxShadow: '8px 8px 0 #222, 0 0 0 4px #fff',
-      padding: 32,
+      padding: 24,
       fontFamily: "'Press Start 2P', monospace",
-      color: 'var(--text-primary)'
+      color: 'var(--text-primary)',
+      minHeight: 400,
+      display: 'flex',
+      flexDirection: 'row',
+      gap: 32,
+      flexWrap: 'wrap',
     }}>
-      <h1 style={{
-        fontFamily: "'Press Start 2P', monospace",
-        color: 'var(--accent-green)',
-        fontSize: '1.1rem',
-        textAlign: 'center',
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        letterSpacing: '1px',
-        textShadow: '2px 2px 0 #222',
-        marginBottom: 24
-      }}>{editingId ? 'Editar Lugar Famoso' : 'Cadastrar Lugar Famoso'}</h1>
-      {/* Mapa interativo para selecionar coordenadas */}
-      <div style={{ width: '100%', height: 300, marginBottom: 16, border: '2px solid #222', boxShadow: '2px 2px 0 #222' }}>
-        <MapContainer
-          center={selectedPosition ? [selectedPosition.lat, selectedPosition.lng] : [-23.9676, -46.3287]}
-          zoom={13}
-          style={{ width: '100%', height: '100%' }}
-          scrollWheelZoom={true}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
-          />
-          <MapEvents onClick={handleMapClick} />
-          {selectedPosition && (
-            <Marker position={selectedPosition} />
+      {/* Coluna do formulário */}
+      <div style={{
+        flex: '1 1 340px',
+        minWidth: 320,
+        maxWidth: 520,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 0,
+      }}>
+        <h1 style={{
+          fontFamily: "'Press Start 2P', monospace",
+          color: 'var(--accent-green)',
+          fontSize: '1.1rem',
+          textAlign: 'center',
+          textTransform: 'uppercase',
+          fontWeight: 700,
+          letterSpacing: '1px',
+          textShadow: '2px 2px 0 #222',
+          marginBottom: 24
+        }}>{editingId ? 'Editar Lugar Famoso' : 'Cadastrar Lugar Famoso'}</h1>
+        {/* Mapa interativo para selecionar coordenadas */}
+        <div style={{ width: '100%', height: 300, marginBottom: 16, border: '2px solid #222', boxShadow: '2px 2px 0 #222' }}>
+          <MapContainer
+            center={selectedPosition ? [selectedPosition.lat, selectedPosition.lng] : [-23.9676, -46.3287]}
+            zoom={13}
+            style={{ width: '100%', height: '100%' }}
+            scrollWheelZoom={true}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="&copy; OpenStreetMap contributors"
+            />
+            <MapEvents onClick={handleMapClick} />
+            {selectedPosition && (
+              <Marker position={selectedPosition} />
+            )}
+          </MapContainer>
+        </div>
+        {/* Fim do mapa */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Nome" style={inputStyle} />
+          <textarea name="description" value={form.description} onChange={handleChange} placeholder="Descrição" style={{ ...inputStyle, minHeight: 60 }} />
+          <input name="latitude" value={form.latitude} onChange={handleChange} placeholder="Latitude" style={inputStyle} type="number" step="any" />
+          <input name="longitude" value={form.longitude} onChange={handleChange} placeholder="Longitude" style={inputStyle} type="number" step="any" />
+          <input name="category" value={form.category} onChange={handleChange} placeholder="Categoria" style={inputStyle} />
+          <input name="address" value={form.address} onChange={handleChange} placeholder="Endereço" style={inputStyle} />
+          <input name="imageUrl" value={form.imageUrl} onChange={handleChange} placeholder="URL da Imagem (ou use upload)" style={inputStyle} />
+          <label style={{ fontSize: 12, color: '#222', fontFamily: "'Press Start 2P', monospace" }}>
+            Upload de Imagem:
+            <input type="file" accept="image/*" onChange={handleImageUpload} style={{ marginTop: 6, fontFamily: "'Press Start 2P', monospace" }} />
+          </label>
+          {uploading && <div style={{ color: '#888', fontSize: 12 }}>Enviando imagem...</div>}
+          {imagePreview && (
+            <img src={imagePreview} alt="Preview" style={{ width: '100%', maxWidth: 180, margin: '8px auto', border: '2px solid #222', boxShadow: '2px 2px 0 #222', background: '#fff' }} />
           )}
-        </MapContainer>
-      </div>
-      {/* Fim do mapa */}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Nome" style={inputStyle} />
-        <textarea name="description" value={form.description} onChange={handleChange} placeholder="Descrição" style={{ ...inputStyle, minHeight: 60 }} />
-        <input name="latitude" value={form.latitude} onChange={handleChange} placeholder="Latitude" style={inputStyle} type="number" step="any" />
-        <input name="longitude" value={form.longitude} onChange={handleChange} placeholder="Longitude" style={inputStyle} type="number" step="any" />
-        <input name="category" value={form.category} onChange={handleChange} placeholder="Categoria" style={inputStyle} />
-        <input name="address" value={form.address} onChange={handleChange} placeholder="Endereço" style={inputStyle} />
-        <input name="imageUrl" value={form.imageUrl} onChange={handleChange} placeholder="URL da Imagem (ou use upload)" style={inputStyle} />
-        <label style={{ fontSize: 12, color: '#222', fontFamily: "'Press Start 2P', monospace" }}>
-          Upload de Imagem:
-          <input type="file" accept="image/*" onChange={handleImageUpload} style={{ marginTop: 6, fontFamily: "'Press Start 2P', monospace" }} />
-        </label>
-        {uploading && <div style={{ color: '#888', fontSize: 12 }}>Enviando imagem...</div>}
-        {imagePreview && (
-          <img src={imagePreview} alt="Preview" style={{ width: '100%', maxWidth: 180, margin: '8px auto', border: '2px solid #222', boxShadow: '2px 2px 0 #222', background: '#fff' }} />
-        )}
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="submit" disabled={loading} style={{
-            ...inputStyle,
-            background: 'var(--accent-green)',
-            color: 'var(--bg-primary)',
-            border: '3px solid #222',
-            cursor: 'pointer',
-            fontWeight: 700,
-            fontSize: 14,
-            marginTop: 8
-          }}>{loading ? (editingId ? 'Salvando...' : 'Cadastrando...') : (editingId ? 'Salvar' : 'Cadastrar')}</button>
-          {editingId && (
-            <button type="button" onClick={handleCancelEdit} style={{
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="submit" disabled={loading} style={{
               ...inputStyle,
-              background: 'var(--accent-red)',
+              background: 'var(--accent-green)',
               color: 'var(--bg-primary)',
               border: '3px solid #222',
               cursor: 'pointer',
               fontWeight: 700,
               fontSize: 14,
               marginTop: 8
-            }}>Cancelar</button>
-          )}
-        </div>
-      </form>
-      <hr style={{ margin: '32px 0', border: 0, borderTop: '2px dashed #222' }} />
-      <h2 style={{ fontSize: 15, color: '#222', marginBottom: 12, fontFamily: "'Press Start 2P', monospace", textTransform: 'uppercase' }}>Lugares já cadastrados</h2>
-      <div style={{ maxHeight: 320, overflowY: 'auto', border: '1px solid #222', background: '#fff', borderRadius: 0, boxShadow: '2px 2px 0 #222', padding: 8 }}>
+            }}>{loading ? (editingId ? 'Salvando...' : 'Cadastrando...') : (editingId ? 'Salvar' : 'Cadastrar')}</button>
+            {editingId && (
+              <button type="button" onClick={handleCancelEdit} style={{
+                ...inputStyle,
+                background: 'var(--accent-red)',
+                color: 'var(--bg-primary)',
+                border: '3px solid #222',
+                cursor: 'pointer',
+                fontWeight: 700,
+                fontSize: 14,
+                marginTop: 8
+              }}>Cancelar</button>
+            )}
+          </div>
+        </form>
+      </div>
+      {/* Coluna da lista de lugares */}
+      <div style={{
+        flex: '2 1 400px',
+        minWidth: 320,
+        maxWidth: 900,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 0,
+        height: 'calc(90vh - 80px)',
+        overflowY: 'auto',
+        background: '#fff',
+        border: '1px solid #222',
+        borderRadius: 0,
+        boxShadow: '2px 2px 0 #222',
+        padding: 16,
+      }}>
+        <h2 style={{ fontSize: 15, color: '#222', marginBottom: 12, fontFamily: "'Press Start 2P', monospace", textTransform: 'uppercase' }}>Lugares já cadastrados</h2>
         {places.length === 0 && <div style={{ color: '#888', fontSize: 13 }}>Nenhum lugar cadastrado ainda.</div>}
         {places.map(place => (
           <div key={place.id} style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px dashed #ccc', padding: '8px 0' }}>

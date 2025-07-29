@@ -80,8 +80,8 @@ export const GameRanking: React.FC<GameRankingProps> = ({
 
   const getContainerStyle = (): React.CSSProperties => {
     const baseStyle: React.CSSProperties = {
-      fontFamily: "'VT323', monospace",
-      transition: 'all 0.3s ease',
+      fontFamily: "'LaCartoonerie', sans-serif",
+      transition: 'none',
       pointerEvents: 'auto',
     };
 
@@ -101,15 +101,15 @@ export const GameRanking: React.FC<GameRankingProps> = ({
       return {
         ...baseStyle,
         position: 'fixed',
-        top: '80px',
+        bottom: '40px',
         left: '40px',
         zIndex: 2002,
         minWidth: '340px',
         maxWidth: '400px',
-        boxShadow: 'none',
-        border: '4px solid var(--accent-yellow)',
-        borderRadius: '12px',
-        background: 'rgba(30, 30, 30, 0.98)',
+        boxShadow: 'var(--shadow-md)',
+        border: '3px solid var(--text-primary)',
+        borderRadius: '4px',
+        background: 'var(--bg-secondary)',
       };
     }
 
@@ -125,25 +125,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
 
   return (
     <div style={getContainerStyle()}>
-      <style>
-        {`
-          @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-          @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-          }
-          .ranking-container {
-            animation: slideIn 0.3s ease-out;
-          }
-          .ranking-header {
-            animation: pulse 2s infinite;
-          }
-        `}
-      </style>
+
 
       <div className="ranking-container" style={{
         background: variant === 'startScreen' ? 'transparent' : 'var(--bg-secondary)',
@@ -159,9 +141,9 @@ export const GameRanking: React.FC<GameRankingProps> = ({
           className="ranking-header"
           onClick={() => setIsExpanded(!isExpanded)}
           style={{
-            background: variant === 'startScreen' ? 'var(--accent-yellow)' : 'var(--accent-green)',
+            background: variant === 'startScreen' ? 'var(--bg-secondary)' : 'var(--accent-green)',
             color: 'var(--text-primary)',
-            padding: variant === 'startScreen' ? '18px 18px 10px 18px' : '8px 12px',
+            padding: variant === 'startScreen' ? '16px 24px' : '8px 12px',
             cursor: 'pointer',
             display: 'flex',
             flexDirection: variant === 'startScreen' ? 'column' : 'row',
@@ -169,18 +151,20 @@ export const GameRanking: React.FC<GameRankingProps> = ({
             alignItems: 'center',
             fontWeight: 'bold',
             fontSize: variant === 'startScreen' ? '1.7rem' : '1.1rem',
-            textShadow: variant === 'startScreen' ? '0 2px 8px #fff, 2px 2px 0px rgba(0,0,0,0.8)' : '1px 1px 0px rgba(0, 0, 0, 0.8)',
-            borderTopLeftRadius: variant === 'startScreen' ? '8px' : '0',
-            borderTopRightRadius: variant === 'startScreen' ? '8px' : '0',
+            textShadow: 'none',
+            borderTopLeftRadius: variant === 'startScreen' ? '4px' : '0',
+            borderTopRightRadius: variant === 'startScreen' ? '4px' : '0',
             letterSpacing: '1px',
-            boxShadow: 'none'
+            boxShadow: variant === 'startScreen' ? 'var(--shadow-md)' : 'none',
+            border: variant === 'startScreen' ? '3px solid var(--text-primary)' : 'none'
           }}
         >
           <span style={{
             fontSize: variant === 'startScreen' ? '2.1rem' : '1.2rem',
             marginBottom: variant === 'startScreen' ? '2px' : 0,
             textAlign: 'center',
-            width: '100%'
+            width: '100%',
+            fontFamily: "'LaCartoonerie', sans-serif"
           }}>🏆 RANKING GERAL</span>
           <button
             onClick={(e) => {
@@ -238,7 +222,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
               Nenhum jogador ainda
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {ranking.map((player, index) => (
                 <div
                   key={player.id}
@@ -246,18 +230,18 @@ export const GameRanking: React.FC<GameRankingProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    padding: '6px 8px',
-                    background: index === 0 ? 'rgba(16, 185, 129, 0.2)' : 
-                               index === 1 ? 'rgba(192, 192, 192, 0.2)' :
-                               index === 2 ? 'rgba(205, 127, 50, 0.2)' : 'transparent',
+                    padding: '8px 12px',
+                    background: index === 0 ? 'rgba(16, 185, 129, 0.1)' : 
+                               index === 1 ? 'rgba(192, 192, 192, 0.1)' :
+                               index === 2 ? 'rgba(205, 127, 50, 0.1)' : 'transparent',
                     border: index < 3 ? '1px solid var(--accent-green)' : '1px solid transparent',
-                    borderRadius: '2px',
-                    fontSize: '0.9rem'
+                    borderRadius: '4px',
+                    fontFamily: "'LaCartoonerie', sans-serif"
                   }}
                 >
                   <span style={{
-                    fontSize: '1.2rem',
-                    minWidth: '24px',
+                    fontSize: '1.1rem',
+                    minWidth: '20px',
                     textAlign: 'center'
                   }}>
                     {getMedalIcon(index + 1)}
@@ -266,7 +250,8 @@ export const GameRanking: React.FC<GameRankingProps> = ({
                   <div style={{
                     flex: 1,
                     minWidth: 0,
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    fontFamily: "'LaCartoonerie', sans-serif"
                   }}>
                     <div style={{
                       color: 'var(--text-primary)',
@@ -274,22 +259,11 @@ export const GameRanking: React.FC<GameRankingProps> = ({
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      fontSize: '1rem'
+                      fontSize: '1rem',
+                      fontFamily: "'LaCartoonerie', sans-serif"
                     }}>
                       {player.player_name}
                     </div>
-                    
-                    {isExpanded && (
-                      <div style={{
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.8rem',
-                        marginTop: '2px'
-                      }}>
-                        <span>⏱️ {formatTime(player.play_time)}</span>
-                        <span style={{ margin: '0 4px' }}>•</span>
-                        <span>🎯 {formatAccuracy(player.accuracy)}</span>
-                      </div>
-                    )}
                   </div>
                   
                   <div style={{
@@ -297,7 +271,8 @@ export const GameRanking: React.FC<GameRankingProps> = ({
                     fontWeight: 'bold',
                     fontSize: '1rem',
                     textAlign: 'right',
-                    minWidth: '50px'
+                    minWidth: '50px',
+                    fontFamily: "'LaCartoonerie', sans-serif"
                   }}>
                     {player.score.toLocaleString()}
                   </div>
