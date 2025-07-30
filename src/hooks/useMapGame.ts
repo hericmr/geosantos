@@ -136,7 +136,7 @@ export const useMapGame = (
             }, interval);
           }
         }, 1000);
-      }, 0);
+      }, 200);
       return;
     }
 
