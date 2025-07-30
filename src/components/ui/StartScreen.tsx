@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { 
   PlayIcon, 
   TrophyIcon, 
@@ -28,7 +28,11 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   onSelectMode
 }) => {
   const [selectedOption, setSelectedOption] = useState(0);
-
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [firstFrameDataUrl, setFirstFrameDataUrl] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
 
   const menuOptions = useMemo(() => [
@@ -64,14 +68,57 @@ export const StartScreen: React.FC<StartScreenProps> = ({
     }
   }, [menuOptions, selectedOption]);
 
+  const captureFirstFrame = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    if (video && canvas && video.videoWidth > 0 && video.videoHeight > 0) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setFirstFrameDataUrl(dataUrl);
+      }
+    }
+  }, []);
+
+  const handleVideoLoad = useCallback(() => {
+    // Captura o primeiro frame quando o vídeo carrega
+    captureFirstFrame();
+    setVideoLoaded(true);
+  }, [captureFirstFrame]);
+
+  const handleVideoError = useCallback(() => {
+    setVideoError(true);
+    console.warn('Erro ao carregar vídeo de background');
+  }, []);
+
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.addEventListener('loadeddata', handleVideoLoad);
+      video.addEventListener('error', handleVideoError);
+      video.addEventListener('canplay', captureFirstFrame);
+      
+      return () => {
+        video.removeEventListener('loadeddata', handleVideoLoad);
+        video.removeEventListener('error', handleVideoError);
+        video.removeEventListener('canplay', captureFirstFrame);
+      };
+    }
+  }, [handleVideoLoad, handleVideoError, captureFirstFrame]);
+
   return (
     <>
-      {/* Background Video */}
+      {/* Background Video with Fallback */}
       <div style={{
         position: 'fixed',
         top: 0,
@@ -81,7 +128,39 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         overflow: 'hidden',
         zIndex: 0
       }}>
+        {/* Hidden canvas for capturing first frame */}
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: 'absolute',
+            top: '-9999px',
+            left: '-9999px',
+            width: '1px',
+            height: '1px'
+          }}
+        />
+        
+        {/* First Frame Fallback - visible until video loads */}
+        {firstFrameDataUrl && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundImage: `url(${firstFrameDataUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: videoLoaded && !videoError ? 0 : 1,
+            transition: 'opacity 0.5s ease-in-out',
+            zIndex: 1
+          }} />
+        )}
+        
+        {/* Video - overlays the image when loaded */}
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
@@ -93,7 +172,9 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             position: 'absolute',
             top: 0,
             left: 0,
-            zIndex: 0
+            opacity: videoLoaded && !videoError ? 1 : 0,
+            transition: 'opacity 0.5s ease-in-out',
+            zIndex: 2
           }}
         >
           <source src={backgroundVideo} type="video/webm" />

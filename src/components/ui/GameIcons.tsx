@@ -41,9 +41,7 @@ export const GameIcon: React.FC<GameIconProps> = ({
     size,
     color,
     className: `game-icon ${className}`,
-    style: {
-      filter: 'drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8))'
-    }
+    style: {}
   };
 
   switch (name.toLowerCase()) {
@@ -218,7 +216,7 @@ export const SkullIcon = ({ size = 40, color = 'var(--accent-red)' }: { size?: n
     viewBox="0 0 40 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    style={{ display: 'inline-block', verticalAlign: 'middle', filter: 'drop-shadow(2px 2px 0px #000)' }}
+    style={{ display: 'inline-block', verticalAlign: 'middle' }}
   >
     <rect x="4" y="8" width="32" height="24" rx="14" fill={color} stroke="#000" strokeWidth="2" />
     <ellipse cx="14" cy="20" rx="3" ry="4" fill="#000" />

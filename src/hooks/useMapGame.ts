@@ -71,30 +71,52 @@ export const useMapGame = (
     if (gameMode === 'famous_places' && currentFamousPlace) {
       const targetLatLng = L.latLng(currentFamousPlace.latitude, currentFamousPlace.longitude);
       const distance = calculateDistance(latlng, targetLatLng);
-      const acerto = distance <= 25; // raio de 25 metros para considerar acerto
+      
+      // Sistema de pontuação competitivo similar ao modo bairros
+      const distanceKm = distance / 1000;
+      let score = 0;
       let feedbackMessage = '';
       let arrowPath: [L.LatLng, L.LatLng] | null = null;
-      let score = 0;
-      if (acerto) {
-        score = 3000 * Math.pow(gameState.timeLeft / 10, 2); // bônus de acerto rápido
-        feedbackMessage = 'Acertou!';
+      let isCorrectPlace = false;
+      
+      // Critérios de acerto: dentro de 100 metros (0.1km)
+      if (distanceKm <= 0.1) {
+        isCorrectPlace = true;
+        // Pontuação base para acerto: 2000 pontos
+        const baseScore = 2000;
+        // Bônus de tempo: até 1000 pontos se tempo < 5s
+        const timeBonus = gameState.timeLeft <= 5 ? Math.round((gameState.timeLeft / 5) * 1000) : 0;
+        score = baseScore + timeBonus;
+        feedbackMessage = `Acertou! ${currentFamousPlace.name}`;
       } else {
-        score = calculateScore(distance, gameState.timeLeft, 'famous_places').total;
-        feedbackMessage = distance < 200 ? 'Quase lá!' : 'Tente novamente!';
+        // Pontuação baseada na distância (máx 1500 pontos para 0.1km, 0 pontos para >=3km)
+        const distanceScore = Math.max(0, 1500 * (1 - (distanceKm / 3)));
+        // Bônus de tempo: até 500 pontos se tempo < 5s
+        const timeBonus = gameState.timeLeft <= 5 ? Math.round((gameState.timeLeft / 5) * 500) : 0;
+        score = distanceScore + timeBonus;
+        
+        // Feedback baseado na distância
+        if (distanceKm < 0.5) {
+          feedbackMessage = 'Quase lá! Continue tentando!';
+        } else if (distanceKm < 1) {
+          feedbackMessage = 'Está no caminho certo!';
+        } else if (distanceKm < 2) {
+          feedbackMessage = 'Ainda longe, mas continue!';
+        } else {
+          feedbackMessage = 'Muito longe! Tente novamente!';
+        }
+        
+        // Mostrar seta para o local correto
         arrowPath = [latlng, targetLatLng];
-        // Exibir círculo de feedback como no modo normal
-        setTimeout(() => {
-          setDistanceCircle({
-            center: latlng,
-            radius: distance
-          });
-        }, 200); // delay para sincronizar com a animação da bandeira
       }
+      
       const newScore = gameState.score + Math.round(score);
+      
+      // Atualizar estado do jogo
       setTimeout(() => {
-        setTargetIconPosition(null); // Clear target icon after delay
+        setTargetIconPosition(null);
         updateGameState({
-          clickedPosition: latlng, // Set clickedPosition here
+          clickedPosition: latlng,
           clickTime: clickDuration,
           score: newScore,
           showFeedback: true,
@@ -102,23 +124,39 @@ export const useMapGame = (
           feedbackProgress: 100,
           feedbackMessage: feedbackMessage,
           gameOver: false,
-          revealedNeighborhoods: acerto ? new Set([...gameState.revealedNeighborhoods, currentFamousPlace.name]) : gameState.revealedNeighborhoods,
+          revealedNeighborhoods: isCorrectPlace ? new Set([...gameState.revealedNeighborhoods, currentFamousPlace.name]) : gameState.revealedNeighborhoods,
           arrowPath: arrowPath,
           totalDistance: gameState.totalDistance + distance
         });
-        if (successSoundRef.current && acerto) {
+        
+        // Tocar som de sucesso se acertou
+        if (successSoundRef.current && isCorrectPlace) {
           successSoundRef.current.currentTime = 0;
           successSoundRef.current.play().catch(() => {});
         }
+        
+        // Mostrar círculo de distância se não acertou
+        if (!isCorrectPlace) {
+          setTimeout(() => {
+            setDistanceCircle({
+              center: latlng,
+              radius: distance
+            });
+          }, 200);
+        }
+        
+        // Lógica de próxima rodada
         setTimeout(() => {
           const duration = 4000;
           const interval = 100;
           let timeElapsed = 0;
+          
           if (progressIntervalRef.current) {
             clearInterval(progressIntervalRef.current);
           }
-          // Só faz preenchimento automático se NÃO for modo famous_places
-          if (gameMode !== 'famous_places') {
+          
+          // Se acertou, avançar para próxima rodada automaticamente
+          if (isCorrectPlace) {
             progressIntervalRef.current = setInterval(() => {
               timeElapsed += interval;
               const progress = 100 - (timeElapsed / duration * 100);
@@ -126,7 +164,49 @@ export const useMapGame = (
                 if (progressIntervalRef.current) {
                   clearInterval(progressIntervalRef.current);
                 }
-                handleNextRound(geoJsonData!);
+                // Avançar para próxima rodada
+                if (gameMode === 'famous_places') {
+                  // Usar o FamousPlacesManager para avançar
+                  if ((window as any).famousPlacesManager) {
+                    (window as any).famousPlacesManager.forceNextRound();
+                  }
+                  // Atualizar estado do jogo
+                  updateGameState({
+                    roundNumber: gameState.roundNumber + 1,
+                    timeLeft: ROUND_TIME,
+                    roundInitialTime: ROUND_TIME,
+                    isCountingDown: true
+                  });
+                } else {
+                  startNextRound(geoJsonData!);
+                }
+                return;
+              }
+              updateGameState({
+                feedbackProgress: progress,
+                feedbackOpacity: progress / 100
+              });
+            }, interval);
+          } else {
+            // Se não acertou, permitir mais tentativas até o tempo acabar
+            progressIntervalRef.current = setInterval(() => {
+              timeElapsed += interval;
+              const progress = 100 - (timeElapsed / duration * 100);
+              if (progress <= 0) {
+                if (progressIntervalRef.current) {
+                  clearInterval(progressIntervalRef.current);
+                }
+                // Verificar se o tempo da rodada acabou
+                if (gameState.timeLeft <= 0) {
+                  startNextRound(geoJsonData!);
+                } else {
+                  // Resetar feedback para permitir nova tentativa
+                  updateGameState({
+                    showFeedback: false,
+                    feedbackOpacity: 0,
+                    arrowPath: null
+                  });
+                }
                 return;
               }
               updateGameState({
