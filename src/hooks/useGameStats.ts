@@ -13,7 +13,7 @@ interface GameStats {
   winRate: number;
 }
 
-const STORAGE_KEY = 'jogocaicara_stats';
+const STORAGE_KEY = 'geosantos_stats';
 
 export const useGameStats = () => {
   const [stats, setStats] = useState<GameStats>({

@@ -522,7 +522,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                 score >= 100 ? "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA!" :
                 "Eita! Parece que eu não sei nada de Santos!";
 
-              const shareText = `${mensagem} Joguei O Caiçara e fiz ${score} pontos! Jogue agora em https://hericmr.github.io/jogocaicara e veja quanto você consegue fazer!`;
+              const shareText = `${mensagem} Joguei o Geosantos e fiz ${score} pontos! Jogue agora em https://hericmr.github.io/geosantos e veja quanto você consegue fazer!`;
 
               if (navigator.share) {
                 navigator.share({

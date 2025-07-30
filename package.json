@@ -1,5 +1,5 @@
 {
-  "name": "ocaicara-react",
+  "name": "geosantos",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -46,5 +46,5 @@
     "vite": "^6.2.2",
     "vitest": "^3.0.9"
   },
-  "homepage": "https://hericmr.github.io/jogocaicara"
+  "homepage": "https://hericmr.github.io/geosantos"
 }

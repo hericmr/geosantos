@@ -174,7 +174,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
                   fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)',
                   textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
                   letterSpacing: '1px',
-                  fontFamily: "'Press Start 2P', monospace",
+                  fontFamily: "'LaCartoonerie', sans-serif",
                   lineHeight: 1.2,
                   textAlign: 'center',
                   maxWidth: '80%',
@@ -199,7 +199,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
           }}>
             <p style={{ 
               fontSize: 'clamp(0.7rem, 1.8vw, 0.9rem)', 
-              fontFamily: "'Press Start 2P', monospace",
+              fontFamily: "'LaCartoonerie', sans-serif",
               fontWeight: 400,
               color: '#FFFFFF',
               lineHeight: 1.4,

@@ -1,6 +1,6 @@
-# O Caiçara
+# Geosantos
 
-Acesse: https://hericmr.github.io/jogocaicara/
+Acesse: https://hericmr.github.io/geosantos/
 
 Jogo educativo para aprender os bairros e lugares famosos de Santos.
 
@@ -19,7 +19,7 @@ Jogo educativo para aprender os bairros e lugares famosos de Santos.
 npm install
 npm run dev
 ```
-Acesse: http://localhost:5173/jogocaicara/
+Acesse: http://localhost:5173/geosantos/
 
 ## Deploy
 O deploy é feito via GitHub Pages.

@@ -10,7 +10,7 @@ export default defineConfig({
     open: true
   },
   publicDir: 'public',
-  base: '/jogocaicara/',
+  base: '/geosantos/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

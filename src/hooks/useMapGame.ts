@@ -413,12 +413,16 @@ export const useMapGame = (
   };
 
   const handleStartGame = () => {
+    console.log('[handleStartGame] Função chamada');
     if (geoJsonData) {
+      console.log('[handleStartGame] GeoJSON data disponível, iniciando jogo');
       setShowPhaseOneMessage(true);
       setTimeout(() => {
         setShowPhaseOneMessage(false);
         startGame();
       }, 1000);
+    } else {
+      console.log('[handleStartGame] GeoJSON data não disponível');
     }
   };
 

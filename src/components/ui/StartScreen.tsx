@@ -7,7 +7,8 @@ import {
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
 import { BookOpenIcon } from 'lucide-react';
-import bgImage from '../../../public/assets/images/bg.png';
+import backgroundVideo from '../../assets/images/background.webm';
+
 
 interface StartScreenProps {
   onStartGame: () => void;
@@ -31,10 +32,17 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
 
   const menuOptions = useMemo(() => [
-    { id: 'famous_places', label: 'LUGARES FAMOSOS', icon: LandmarkIcon, action: () => { onSelectMode?.('famous_places'); onStartGame(); }, isMode: true },
-    { id: 'play', label: 'JOGAR', icon: PlayIcon, action: onStartGame },
+    { id: 'famous_places', label: 'LUGARES FAMOSOS', icon: LandmarkIcon, action: () => { 
+      console.log('[StartScreen] Lugares famosos selecionado');
+      onSelectMode?.('famous_places'); 
+      onStartGame(); 
+    }, isMode: true },
+    { id: 'play', label: 'JOGAR', icon: PlayIcon, action: () => {
+      console.log('[StartScreen] Jogar selecionado');
+      onStartGame();
+    } },
     { id: 'leaderboard', label: 'RANKING', icon: TrophyIcon, action: onShowLeaderboard },
-    { id: 'wiki', label: 'CONHEÇA OS LUGARES', icon: BookOpenIcon, action: () => { window.location.href = '/jogocaicara/lugares-famosos'; } }
+    { id: 'wiki', label: 'CONHEÇA OS LUGARES', icon: BookOpenIcon, action: () => { window.location.href = '/geosantos/lugares-famosos'; } }
   ], [onStartGame, onShowLeaderboard, onSelectMode]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -62,36 +70,51 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   }, [handleKeyDown]);
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      background: `url(${bgImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 10000,
-      padding: '20px',
-      boxSizing: 'border-box'
-    }}>
-
+    <>
+      {/* Background Video */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        zIndex: 0
+      }}>
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            width: '100vw',
+            height: '100vh',
+            objectFit: 'cover',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 0
+          }}
+        >
+          <source src={backgroundVideo} type="video/webm" />
+          Seu navegador não suporta vídeo em background.
+        </video>
+      </div>
 
       {/* Container principal */}
       <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '0px',
-        maxWidth: '800px',
-        width: '100%',
-        position: 'relative',
-        zIndex: 4
+        justifyContent: 'center',
+        zIndex: 4,
+        padding: '20px',
+        boxSizing: 'border-box'
       }}>
 
         {/* Logo e título */}
@@ -109,7 +132,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             letterSpacing: '0px',
             textShadow: '3px 3px 0px #fff, -3px -3px 0px #fff, 3px -3px 0px #fff, -3px 3px 0px #fff'
           }}>
-            O CAIÇARA
+            GEOSANTOS
           </h1>
           
           <p style={{
@@ -142,7 +165,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               }}>
                 <div style={{
                   fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                  fontFamily: "'Press Start 2P', monospace",
+                  fontFamily: "'LaCartoonerie', sans-serif",
                   color: 'var(--text-secondary)',
                   marginBottom: '4px'
                 }}>
@@ -170,7 +193,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               }}>
                 <div style={{
                   fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                  fontFamily: "'Press Start 2P', monospace",
+                  fontFamily: "'LaCartoonerie', sans-serif",
                   color: 'var(--text-secondary)',
                   marginBottom: '4px'
                 }}>
@@ -198,7 +221,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               }}>
                 <div style={{
                   fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                  fontFamily: "'Press Start 2P', monospace",
+                  fontFamily: "'LaCartoonerie', sans-serif",
                   color: 'var(--text-secondary)',
                   marginBottom: '4px'
                 }}>
@@ -356,6 +379,6 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }; 

@@ -7,7 +7,7 @@ import { FamousPlacesWiki } from './components/ui/FamousPlacesWiki';
 
 function App() {
   return (
-    <BrowserRouter basename="/jogocaicara">
+    <BrowserRouter basename="/geosantos">
       <Routes>
         {/* Outras rotas do seu app */}
         {/* <Route path="/" element={<AppMain />} /> */}

@@ -21,7 +21,7 @@ export class MainSceneTest extends Phaser.Scene {
         // Carregando as imagens
         this.load.image('map', '/assets/images/map.png');
         this.load.image('chorao', '/assets/images/chorao.png');
-        this.load.image('bandeira', 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/images/bandeira2.png');
+        this.load.image('bandeira', `${import.meta.env.BASE_URL || ''}/assets/images/bandeira2.png`);
         this.load.image('particula', '/assets/images/particula.png');
     }
 

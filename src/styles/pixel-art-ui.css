@@ -138,7 +138,7 @@ html, body {
   justify-content: center;
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-lg);
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'LaCartoonerie', sans-serif;
   font-weight: 400;
   font-size: 12px;
   line-height: 1;
@@ -280,7 +280,7 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: var(--space-xs);
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'LaCartoonerie', sans-serif;
 }
 
 .game-stat__value {
@@ -356,7 +356,7 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: var(--space-xs);
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'LaCartoonerie', sans-serif;
 }
 
 .game-target__name {
@@ -424,7 +424,7 @@ html, body {
   color: var(--text-primary);
   margin-bottom: var(--space-md);
   text-align: center;
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'LaCartoonerie', sans-serif;
   text-transform: uppercase;
 }
 

@@ -64,7 +64,7 @@ L.Icon.Default.mergeOptions({
 
 // Create custom icon for bandeira2
 const bandeira2Icon = new L.Icon({
-  iconUrl: 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/images/bandeira2.png',
+  iconUrl: `${import.meta.env.BASE_URL || ''}/assets/images/bandeira2.png`,
   iconSize: [70, 70],
   iconAnchor: [30, 60],
   popupAnchor: [0, -50],
@@ -73,7 +73,7 @@ const bandeira2Icon = new L.Icon({
 
 // Create custom icon for bandeira1
 const bandeira1Icon = new L.Icon({
-  iconUrl: 'https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/images/bandeira1.png', // Corrigido para usar o caminho público
+  iconUrl: `${import.meta.env.BASE_URL || ''}/assets/images/bandeira1.png`, // Corrigido para usar o caminho público
   iconSize: [70, 70],
   iconAnchor: [30, 60],
   popupAnchor: [0, -50],
@@ -105,6 +105,17 @@ const targetIcon = new L.DivIcon({
 });
 
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
+  // Pré-carregar as imagens das bandeiras
+  useEffect(() => {
+    const preloadImages = () => {
+      const bandeira1 = new Image();
+      const bandeira2 = new Image();
+      bandeira1.src = `${import.meta.env.BASE_URL || ''}/assets/images/bandeira1.png`;
+      bandeira2.src = `${import.meta.env.BASE_URL || ''}/assets/images/bandeira2.png`;
+    };
+    preloadImages();
+  }, []);
+
   const [geoJsonData, setGeoJsonData] = useState<FeatureCollection | null>(null);
   const [showGameOver, setShowGameOver] = useState(false);
   const [gameStats, setGameStats] = useState({
@@ -189,14 +200,20 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   }, [currentMode, currentFamousPlace]);
 
   useEffect(() => {
-    fetch('https://raw.githubusercontent.com/hericmr/jogocaicara/refs/heads/main/public/data/bairros.geojson')
-      .then(response => response.json())
-      .then(data => {
+    const fetchGeoJson = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.BASE_URL || ''}/data/bairros.geojson`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: FeatureCollection = await response.json();
         setGeoJsonData(data);
-      })
-      .catch(() => {
-        // Handle error silently
-      });
+      } catch (error) {
+        console.error('Error fetching geojson data:', error);
+        setGeoJsonData(null);
+      }
+    };
+    fetchGeoJson();
   }, []);
 
   // Disponibilizar a referência do mapa para outros componentes
@@ -246,8 +263,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       overflow: 'hidden'
     }}>
       <audio ref={audioRef} preload="auto" />
-      <audio ref={successSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/success.mp3" preload="auto" />
-      <audio ref={errorSoundRef} src="https://github.com/hericmr/jogocaicara/raw/refs/heads/main/public/assets/audio/error.mp3" preload="auto" />
+      <audio ref={successSoundRef} src="/assets/audio/success.mp3" preload="auto" />
+      <audio ref={errorSoundRef} src="/assets/audio/error.mp3" preload="auto" />
       
       <style>
         {`
@@ -499,7 +516,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             />
           )}
 
-          {mapRef.current && (
+          {mapRef.current && distanceCircle && (
             <DistanceCircle
               map={mapRef.current}
               distanceCircle={distanceCircle}

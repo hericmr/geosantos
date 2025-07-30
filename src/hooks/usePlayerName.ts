@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const PLAYER_NAME_KEY = 'jogocaicara_player_name';
+const PLAYER_NAME_KEY = 'geosantos_player_name';
 
 export const usePlayerName = () => {
   const [playerName, setPlayerName] = useState<string>('');
