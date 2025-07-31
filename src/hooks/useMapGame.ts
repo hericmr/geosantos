@@ -138,8 +138,8 @@ export const useMapGame = (
           });
         }
         
-        // Tocar som de erro se não acertou
-        if (errorSoundRef.current && !isCorrectPlace) {
+        // Tocar som de erro se não acertou E a distância for maior que 500m
+        if (errorSoundRef.current && !isCorrectPlace && distance > 500) {
           errorSoundRef.current.currentTime = 0;
           errorSoundRef.current.volume = 0.7; // Definir volume adequado
           errorSoundRef.current.play().catch((error) => {
@@ -423,8 +423,8 @@ export const useMapGame = (
           feedbackMessage = getFeedbackMessage(distance);
         }
 
-        // Tocar som de erro se não acertou o bairro
-        if (errorSoundRef.current && !isCorrectNeighborhood) {
+        // Tocar som de erro se não acertou o bairro E a distância for maior que 500m
+        if (errorSoundRef.current && !isCorrectNeighborhood && distance > 500) {
           errorSoundRef.current.currentTime = 0;
           errorSoundRef.current.volume = 0.7; // Definir volume adequado
           errorSoundRef.current.play().catch((error) => {

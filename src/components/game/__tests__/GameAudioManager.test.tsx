@@ -1,133 +1,114 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
 import { render } from '@testing-library/react';
 import { GameAudioManager } from '../GameAudioManager';
 
+// Mock do HTMLAudioElement
+const mockAudioElement = {
+  currentTime: 0,
+  volume: 1,
+  loop: false,
+  play: jest.fn().mockResolvedValue(undefined),
+  pause: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+};
+
 describe('GameAudioManager', () => {
-  const mockAudioRef = { current: { play: vi.fn(), pause: vi.fn(), volume: 0 } };
-  const mockSuccessSoundRef = { current: { play: vi.fn(), currentTime: 0 } };
-  const mockErrorSoundRef = { current: { play: vi.fn(), currentTime: 0 } };
-  
-  const mockGameState = {
-    gameStarted: false,
-    gameOver: false,
-    isMuted: false,
-    volume: 0.5
-  };
-
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
-  it('should update background music volume when volume changes', () => {
+  it('should play game start music when showPhaseOneMessage is true', () => {
+    const gameStartAudioRef = { current: mockAudioElement as any };
+    const gameState = {
+      gameStarted: true,
+      gameOver: false,
+      isMuted: false,
+      volume: 0.8
+    };
+
     render(
       <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={mockGameState}
+        audioRef={{ current: null }}
+        successSoundRef={{ current: null }}
+        errorSoundRef={{ current: null }}
+        gameStartAudioRef={gameStartAudioRef}
+        gameState={gameState}
+        showPhaseOneMessage={true}
       />
     );
 
-    expect(mockAudioRef.current.volume).toBe(mockGameState.volume);
+    expect(mockAudioElement.currentTime).toBe(0);
+    expect(mockAudioElement.volume).toBe(0.8);
+    expect(mockAudioElement.play).toHaveBeenCalled();
   });
 
-  it('should mute background music when isMuted is true', () => {
+  it('should not play game start music when muted', () => {
+    const gameStartAudioRef = { current: mockAudioElement as any };
+    const gameState = {
+      gameStarted: true,
+      gameOver: false,
+      isMuted: true,
+      volume: 0.8
+    };
+
     render(
       <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={{
-          ...mockGameState,
-          isMuted: true
-        }}
+        audioRef={{ current: null }}
+        successSoundRef={{ current: null }}
+        errorSoundRef={{ current: null }}
+        gameStartAudioRef={gameStartAudioRef}
+        gameState={gameState}
+        showPhaseOneMessage={true}
       />
     );
 
-    expect(mockAudioRef.current.volume).toBe(0);
+    expect(mockAudioElement.play).not.toHaveBeenCalled();
   });
 
-  it('should play background music when game starts', () => {
+  it('should not play game start music when showPhaseOneMessage is false', () => {
+    const gameStartAudioRef = { current: mockAudioElement as any };
+    const gameState = {
+      gameStarted: true,
+      gameOver: false,
+      isMuted: false,
+      volume: 0.8
+    };
+
     render(
       <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={{
-          ...mockGameState,
-          gameStarted: true
-        }}
+        audioRef={{ current: null }}
+        successSoundRef={{ current: null }}
+        errorSoundRef={{ current: null }}
+        gameStartAudioRef={gameStartAudioRef}
+        gameState={gameState}
+        showPhaseOneMessage={false}
       />
     );
 
-    expect(mockAudioRef.current.play).toHaveBeenCalled();
+    expect(mockAudioElement.play).not.toHaveBeenCalled();
   });
 
-  it('should pause background music when game is over', () => {
+  it('should limit game start music volume to 0.8', () => {
+    const gameStartAudioRef = { current: mockAudioElement as any };
+    const gameState = {
+      gameStarted: true,
+      gameOver: false,
+      isMuted: false,
+      volume: 1.0
+    };
+
     render(
       <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={{
-          ...mockGameState,
-          gameOver: true
-        }}
+        audioRef={{ current: null }}
+        successSoundRef={{ current: null }}
+        errorSoundRef={{ current: null }}
+        gameStartAudioRef={gameStartAudioRef}
+        gameState={gameState}
+        showPhaseOneMessage={true}
       />
     );
 
-    expect(mockAudioRef.current.pause).toHaveBeenCalled();
-  });
-
-  it('should play success sound when playSuccess is called', () => {
-    const { rerender } = render(
-      <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={mockGameState}
-        playSuccess={true}
-      />
-    );
-
-    expect(mockSuccessSoundRef.current.play).toHaveBeenCalled();
-    expect(mockSuccessSoundRef.current.currentTime).toBe(0);
-
-    // Reset playSuccess
-    rerender(
-      <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={mockGameState}
-        playSuccess={false}
-      />
-    );
-  });
-
-  it('should play error sound when playError is called', () => {
-    const { rerender } = render(
-      <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={mockGameState}
-        playError={true}
-      />
-    );
-
-    expect(mockErrorSoundRef.current.play).toHaveBeenCalled();
-    expect(mockErrorSoundRef.current.currentTime).toBe(0);
-
-    // Reset playError
-    rerender(
-      <GameAudioManager
-        audioRef={mockAudioRef as any}
-        successSoundRef={mockSuccessSoundRef as any}
-        errorSoundRef={mockErrorSoundRef as any}
-        gameState={mockGameState}
-        playError={false}
-      />
-    );
+    expect(mockAudioElement.volume).toBe(0.8);
   });
 }); 

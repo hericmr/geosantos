@@ -74,12 +74,11 @@ export const rankingService = {
     return true;
   },
 
-  // Buscar posição do jogador
-  async getPlayerPosition(playerName: string): Promise<number> {
+  // Buscar posição do jogador no ranking
+  async getPlayerPosition(playerName: string, playerScore: number): Promise<number> {
     const { data, error } = await supabase
       .from('ranking')
       .select('score')
-      .gte('score', 0)
       .order('score', { ascending: false });
 
     if (error) {
@@ -87,8 +86,9 @@ export const rankingService = {
       return -1;
     }
 
-    const position = data?.findIndex(entry => entry.score === 0) + 1;
-    return position > 0 ? position : data?.length || 0;
+    // Encontrar a posição baseada na pontuação
+    const position = data?.findIndex(entry => entry.score <= playerScore) + 1;
+    return position > 0 ? position : (data?.length || 0) + 1;
   },
 
   // Buscar estatísticas do jogador

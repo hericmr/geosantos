@@ -125,6 +125,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   });
   const [targetIconPosition, setTargetIconPosition] = useState<L.LatLng | null>(null);
   const { playerName, initializePlayerName } = usePlayerName();
+  const gameStartAudioRef = useRef<HTMLAudioElement>(null);
   
   const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
   const [currentFamousPlace, setCurrentFamousPlace] = useState<FamousPlace | null>(null);
@@ -242,6 +243,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     }
   }, [gameState.gameOver, showGameOver, gameState.lastClickTime, gameState.totalDistance, gameState.roundNumber]);
 
+
+
   // Função para avançar rodada e trocar lugar famoso
   const handleNextRoundWithFamousPlaceReset = useCallback((geoJsonData: any) => {
     console.log('[handleNextRoundWithFamousPlaceReset] chamada. currentFamousPlace:', currentFamousPlace);
@@ -265,6 +268,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       <audio ref={audioRef} preload="auto" />
       <audio ref={successSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/sucess.mp3`} preload="auto" />
       <audio ref={errorSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/error.mp3`} preload="auto" />
+      <audio ref={gameStartAudioRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/game-start.mp3`} preload="auto" />
       
       <style>
         {`
@@ -411,9 +415,11 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         audioRef={audioRef}
         successSoundRef={successSoundRef}
         errorSoundRef={errorSoundRef}
+        gameStartAudioRef={gameStartAudioRef}
         gameState={gameState}
         playSuccess={false}
         playError={false}
+        showPhaseOneMessage={showPhaseOneMessage}
       />
 
 

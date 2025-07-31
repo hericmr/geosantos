@@ -40,6 +40,8 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [rankingData, setRankingData] = useState<any[]>([]);
+  const [playerPosition, setPlayerPosition] = useState<number | null>(null);
+  const [showRankingPosition, setShowRankingPosition] = useState(false);
 
   const fetchRanking = async () => {
     try {
@@ -49,6 +51,16 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
       }
     } catch (err) {
       console.error("Erro ao buscar ranking:", err);
+    }
+  };
+
+  const fetchPlayerPosition = async () => {
+    try {
+      const position = await rankingService.getPlayerPosition(playerName, score);
+      setPlayerPosition(position);
+      setShowRankingPosition(true);
+    } catch (err) {
+      console.error("Erro ao buscar posição do jogador:", err);
     }
   };
 
@@ -83,6 +95,11 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
         setIsSubmitted(true);
         setShowConfetti(true);
         fetchRanking(); // Fetch ranking after successful submission
+        
+        // Buscar posição do jogador após salvar
+        setTimeout(() => {
+          fetchPlayerPosition();
+        }, 1000);
         
         // Parar confetti após 3 segundos
         setTimeout(() => setShowConfetti(false), 3000);

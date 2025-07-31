@@ -11,18 +11,22 @@ interface GameAudioManagerProps {
   audioRef: React.RefObject<HTMLAudioElement>;
   successSoundRef: React.RefObject<HTMLAudioElement>;
   errorSoundRef: React.RefObject<HTMLAudioElement>;
+  gameStartAudioRef?: React.RefObject<HTMLAudioElement>;
   gameState: GameState;
   playSuccess?: boolean;
   playError?: boolean;
+  showPhaseOneMessage?: boolean;
 }
 
 export const GameAudioManager: React.FC<GameAudioManagerProps> = ({
   audioRef,
   successSoundRef,
   errorSoundRef,
+  gameStartAudioRef,
   gameState,
   playSuccess,
-  playError
+  playError,
+  showPhaseOneMessage
 }) => {
   // Gerencia o volume da música de fundo
   useEffect(() => {
@@ -65,6 +69,17 @@ export const GameAudioManager: React.FC<GameAudioManagerProps> = ({
       });
     }
   }, [playError, gameState.volume, gameState.isMuted]);
+
+  // Gerencia a música de início do jogo
+  useEffect(() => {
+    if (showPhaseOneMessage && gameStartAudioRef?.current && !gameState.isMuted) {
+      gameStartAudioRef.current.currentTime = 0;
+      gameStartAudioRef.current.volume = Math.min(gameState.volume, 0.8);
+      gameStartAudioRef.current.play().catch((error) => {
+        console.log('Erro ao tocar música de início:', error);
+      });
+    }
+  }, [showPhaseOneMessage, gameState.volume, gameState.isMuted, gameStartAudioRef]);
 
   return null;
 }; 
