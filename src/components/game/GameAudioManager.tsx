@@ -48,17 +48,23 @@ export const GameAudioManager: React.FC<GameAudioManagerProps> = ({
   useEffect(() => {
     if (playSuccess && successSoundRef.current) {
       successSoundRef.current.currentTime = 0;
-      successSoundRef.current.play();
+      successSoundRef.current.volume = gameState.isMuted ? 0 : Math.min(gameState.volume, 0.7);
+      successSoundRef.current.play().catch((error) => {
+        console.log('Erro ao tocar som de sucesso:', error);
+      });
     }
-  }, [playSuccess]);
+  }, [playSuccess, gameState.volume, gameState.isMuted]);
 
   // Gerencia o som de erro
   useEffect(() => {
     if (playError && errorSoundRef.current) {
       errorSoundRef.current.currentTime = 0;
-      errorSoundRef.current.play();
+      errorSoundRef.current.volume = gameState.isMuted ? 0 : Math.min(gameState.volume, 0.7);
+      errorSoundRef.current.play().catch((error) => {
+        console.log('Erro ao tocar som de erro:', error);
+      });
     }
-  }, [playError]);
+  }, [playError, gameState.volume, gameState.isMuted]);
 
   return null;
 }; 

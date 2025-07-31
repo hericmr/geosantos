@@ -29,7 +29,7 @@ export class MainScene extends Phaser.Scene {
         this.load.image('particula', '/assets/images/particula.png');
         
         // Carregando o áudio
-        this.load.audio('musica', '/assets/audio/musica.ogg');
+        this.load.audio('musica', `${import.meta.env.BASE_URL || ''}/assets/audio/musica.ogg`);
     }
 
     create() {

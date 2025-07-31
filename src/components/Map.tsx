@@ -263,8 +263,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       overflow: 'hidden'
     }}>
       <audio ref={audioRef} preload="auto" />
-      <audio ref={successSoundRef} src="/assets/audio/success.mp3" preload="auto" />
-      <audio ref={errorSoundRef} src="/assets/audio/error.mp3" preload="auto" />
+      <audio ref={successSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/sucess.mp3`} preload="auto" />
+      <audio ref={errorSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/error.mp3`} preload="auto" />
       
       <style>
         {`
@@ -597,28 +597,30 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               animation: 'bounceIn 1s ease-out 0.5s both'
             }}>
               {currentMode === 'neighborhoods' 
-                ? <Home size={window.innerWidth < 768 ? 48 : 64} color="#32CD32" />
-                : <Landmark size={window.innerWidth < 768 ? 48 : 64} color="#FFD700" />}
+                ? <Home size={window.innerWidth < 768 ? 48 : 64} color="var(--accent-green)" />
+                : <Landmark size={window.innerWidth < 768 ? 48 : 64} color="var(--accent-green)" />}
             </div>
             
             <h1 style={{
               fontSize: window.innerWidth < 768 ? '2rem' : '3rem',
-              color: '#32CD32',
+              color: 'var(--accent-green)',
               marginBottom: '15px',
               fontWeight: 800,
               textTransform: 'uppercase',
               letterSpacing: '2px',
-              animation: 'slideInUp 0.8s ease-out 0.7s both'
+              animation: 'slideInUp 0.8s ease-out 0.7s both',
+              fontFamily: "'LaCartoonerie', cursive"
             }}>
               {currentMode === 'neighborhoods' ? 'Nível 1: Bairros Conhecidos' : 'Lugares Famosos'}
             </h1>
             
             <p style={{
               fontSize: window.innerWidth < 768 ? '1rem' : '1.3rem',
-              color: '#FFD700',
+              color: 'var(--text-primary)',
               marginBottom: '25px',
               fontWeight: 600,
-              animation: 'slideInUp 0.8s ease-out 0.9s both'
+              animation: 'slideInUp 0.8s ease-out 0.9s both',
+              fontFamily: "'LaCartoonerie', cursive"
             }}>
               {currentMode === 'neighborhoods' 
                 ? 'Clique no mapa onde você acha que está o bairro!'

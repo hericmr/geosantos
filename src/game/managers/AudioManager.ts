@@ -11,9 +11,9 @@ export class AudioManager {
 
     private loadSounds() {
         // Carrega os sons
-        this.scene.load.audio('success', 'assets/audio/success.mp3');
-        this.scene.load.audio('error', 'assets/audio/error.mp3');
-        this.scene.load.audio('background', 'assets/audio/background.mp3');
+        this.scene.load.audio('success', `${import.meta.env.BASE_URL || ''}/assets/audio/sucess.mp3`);
+        this.scene.load.audio('error', `${import.meta.env.BASE_URL || ''}/assets/audio/error.mp3`);
+        this.scene.load.audio('background', `${import.meta.env.BASE_URL || ''}/assets/audio/background.mp3`);
     }
 
     public playSound(key: string) {

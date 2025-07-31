@@ -326,7 +326,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         gameOver={false}
         onPauseGame={onPauseGame}
         onNextRound={() => {
-          console.log('[FeedbackPanel] Botão Próximo clicado. Chamando onNextRound.');
+          console.log('[FeedbackPanel] Botão Próximo clicado manualmente. Modo:', currentMode, 'Chamando onNextRound.');
           if (geoJsonData) {
             onNextRound(geoJsonData);
           }

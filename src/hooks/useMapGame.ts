@@ -132,7 +132,19 @@ export const useMapGame = (
         // Tocar som de sucesso se acertou
         if (successSoundRef.current && isCorrectPlace) {
           successSoundRef.current.currentTime = 0;
-          successSoundRef.current.play().catch(() => {});
+          successSoundRef.current.volume = 0.7; // Definir volume adequado
+          successSoundRef.current.play().catch((error) => {
+            console.log('Erro ao tocar som de sucesso:', error);
+          });
+        }
+        
+        // Tocar som de erro se não acertou
+        if (errorSoundRef.current && !isCorrectPlace) {
+          errorSoundRef.current.currentTime = 0;
+          errorSoundRef.current.volume = 0.7; // Definir volume adequado
+          errorSoundRef.current.play().catch((error) => {
+            console.log('Erro ao tocar som de erro:', error);
+          });
         }
         
         // Mostrar círculo de distância se não acertou
@@ -155,46 +167,90 @@ export const useMapGame = (
             clearInterval(progressIntervalRef.current);
           }
           
-          // Se acertou, avançar para próxima rodada automaticamente
+          // Se acertou, verificar o modo de jogo
           if (isCorrectPlace) {
-            progressIntervalRef.current = setInterval(() => {
-              timeElapsed += interval;
-              const progress = 100 - (timeElapsed / duration * 100);
-              if (progress <= 0) {
-                if (progressIntervalRef.current) {
-                  clearInterval(progressIntervalRef.current);
-                }
-                // Avançar para próxima rodada
-                if (gameMode === 'famous_places') {
-                  // Usar o FamousPlacesManager para avançar
-                  if ((window as any).famousPlacesManager) {
-                    (window as any).famousPlacesManager.forceNextRound();
-                  }
-                  // Atualizar estado do jogo
-                  updateGameState({
-                    roundNumber: gameState.roundNumber + 1,
-                    timeLeft: ROUND_TIME,
-                    roundInitialTime: ROUND_TIME,
-                    isCountingDown: true
-                  });
-                } else {
-                  startNextRound(geoJsonData!);
-                }
-                return;
-              }
+            if (gameMode === 'famous_places') {
+              // Modo lugares famosos: manter progresso em 100 e aguardar clique do botão
+              console.log('[useMapGame] Modo lugares famosos - aguardando clique do botão próximo');
               updateGameState({
-                feedbackProgress: progress,
-                feedbackOpacity: progress / 100
+                feedbackProgress: 100,
+                feedbackOpacity: 1
               });
-            }, interval);
-          } else {
-            // Se não acertou, permitir mais tentativas até o tempo acabar
-            progressIntervalRef.current = setInterval(() => {
-              timeElapsed += interval;
-              const progress = 100 - (timeElapsed / duration * 100);
-              if (progress <= 0) {
+            } else {
+              // Modo bairros: avançar automaticamente
+              progressIntervalRef.current = setInterval(() => {
+                timeElapsed += interval;
+                const remainingProgress = Math.max(0, 100 * (1 - timeElapsed / duration));
+                updateGameState({ 
+                  feedbackProgress: remainingProgress,
+                  feedbackOpacity: remainingProgress / 100
+                });
+                
+                if (timeElapsed >= duration) {
+                  console.log('[useMapGame] Modo bairros - avançando automaticamente');
+                  if (progressIntervalRef.current) {
+                    clearInterval(progressIntervalRef.current);
+                    progressIntervalRef.current = null;
+                  }
+                  startNextRound(geoJsonData!);
+                  return;
+                }
+              }, interval);
+              
+              feedbackTimerRef.current = setTimeout(() => {
                 if (progressIntervalRef.current) {
                   clearInterval(progressIntervalRef.current);
+                  progressIntervalRef.current = null;
+                }
+                startNextRound(geoJsonData!);
+              }, duration);
+            }
+          } else {
+            // Se não acertou, verificar o modo de jogo
+            if (gameMode === 'famous_places') {
+              // Modo lugares famosos: manter progresso em 100 e aguardar clique do botão
+              console.log('[useMapGame] Modo lugares famosos - erro, aguardando clique do botão próximo');
+              updateGameState({
+                feedbackProgress: 100,
+                feedbackOpacity: 1
+              });
+            } else {
+              // Modo bairros: permitir mais tentativas até o tempo acabar
+              progressIntervalRef.current = setInterval(() => {
+                timeElapsed += interval;
+                const remainingProgress = Math.max(0, 100 * (1 - timeElapsed / duration));
+                updateGameState({ 
+                  feedbackProgress: remainingProgress,
+                  feedbackOpacity: remainingProgress / 100
+                });
+                
+                if (timeElapsed >= duration) {
+                  console.log('[useMapGame] Progresso chegou a 0 (erro), verificando se deve avançar ou permitir nova tentativa');
+                  if (progressIntervalRef.current) {
+                    clearInterval(progressIntervalRef.current);
+                    progressIntervalRef.current = null;
+                  }
+                  // Verificar se o tempo da rodada acabou
+                  if (gameState.timeLeft <= 0) {
+                    console.log('[useMapGame] Tempo da rodada acabou, avançando para próxima rodada');
+                    startNextRound(geoJsonData!);
+                  } else {
+                    console.log('[useMapGame] Permitindo nova tentativa');
+                    // Resetar feedback para permitir nova tentativa
+                    updateGameState({
+                      showFeedback: false,
+                      feedbackOpacity: 0,
+                      arrowPath: null
+                    });
+                  }
+                  return;
+                }
+              }, interval);
+              
+              feedbackTimerRef.current = setTimeout(() => {
+                if (progressIntervalRef.current) {
+                  clearInterval(progressIntervalRef.current);
+                  progressIntervalRef.current = null;
                 }
                 // Verificar se o tempo da rodada acabou
                 if (gameState.timeLeft <= 0) {
@@ -207,13 +263,8 @@ export const useMapGame = (
                     arrowPath: null
                   });
                 }
-                return;
-              }
-              updateGameState({
-                feedbackProgress: progress,
-                feedbackOpacity: progress / 100
-              });
-            }, interval);
+              }, duration);
+            }
           }
         }, 1000);
       }, 200);
@@ -290,7 +341,10 @@ export const useMapGame = (
           
           if (successSoundRef.current) {
             successSoundRef.current.currentTime = 0;
-            successSoundRef.current.play().catch(() => {});
+            successSoundRef.current.volume = 0.7; // Definir volume adequado
+            successSoundRef.current.play().catch((error) => {
+              console.log('Erro ao tocar som de sucesso:', error);
+            });
           }
           
           setTimeout(() => {
@@ -307,6 +361,7 @@ export const useMapGame = (
               const progress = 100 - (timeElapsed / duration * 100);
               
               if (progress <= 0) {
+                console.log('[useMapGame] Progresso chegou a 0 (modo bairros), avançando automaticamente para próxima rodada');
                 if (progressIntervalRef.current) {
                   clearInterval(progressIntervalRef.current);
                 }
@@ -368,9 +423,20 @@ export const useMapGame = (
           feedbackMessage = getFeedbackMessage(distance);
         }
 
+        // Tocar som de erro se não acertou o bairro
+        if (errorSoundRef.current && !isCorrectNeighborhood) {
+          errorSoundRef.current.currentTime = 0;
+          errorSoundRef.current.volume = 0.7; // Definir volume adequado
+          errorSoundRef.current.play().catch((error) => {
+            console.log('Erro ao tocar som de erro:', error);
+          });
+        }
+
         setTimeout(() => {
           setTargetIconPosition(null); // Clear target icon after delay
           const newTotalDistance = gameState.totalDistance + distance;
+          const isGameOver = newNegativeSum > 60 || newTotalDistance > 6000;
+          
           updateGameState({
             clickedPosition: latlng, // Set clickedPosition here
             clickTime: clickDuration,
@@ -379,11 +445,20 @@ export const useMapGame = (
             feedbackOpacity: 1,
             feedbackProgress: 100,
             feedbackMessage: feedbackMessage,
-            gameOver: newNegativeSum > 60 || newTotalDistance > 6000,
+            gameOver: isGameOver,
             revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
             arrowPath: (!isCorrectNeighborhood && !isNearBorder) ? [latlng, closestPoint] : null,
             totalDistance: newTotalDistance
           });
+
+          // Tocar som de erro se o jogo terminou
+          if (isGameOver && errorSoundRef.current) {
+            errorSoundRef.current.currentTime = 0;
+            errorSoundRef.current.volume = 0.7; // Definir volume adequado
+            errorSoundRef.current.play().catch((error) => {
+              console.log('Erro ao tocar som de game over:', error);
+            });
+          }
 
           if (newNegativeSum > 50) {
             return;
@@ -404,6 +479,7 @@ export const useMapGame = (
               updateGameState({ feedbackProgress: remainingProgress });
               
               if (timeElapsed >= duration) {
+                console.log('[useMapGame] Progresso chegou a 0 (modo bairros - erro), avançando automaticamente para próxima rodada');
                 if (progressIntervalRef.current) {
                   clearInterval(progressIntervalRef.current);
                   progressIntervalRef.current = null;

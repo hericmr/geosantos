@@ -30,33 +30,35 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           Pausar
         </button>
       )}
-      <button
-        onClick={onNextRound}
-        className={`pixel-btn ${gameOver ? 'pixel-btn--danger' : 'pixel-btn--success'}`}
-        style={styles.button(gameOver ? 'retry' : 'next')}
-      >
-        <div style={styles.progressBar(feedbackProgress, 'rgba(50, 205, 50, 0.3)')} />
-        <div style={styles.progressBar(100 - feedbackProgress, 'rgba(255, 0, 0, 0.5)')} />
-        <span style={{
-          position: 'relative',
-          zIndex: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}>
-          {gameOver ? (
-            <>
-              <RetryIcon size={16} color="var(--text-primary)" />
-              Tente Outra Vez
-            </>
-          ) : (
-            <>
-              <NextIcon size={16} color="var(--text-primary)" />
-              Próximo
-            </>
-          )}
-        </span>
-      </button>
+      {(feedbackProgress > 0 || currentMode === 'famous_places') && (
+        <button
+          onClick={onNextRound}
+          className={`pixel-btn ${gameOver ? 'pixel-btn--danger' : 'pixel-btn--success'}`}
+          style={styles.button(gameOver ? 'retry' : 'next')}
+        >
+          <div style={styles.progressBar(feedbackProgress, 'rgba(50, 205, 50, 0.3)')} />
+          <div style={styles.progressBar(100 - feedbackProgress, 'rgba(255, 0, 0, 0.5)')} />
+          <span style={{
+            position: 'relative',
+            zIndex: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            {gameOver ? (
+              <>
+                <RetryIcon size={16} color="var(--text-primary)" />
+                Tente Outra Vez
+              </>
+            ) : (
+              <>
+                <NextIcon size={16} color="var(--text-primary)" />
+                Próximo
+              </>
+            )}
+          </span>
+        </button>
+      )}
     </div>
   );
 }; 
