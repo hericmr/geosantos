@@ -1,11 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AdminFamousPlaces } from './components/admin/AdminFamousPlaces';
 import Map from './components/Map'
 import './App.css'
 import { FamousPlacesWiki } from './components/ui/FamousPlacesWiki';
+import { MobileDisplay } from './components/ui/MobileDisplay';
+import { useMobileDetection } from './hooks/useMobileDetection';
 
 function App() {
+  const isMobile = useMobileDetection();
+  const [showMobileDisplay, setShowMobileDisplay] = useState(false);
+
+  // Se for mobile, mostra o componente MobileDisplay
+  if (isMobile) {
+    return (
+      <BrowserRouter basename="/geosantos">
+        <Routes>
+          <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
+          <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
+          <Route path="/" element={
+            <MobileDisplay 
+              onClose={() => setShowMobileDisplay(false)}
+            />
+          } />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
+
+  // Se não for mobile, mostra a interface normal
   return (
     <BrowserRouter basename="/geosantos">
       <Routes>

@@ -95,6 +95,8 @@ export const GameRanking: React.FC<GameRankingProps> = ({
           border: '4px solid var(--accent-yellow)',
           borderRadius: '12px',
           background: 'rgba(30, 30, 30, 0.98)',
+          maxHeight: '400px',
+          overflow: 'hidden'
         };
       }
       // Desktop
@@ -133,24 +135,24 @@ export const GameRanking: React.FC<GameRankingProps> = ({
         borderRadius: variant === 'startScreen' ? '0' : '4px',
         boxShadow: variant === 'startScreen' ? 'none' : 'var(--shadow-md)',
         overflow: 'hidden',
-        minWidth: isExpanded ? (variant === 'startScreen' ? '340px' : '280px') : (variant === 'startScreen' ? '340px' : '200px'),
-        maxWidth: isExpanded ? (variant === 'startScreen' ? '400px' : '320px') : (variant === 'startScreen' ? '400px' : '220px')
+        minWidth: isExpanded ? (variant === 'startScreen' ? (isMobile ? '100%' : '340px') : '280px') : (variant === 'startScreen' ? (isMobile ? '100%' : '340px') : '200px'),
+        maxWidth: isExpanded ? (variant === 'startScreen' ? (isMobile ? '100%' : '400px') : '320px') : (variant === 'startScreen' ? (isMobile ? '100%' : '400px') : '220px')
       }}>
         {/* Header */}
         <div 
           className="ranking-header"
           onClick={() => setIsExpanded(!isExpanded)}
           style={{
-            background: variant === 'startScreen' ? 'var(--bg-secondary)' : 'var(--accent-green)',
+            background: variant === 'startScreen' ? 'var(--bg-secondary)' : 'var(--accent-blue)',
             color: 'var(--text-primary)',
-            padding: variant === 'startScreen' ? '16px 24px' : '8px 12px',
+            padding: variant === 'startScreen' ? (isMobile ? '12px 16px' : '16px 24px') : '8px 12px',
             cursor: 'pointer',
             display: 'flex',
             flexDirection: variant === 'startScreen' ? 'column' : 'row',
             justifyContent: 'center',
             alignItems: 'center',
             fontWeight: 'bold',
-            fontSize: variant === 'startScreen' ? '1.7rem' : '1.1rem',
+            fontSize: variant === 'startScreen' ? (isMobile ? '1.3rem' : '1.7rem') : '1.1rem',
             textShadow: 'none',
             borderTopLeftRadius: variant === 'startScreen' ? '4px' : '0',
             borderTopRightRadius: variant === 'startScreen' ? '4px' : '0',
@@ -160,7 +162,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
           }}
         >
           <span style={{
-            fontSize: variant === 'startScreen' ? '2.1rem' : '1.2rem',
+            fontSize: variant === 'startScreen' ? (isMobile ? '1.5rem' : '2.1rem') : '1.2rem',
             marginBottom: variant === 'startScreen' ? '2px' : 0,
             textAlign: 'center',
             width: '100%',
@@ -198,9 +200,9 @@ export const GameRanking: React.FC<GameRankingProps> = ({
         <div style={{
           padding: variant === 'startScreen' ? '18px 18px 12px 18px' : '8px',
           background: variant === 'startScreen' ? 'rgba(255,255,255,0.08)' : 'var(--bg-primary)',
-          maxHeight: isExpanded ? (variant === 'startScreen' ? '520px' : '400px') : (variant === 'startScreen' ? '320px' : '200px'),
+          maxHeight: isExpanded ? (variant === 'startScreen' ? (isMobile ? '300px' : '520px') : '400px') : (variant === 'startScreen' ? (isMobile ? '200px' : '320px') : '200px'),
           overflowY: 'auto',
-          fontSize: variant === 'startScreen' ? '1.25rem' : '0.9rem',
+          fontSize: variant === 'startScreen' ? (isMobile ? '1rem' : '1.25rem') : '0.9rem',
           color: 'var(--text-primary)'
         }}>
           {isLoading ? (

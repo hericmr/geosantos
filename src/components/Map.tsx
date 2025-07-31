@@ -622,7 +622,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               animation: 'slideInUp 0.8s ease-out 0.9s both',
               fontFamily: "'LaCartoonerie', cursive"
             }}>
-              {currentMode === 'neighborhoods' 
+              {currentMode === 'neighborhoods'
                 ? 'Clique no mapa onde você acha que está o bairro!'
                 : 'Encontre o lugar famoso no mapa!'
               }

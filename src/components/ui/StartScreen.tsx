@@ -341,7 +341,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                   alignItems: 'center',
                   gap: '16px',
                   padding: '16px 24px',
-                  background: isSelected ? 'var(--accent-green)' : 'var(--bg-secondary)',
+                  background: isSelected ? 'var(--accent-blue)' : 'var(--bg-secondary)',
                   border: '3px solid var(--text-primary)',
                   borderRadius: '4px',
                   color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
