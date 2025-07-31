@@ -38,7 +38,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
       
       // Buscar posição do jogador atual se tiver pontuação
       if (currentPlayerName && currentPlayerScore) {
-        const position = await rankingService.getPlayerPosition(currentPlayerName);
+        const position = await rankingService.getPlayerPosition(currentPlayerName, currentPlayerScore);
         setPlayerPosition(position);
       }
     } catch (err) {

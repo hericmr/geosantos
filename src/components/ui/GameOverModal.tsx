@@ -452,6 +452,74 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                 PONTUAÇÃO SALVA COM SUCESSO!
               </p>
             </div>
+
+            {/* Posição no Ranking - Estilo Mortal Kombat */}
+            {showRankingPosition && playerPosition && (
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '24px',
+                padding: '20px',
+                background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+                border: '3px solid #FF4500',
+                borderRadius: '8px',
+                boxShadow: '0 0 20px rgba(255, 215, 0, 0.5)',
+                animation: 'rankingGlow 2s ease-in-out infinite alternate'
+              }}>
+                <style>
+                  {`
+                    @keyframes rankingGlow {
+                      0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+                      100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+                    }
+                    
+                    @keyframes rankingPulse {
+                      0%, 100% { transform: scale(1); }
+                      50% { transform: scale(1.05); }
+                    }
+                    
+                    .ranking-position { animation: rankingPulse 1.5s ease-in-out infinite; }
+                  `}
+                </style>
+                
+                <div style={{
+                  fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+                  fontFamily: "'Press Start 2P', monospace",
+                  color: '#FF4500',
+                  textTransform: 'uppercase',
+                  textShadow: '3px 3px 0px rgba(0, 0, 0, 0.8)',
+                  marginBottom: '12px',
+                  animation: 'rankingPulse 1.5s ease-in-out infinite'
+                }}>
+                  POSIÇÃO NO RANKING
+                </div>
+                
+                <div style={{
+                  fontSize: 'clamp(3rem, 8vw, 5rem)',
+                  fontFamily: "'Press Start 2P', monospace",
+                  color: '#FF4500',
+                  fontWeight: 'bold',
+                  textShadow: '4px 4px 0px rgba(0, 0, 0, 0.8)',
+                  marginBottom: '8px',
+                  animation: 'rankingPulse 1.5s ease-in-out infinite'
+                }}>
+                  #{playerPosition}
+                </div>
+                
+                <div style={{
+                  fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+                  fontFamily: "'VT323', monospace",
+                  color: '#8B0000',
+                  fontWeight: 'bold',
+                  textShadow: '2px 2px 0px rgba(0, 0, 0, 0.8)'
+                }}>
+                  {playerPosition === 1 ? '🏆 CAMPEÃO ABSOLUTO! 🏆' :
+                   playerPosition <= 3 ? '🥇 TOP 3 - LENDÁRIO! 🥇' :
+                   playerPosition <= 10 ? '🥈 TOP 10 - IMPRESSIONANTE! 🥈' :
+                   playerPosition <= 50 ? '🥉 TOP 50 - MUITO BOM! 🥉' :
+                   '🎯 NO RANKING! 🎯'}
+                </div>
+              </div>
+            )}
             {isSubmitted && rankingData.length > 0 && (
               <div style={{
                 marginTop: '24px',
