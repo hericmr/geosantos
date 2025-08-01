@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script>
+      // Get the full path from the URL, e.g., "/geosantos/lugares-famosos"
+      const path = window.location.pathname;
+
+      // Use sessionStorage to temporarily store the path we want to be redirected to.
+      // We can't use query parameters easily because of the hash router.
+      sessionStorage.setItem('redirect', path);
+
+      // Redirect the user to the root of the application.
+      // The base path is handled by the router configuration.
+      window.location.href = '/geosantos/';
+    </script>
+  </head>
+  <body>
+    If you are not redirected automatically, please <a href="/geosantos/">click here</a>.
+  </body>
+</html>

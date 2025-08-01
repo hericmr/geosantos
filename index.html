@@ -16,6 +16,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function() {
+        const redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          const basePath = '/geosantos';
+          const path = redirect.startsWith(basePath) ? redirect.slice(basePath.length) : redirect;
+          history.replaceState(null, '', path);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
