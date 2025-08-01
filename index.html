@@ -13,21 +13,21 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <title>Geosantos</title>
     <meta name="description" content="Jogo educativo para aprender os bairros de Santos" />
-    <script>
-      // Script para lidar com roteamento SPA no GitHub Pages
-      (function(){
-        let redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect != location.href) {
-          history.replaceState(null, null, redirect);
-          return;
-        }
-      })();
-    </script>
-    <script type="module" crossorigin src="/geosantos/assets/index-Cuj6JqW3.js"></script>
-    <link rel="stylesheet" crossorigin href="/geosantos/assets/index-cDyDqF7I.css">
+    <script type="module" crossorigin src="/geosantos/assets/index-xdgbdcxU.js"></script>
+    <link rel="stylesheet" crossorigin href="/geosantos/assets/index-DxDFPEEp.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function() {
+        const redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          const basePath = '/geosantos';
+          const path = redirect.startsWith(basePath) ? redirect.slice(basePath.length) : redirect;
+          history.replaceState(null, '', path);
+        }
+      })();
+    </script>
   </body>
 </html>

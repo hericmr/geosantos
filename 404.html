@@ -1,57 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Geosantos - Página não encontrada</title>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
     <script>
-      // Script para redirecionar rotas do SPA
-      (function(){
-        let redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect != location.href) {
-          history.replaceState(null, null, redirect);
-          return;
-        }
-      })();
+      // Get the full path from the URL, e.g., "/geosantos/lugares-famosos"
+      const path = window.location.pathname;
+
+      // Use sessionStorage to temporarily store the path we want to be redirected to.
+      // We can't use query parameters easily because of the hash router.
+      sessionStorage.setItem('redirect', path);
+
+      // Redirect the user to the root of the application.
+      // The base path is handled by the router configuration.
+      window.location.href = '/geosantos/';
     </script>
   </head>
   <body>
-    <div id="root">
-      <div style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        font-family: 'Press Start 2P', monospace;
-        background: #1a4d2e;
-        color: white;
-        text-align: center;
-        padding: 20px;
-      ">
-        <h1 style="font-size: 2rem; margin-bottom: 20px;">404</h1>
-        <p style="font-size: 1rem; margin-bottom: 30px;">Página não encontrada</p>
-        <p style="font-size: 0.8rem; margin-bottom: 30px;">Redirecionando...</p>
-        <button onclick="window.location.href='/geosantos/'" style="
-          background: #2d6a4f;
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          font-family: 'Press Start 2P', monospace;
-          font-size: 0.8rem;
-          cursor: pointer;
-          border-radius: 4px;
-        ">
-          Voltar ao Início
-        </button>
-      </div>
-    </div>
-    <script>
-      // Redirecionar para a página principal após um breve delay
-      setTimeout(function() {
-        window.location.href = '/geosantos/';
-      }, 3000);
-    </script>
+    If you are not redirected automatically, please <a href="/geosantos/">click here</a>.
   </body>
-</html> 
+</html>
