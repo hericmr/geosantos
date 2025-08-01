@@ -544,8 +544,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       <GameControls
         gameStarted={gameState.gameStarted}
         currentNeighborhood={gameState.currentNeighborhood}
-        timeLeft={gameState.timeLeft}
-        totalTimeLeft={gameState.totalTimeLeft}
+        globalTimeLeft={gameState.globalTimeLeft}
+        roundTimeLeft={gameState.roundTimeLeft}
         roundNumber={gameState.roundNumber}
         roundInitialTime={gameState.roundInitialTime}
         score={gameState.score}

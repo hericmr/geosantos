@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import * as L from 'leaflet';
 import { FeatureCollection } from 'geojson';
 import { calculateDistance, calculateScore, closestPointOnSegment } from '../utils/gameUtils';
+import { calculateTimeBonus } from '../utils/gameConstants';
 import { useGameState } from './useGameState';
 import { getFeedbackMessage, ROUND_TIME } from '../utils/gameConstants';
 import { GameMode, FamousPlace } from '../types/famousPlaces';
@@ -56,7 +57,7 @@ export const useMapGame = (
   const handleMapClick = (latlng: L.LatLng) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
 
-    const clickDuration = gameState.roundInitialTime - gameState.timeLeft;
+    const clickDuration = gameState.roundInitialTime - gameState.roundTimeLeft;
 
     // Pausa a barra de tempo imediatamente após o clique
     updateGameState({
@@ -85,14 +86,14 @@ export const useMapGame = (
         // Pontuação base para acerto: 2000 pontos
         const baseScore = 2000;
         // Bônus de tempo: até 1000 pontos se tempo < 5s
-        const timeBonus = gameState.timeLeft <= 5 ? Math.round((gameState.timeLeft / 5) * 1000) : 0;
+        const timeBonus = gameState.roundTimeLeft <= 5 ? Math.round((gameState.roundTimeLeft / 5) * 1000) : 0;
         score = baseScore + timeBonus;
         feedbackMessage = `Acertou! ${currentFamousPlace.name}`;
       } else {
         // Pontuação baseada na distância (máx 1500 pontos para 0.1km, 0 pontos para >=3km)
         const distanceScore = Math.max(0, 1500 * (1 - (distanceKm / 3)));
         // Bônus de tempo: até 500 pontos se tempo < 5s
-        const timeBonus = gameState.timeLeft <= 5 ? Math.round((gameState.timeLeft / 5) * 500) : 0;
+        const timeBonus = gameState.roundTimeLeft <= 5 ? Math.round((gameState.roundTimeLeft / 5) * 500) : 0;
         score = distanceScore + timeBonus;
         
         // Feedback baseado na distância
@@ -112,6 +113,12 @@ export const useMapGame = (
       
       const newScore = gameState.score + Math.round(score);
       
+      // Calcular tempo gasto na rodada e bônus de tempo para próxima rodada
+      const timeSpent = clickDuration;
+      const timeBonus = calculateTimeBonus(score);
+      const newGlobalTime = Math.max(gameState.globalTimeLeft - timeSpent, 0);
+      const isGameOver = newGlobalTime <= 0;
+      
       // Atualizar estado do jogo
       setTimeout(() => {
         setTargetIconPosition(null);
@@ -119,18 +126,20 @@ export const useMapGame = (
           clickedPosition: latlng,
           clickTime: clickDuration,
           score: newScore,
+          globalTimeLeft: newGlobalTime,
+          timeBonus: timeBonus, // Armazenar bônus para próxima rodada
+          gameOver: isGameOver,
           showFeedback: true,
           feedbackOpacity: 1,
           feedbackProgress: 100,
           feedbackMessage: feedbackMessage,
-          gameOver: false,
           revealedNeighborhoods: isCorrectPlace ? new Set([...gameState.revealedNeighborhoods, currentFamousPlace.name]) : gameState.revealedNeighborhoods,
           arrowPath: arrowPath,
           totalDistance: gameState.totalDistance + distance
         });
         
-        // Tocar som de sucesso se acertou
-        if (successSoundRef.current && isCorrectPlace) {
+        // Tocar som de sucesso se acertou OU se a distância for <= 500m
+        if (successSoundRef.current && (isCorrectPlace || distance <= 500)) {
           successSoundRef.current.currentTime = 0;
           successSoundRef.current.volume = 0.7; // Definir volume adequado
           successSoundRef.current.play().catch((error) => {
@@ -138,8 +147,8 @@ export const useMapGame = (
           });
         }
         
-        // Tocar som de erro se não acertou E a distância for maior que 500m
-        if (errorSoundRef.current && !isCorrectPlace && distance > 500) {
+        // Tocar som de erro se não acertou E a distância for >= 700m
+        if (errorSoundRef.current && !isCorrectPlace && distance >= 700) {
           errorSoundRef.current.currentTime = 0;
           errorSoundRef.current.volume = 0.7; // Definir volume adequado
           errorSoundRef.current.play().catch((error) => {
@@ -231,7 +240,7 @@ export const useMapGame = (
                     progressIntervalRef.current = null;
                   }
                   // Verificar se o tempo da rodada acabou
-                  if (gameState.timeLeft <= 0) {
+                  if (gameState.roundTimeLeft <= 0) {
                     console.log('[useMapGame] Tempo da rodada acabou, avançando para próxima rodada');
                     startNextRound(geoJsonData!);
                   } else {
@@ -253,7 +262,7 @@ export const useMapGame = (
                   progressIntervalRef.current = null;
                 }
                 // Verificar se o tempo da rodada acabou
-                if (gameState.timeLeft <= 0) {
+                if (gameState.roundTimeLeft <= 0) {
                   startNextRound(geoJsonData!);
                 } else {
                   // Resetar feedback para permitir nova tentativa
@@ -320,8 +329,14 @@ export const useMapGame = (
       
       if (isCorrectNeighborhood) {
         const distance = 0;
-        const score = 3000 * Math.pow(gameState.timeLeft / 10, 2);
+        const score = 3000 * Math.pow(gameState.roundTimeLeft / 10, 2);
         const newScore = gameState.score + Math.round(score);
+        
+        // Calcular tempo gasto na rodada e bônus de tempo para próxima rodada
+        const timeSpent = clickDuration;
+        const timeBonus = calculateTimeBonus(score);
+        const newGlobalTime = Math.max(gameState.globalTimeLeft - timeSpent, 0);
+        const isGameOver = newGlobalTime <= 0;
         
         setTimeout(() => {
           setTargetIconPosition(null); // Clear target icon after delay
@@ -329,11 +344,13 @@ export const useMapGame = (
             clickedPosition: latlng, // Set clickedPosition here
             clickTime: clickDuration,
             score: newScore,
+            globalTimeLeft: newGlobalTime,
+            timeBonus: timeBonus, // Armazenar bônus para próxima rodada
+            gameOver: isGameOver,
             showFeedback: true,
             feedbackOpacity: 1,
             feedbackProgress: 100,
             feedbackMessage: "",
-            gameOver: false,
             revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
             arrowPath: null,
             totalDistance: gameState.totalDistance
@@ -405,8 +422,8 @@ export const useMapGame = (
         const isNearBorder = distance < 10;
         
         const score = isNearBorder
-          ? 2500 * Math.pow(gameState.timeLeft / 15, 2)
-          : calculateScore(distance, gameState.timeLeft).total;
+          ? 2500 * Math.pow(gameState.roundTimeLeft / 15, 2)
+          : calculateScore(distance, gameState.roundTimeLeft).total;
         
         const newScore = gameState.score + Math.round(score);
         
@@ -423,8 +440,8 @@ export const useMapGame = (
           feedbackMessage = getFeedbackMessage(distance);
         }
 
-        // Tocar som de erro se não acertou o bairro E a distância for maior que 500m
-        if (errorSoundRef.current && !isCorrectNeighborhood && distance > 500) {
+        // Tocar som de erro se não acertou o bairro E a distância for >= 700m
+        if (errorSoundRef.current && !isCorrectNeighborhood && distance >= 700) {
           errorSoundRef.current.currentTime = 0;
           errorSoundRef.current.volume = 0.7; // Definir volume adequado
           errorSoundRef.current.play().catch((error) => {
@@ -432,15 +449,33 @@ export const useMapGame = (
           });
         }
 
+        // Tocar som de sucesso se a distância for <= 500m (mesmo que não tenha acertado o bairro)
+        if (successSoundRef.current && distance <= 500) {
+          successSoundRef.current.currentTime = 0;
+          successSoundRef.current.volume = 0.7; // Definir volume adequado
+          successSoundRef.current.play().catch((error) => {
+            console.log('Erro ao tocar som de sucesso:', error);
+          });
+        }
+
+        // Calcular tempo gasto na rodada e bônus de tempo para próxima rodada
+        const timeSpent = clickDuration;
+        const timeBonus = calculateTimeBonus(score);
+        const newGlobalTime = Math.max(gameState.globalTimeLeft - timeSpent, 0);
+        const newTotalDistance = gameState.totalDistance + distance;
+        const isGameOverByTime = newGlobalTime <= 0;
+        const isGameOverByScore = newNegativeSum > 60 || newTotalDistance > 6000;
+        const isGameOver = isGameOverByTime || isGameOverByScore;
+        
         setTimeout(() => {
           setTargetIconPosition(null); // Clear target icon after delay
-          const newTotalDistance = gameState.totalDistance + distance;
-          const isGameOver = newNegativeSum > 60 || newTotalDistance > 6000;
           
           updateGameState({
             clickedPosition: latlng, // Set clickedPosition here
             clickTime: clickDuration,
             score: newScore,
+            globalTimeLeft: newGlobalTime,
+            timeBonus: timeBonus, // Armazenar bônus para próxima rodada
             showFeedback: true,
             feedbackOpacity: 1,
             feedbackProgress: 100,
@@ -554,8 +589,7 @@ export const useMapGame = (
 
     updateGameState({
       roundInitialTime: ROUND_TIME,
-      timeLeft: ROUND_TIME,
-      isCountingDown: true,
+      roundTimeLeft: ROUND_TIME,
       isPaused: false,
       showFeedback: false,
       feedbackOpacity: 0,

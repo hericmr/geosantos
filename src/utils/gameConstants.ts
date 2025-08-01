@@ -1,3 +1,4 @@
+export const INITIAL_TIME = 15; // Tempo total inicial do jogo
 export const ROUND_TIME = 15; // 15 seconds per round (mais fácil)
 export const PHASE_TWO_TIME = 8; // 8 seconds per round in phase 2 (mais fácil)
 export const TIME_BONUS = 1.5; // Time bonus for correct neighborhood

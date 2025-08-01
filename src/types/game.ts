@@ -11,9 +11,9 @@ export interface MapProps {
 export interface GameState {
   currentNeighborhood: string;
   score: number;
-  timeLeft: number;
-  totalTimeLeft: number;
-  roundInitialTime: number;
+  globalTimeLeft: number;      // Tempo global do jogo
+  roundTimeLeft: number;       // Tempo da rodada atual
+  roundInitialTime: number;    // Tempo inicial da rodada
   roundNumber: number;
   gameOver: boolean;
   gameStarted: boolean;
@@ -51,8 +51,8 @@ export interface AudioControlsProps {
 export interface GameControlsProps {
   gameStarted: boolean;
   currentNeighborhood: string;
-  timeLeft: number;
-  totalTimeLeft: number;
+  globalTimeLeft: number;      // Tempo global do jogo
+  roundTimeLeft: number;       // Tempo da rodada atual
   roundNumber: number;
   roundInitialTime: number;
   score: number;

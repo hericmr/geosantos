@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { LatLng } from 'leaflet';
 import { GameState } from '../types/game';
-import { ROUND_TIME, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS, calculateTimeBonus } from '../utils/gameConstants';
+import { ROUND_TIME, INITIAL_TIME, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS, calculateTimeBonus } from '../utils/gameConstants';
 
 export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>({
     currentNeighborhood: '',
     score: 0,
-    timeLeft: ROUND_TIME,
-    totalTimeLeft: 300,
+    globalTimeLeft: INITIAL_TIME,
+    roundTimeLeft: ROUND_TIME,
     roundInitialTime: ROUND_TIME,
     roundNumber: 1,
     gameOver: false,
@@ -34,16 +34,16 @@ export const useGameState = () => {
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (gameState.gameStarted && !gameState.gameOver && gameState.timeLeft > 0 && gameState.isCountingDown && !gameState.isPaused) {
+    if (gameState.gameStarted && !gameState.gameOver && gameState.roundTimeLeft > 0 && gameState.globalTimeLeft > 0 && gameState.isCountingDown && !gameState.isPaused) {
       const timer = setInterval(() => {
         setGameState(prev => {
-          if (prev.timeLeft <= 0) {
-            return { ...prev, gameOver: true, timeLeft: 0, showFeedback: true };
+          if (prev.roundTimeLeft <= 0 || prev.globalTimeLeft <= 0) {
+            return { ...prev, gameOver: true, roundTimeLeft: 0, globalTimeLeft: 0, showFeedback: true };
           }
           return { 
             ...prev, 
-            timeLeft: prev.timeLeft - 0.1,
-            totalTimeLeft: prev.totalTimeLeft - 0.1
+            roundTimeLeft: prev.roundTimeLeft - 0.1,
+            globalTimeLeft: prev.globalTimeLeft - 0.1
           };
         });
       }, 100);
@@ -64,8 +64,8 @@ export const useGameState = () => {
         gameStarted: true,
         score: 0,
         gameOver: false,
-        timeLeft: ROUND_TIME,
-        totalTimeLeft: ROUND_TIME,
+        globalTimeLeft: INITIAL_TIME,
+        roundTimeLeft: ROUND_TIME,
         roundInitialTime: ROUND_TIME,
         roundNumber: 1,
         isCountingDown: false,
@@ -88,6 +88,9 @@ export const useGameState = () => {
   const startNextRound = (geoJsonData: any) => {
     setGameState(prev => {
       const nextRoundNumber = prev.roundNumber + 1;
+      const timeBonus = prev.timeBonus || 0; // Pegar bônus armazenado
+      const newGlobalTime = Math.max(prev.globalTimeLeft + timeBonus, 0); // Aplicar bônus ao tempo global
+      
       if (prev.gameMode === 'famous_places') {
         // O controle do lugar famoso é feito pelo FamousPlacesManager
         return {
@@ -96,13 +99,14 @@ export const useGameState = () => {
           arrowPath: null,
           showFeedback: false,
           feedbackOpacity: 0,
-          timeLeft: ROUND_TIME,
+          globalTimeLeft: newGlobalTime, // Aplicar bônus
+          roundTimeLeft: ROUND_TIME,
           roundInitialTime: ROUND_TIME,
           roundNumber: nextRoundNumber,
           isCountingDown: false,
           currentNeighborhood: '',
           revealedNeighborhoods: new Set(),
-          timeBonus: 0
+          timeBonus: 0 // Resetar bônus após aplicar
         };
       } else {
         const features = geoJsonData.features;
@@ -114,13 +118,14 @@ export const useGameState = () => {
           arrowPath: null,
           showFeedback: false,
           feedbackOpacity: 0,
-          timeLeft: ROUND_TIME,
+          globalTimeLeft: newGlobalTime, // Aplicar bônus
+          roundTimeLeft: ROUND_TIME,
           roundInitialTime: ROUND_TIME,
           roundNumber: nextRoundNumber,
           isCountingDown: false,
           currentNeighborhood: neighborhood,
           revealedNeighborhoods: new Set(),
-          timeBonus: 0
+          timeBonus: 0 // Resetar bônus após aplicar
         };
       }
     });

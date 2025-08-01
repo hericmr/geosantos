@@ -11,8 +11,8 @@ import { LeaderboardModal } from './LeaderboardModal';
 export const GameControls: React.FC<GameControlsProps> = ({
   gameStarted,
   currentNeighborhood,
-  timeLeft,
-  totalTimeLeft,
+  globalTimeLeft,
+  roundTimeLeft,
   roundNumber,
   roundInitialTime,
   score,
@@ -100,17 +100,17 @@ export const GameControls: React.FC<GameControlsProps> = ({
             bottom: 0
           }}>
             <div style={{
-              width: `${(timeLeft / roundInitialTime) * 100}%`,
+              width: `${(globalTimeLeft / 15) * 100}%`,
               height: '100%',
-              background: `linear-gradient(90deg, ${getProgressBarColor(timeLeft, roundInitialTime)}, ${getProgressBarColor(timeLeft, roundInitialTime)}CC)`,
+              background: `linear-gradient(90deg, ${getProgressBarColor(globalTimeLeft, 15)}, ${getProgressBarColor(globalTimeLeft, 15)}CC)`,
               transition: 'width 0.1s linear',
               position: 'absolute',
               left: 0,
               top: 0,
               bottom: 0,
               backgroundColor: '#1B4D3E',
-              boxShadow: timeLeft <= 3 ? '0 0 20px rgba(255, 0, 0, 0.3)' : '0 0 15px rgba(255, 255, 255, 0.1)',
-              animation: timeLeft <= 3 ? 'pulse 1s infinite' : 'none'
+              boxShadow: globalTimeLeft <= 3 ? '0 0 20px rgba(255, 0, 0, 0.3)' : '0 0 15px rgba(255, 255, 255, 0.1)',
+              animation: globalTimeLeft <= 3 ? 'pulse 1s infinite' : 'none'
             }} />
             <style>
               {`
@@ -165,7 +165,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
                     textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)',
                     whiteSpace: 'nowrap'
                   }}>
-                    {Math.round(timeLeft * 10) / 10}s
+                    {Math.round(globalTimeLeft * 10) / 10}s
                   </span>
                 </div>
                 <span style={{

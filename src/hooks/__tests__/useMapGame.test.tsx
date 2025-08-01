@@ -42,6 +42,24 @@ const mockAudioElement = {
   removeEventListener: jest.fn(),
 };
 
+// Dados mock para testes de lugares famosos
+const mockFamousPlace = {
+  id: '1',
+  name: 'Test Place',
+  latitude: -23.9618,
+  longitude: -46.3322,
+  category: 'Test',
+  description: 'Test description',
+  address: 'Test address',
+  imageUrl: 'test.jpg'
+};
+
+// Dados mock para testes de som
+const mockGeoJsonDataForSoundTests = {
+  type: 'FeatureCollection',
+  features: []
+} as any;
+
 describe('useMapGame', () => {
   const mockGeoJsonData: FeatureCollection<Geometry, GeoJsonProperties> = {
     type: 'FeatureCollection',
@@ -230,12 +248,12 @@ describe('useMapGame - Som de Erro', () => {
     jest.clearAllMocks();
   });
 
-  it('should not play error sound when distance is less than 500m', () => {
+  it('should not play error sound when distance is less than 700m', () => {
     const mockCalculateDistance = calculateDistance as jest.MockedFunction<typeof calculateDistance>;
-    mockCalculateDistance.mockReturnValue(300); // 300m
+    mockCalculateDistance.mockReturnValue(600); // 600m
 
     const { result } = renderHook(() => 
-      useMapGame(mockGeoJsonData, 'famous_places', mockFamousPlace, jest.fn())
+      useMapGame(mockGeoJsonDataForSoundTests, 'famous_places', mockFamousPlace, jest.fn())
     );
 
     // Simular clique no mapa
@@ -247,7 +265,7 @@ describe('useMapGame - Som de Erro', () => {
     expect(mockAudioElement.play).not.toHaveBeenCalled();
   });
 
-  it('should play error sound when distance is greater than 500m', () => {
+  it('should play error sound when distance is greater than or equal to 700m', () => {
     const mockCalculateDistance = calculateDistance as jest.MockedFunction<typeof calculateDistance>;
     mockCalculateDistance.mockReturnValue(800); // 800m
 
@@ -264,7 +282,30 @@ describe('useMapGame - Som de Erro', () => {
     expect(mockAudioElement.play).toHaveBeenCalled();
   });
 
-  it('should play error sound when distance is exactly 500m', () => {
+  it('should play error sound when distance is exactly 700m', () => {
+    const mockCalculateDistance = calculateDistance as jest.MockedFunction<typeof calculateDistance>;
+    mockCalculateDistance.mockReturnValue(700); // 700m
+
+    const { result } = renderHook(() => 
+      useMapGame(mockGeoJsonData, 'famous_places', mockFamousPlace, jest.fn())
+    );
+
+    // Simular clique no mapa
+    act(() => {
+      result.current.handleMapClick({ lat: -23.9618, lng: -46.3322 } as any);
+    });
+
+    // Verificar se o som de erro foi tocado
+    expect(mockAudioElement.play).toHaveBeenCalled();
+  });
+});
+
+describe('useMapGame - Som de Sucesso por Distância', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should play success sound when distance is 500m or less in famous places mode', () => {
     const mockCalculateDistance = calculateDistance as jest.MockedFunction<typeof calculateDistance>;
     mockCalculateDistance.mockReturnValue(500); // 500m
 
@@ -277,24 +318,41 @@ describe('useMapGame - Som de Erro', () => {
       result.current.handleMapClick({ lat: -23.9618, lng: -46.3322 } as any);
     });
 
-    // Verificar se o som de erro foi tocado (500m é maior que 500m)
+    // Verificar se o som de sucesso foi tocado
     expect(mockAudioElement.play).toHaveBeenCalled();
   });
 
-  // Dados mock necessários
-  const mockGeoJsonData = {
-    type: 'FeatureCollection',
-    features: []
-  } as any;
+  it('should play success sound when distance is less than 500m in famous places mode', () => {
+    const mockCalculateDistance = calculateDistance as jest.MockedFunction<typeof calculateDistance>;
+    mockCalculateDistance.mockReturnValue(300); // 300m
 
-  const mockFamousPlace = {
-    id: '1',
-    name: 'Test Place',
-    latitude: -23.9618,
-    longitude: -46.3322,
-    category: 'Test',
-    description: 'Test description',
-    address: 'Test address',
-    imageUrl: 'test.jpg'
-  };
-}); 
+    const { result } = renderHook(() => 
+      useMapGame(mockGeoJsonData, 'famous_places', mockFamousPlace, jest.fn())
+    );
+
+    // Simular clique no mapa
+    act(() => {
+      result.current.handleMapClick({ lat: -23.9618, lng: -46.3322 } as any);
+    });
+
+    // Verificar se o som de sucesso foi tocado
+    expect(mockAudioElement.play).toHaveBeenCalled();
+  });
+
+  it('should not play success sound when distance is greater than 500m in famous places mode', () => {
+    const mockCalculateDistance = calculateDistance as jest.MockedFunction<typeof calculateDistance>;
+    mockCalculateDistance.mockReturnValue(600); // 600m
+
+    const { result } = renderHook(() => 
+      useMapGame(mockGeoJsonData, 'famous_places', mockFamousPlace, jest.fn())
+    );
+
+    // Simular clique no mapa
+    act(() => {
+      result.current.handleMapClick({ lat: -23.9618, lng: -46.3322 } as any);
+    });
+
+    // Verificar se o som de sucesso não foi tocado
+    expect(mockAudioElement.play).not.toHaveBeenCalled();
+  });
+});

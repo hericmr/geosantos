@@ -3,6 +3,7 @@ import Map from './Map';
 import './Game.css';
 import { useGameState } from '../hooks/useGameState';
 import { GameControls } from './ui/GameControls';
+import { getProgressBarColor } from '../utils/gameConstants';
 
 const Game: React.FC = () => {
     const { gameState } = useGameState();
@@ -13,7 +14,7 @@ const Game: React.FC = () => {
                 <h1>O CAIÇARA</h1>
                 <div className="game-stats">
                     <span>Pontuação: {gameState.score}</span>
-                    <span>Tempo: {gameState.timeLeft}</span>
+                    <span>Tempo: {gameState.globalTimeLeft}</span>
                 </div>
             </div>
             {/* A exibição do lugar famoso deve ser feita no Map ou em um componente que recebe currentFamousPlace do FamousPlacesManager */}
@@ -24,13 +25,13 @@ const Game: React.FC = () => {
             <GameControls
                 gameStarted={gameState.gameStarted}
                 currentNeighborhood={gameState.currentNeighborhood}
-                timeLeft={gameState.timeLeft}
-                totalTimeLeft={gameState.totalTimeLeft}
+                globalTimeLeft={gameState.globalTimeLeft}
+                roundTimeLeft={gameState.roundTimeLeft}
                 roundNumber={gameState.roundNumber}
                 roundInitialTime={gameState.roundInitialTime}
                 score={gameState.score}
                 onStartGame={() => {}}
-                getProgressBarColor={() => '#1B4D3E'}
+                getProgressBarColor={getProgressBarColor}
                 currentMode={gameState.gameMode}
             />
         </div>
