@@ -4,7 +4,8 @@ Jogo educativo sobre a cidade de Santos (SP)
 ## VISÃO GERAL
 
 GeoSantos é um jogo casual educativo e acessível via navegador. Nele os jogadores precisam localizar bairros e locais importantes no território do município de Santos, SP. Em mapa interativo, o jogador clica no ponto que acredita ser o correto. A pontuação é baseada na distância em relação à localização real e no tempo de resposta. Funciona direto no navegador (em computadores) — sem necessidade de instalar nada. 
-Acesse o jogo em: https://hericmr.github.io/geosantos/
+
+**🎮 Acesse o jogo:** https://hericmr.github.io/geosantos/
 
 ![Tela Inicial do GeoSantos](readme1.png)
 *Interface principal do jogo GeoSantos - Desafio Geográfico de Santos*
@@ -18,6 +19,54 @@ Os locais registrados no GeoSantos são pontos importantes da cidade de Santos q
 Entre os elementos mapeados, encontram-se narrativas relacionadas à escravidão e às lutas do povo negro, à resistência contra a ditadura empresarial-militar (1964-1984) e aos movimentos que moldaram e continuam a moldar a identidade da região.
 
 Os materiais cartográficos e textuais disponíveis foram produzidos pelas(os) estudantes de Serviço Social da UNIFESP, dos turnos vespertino e noturno, durante a Unidade Curricular de Política Social 2, nos anos de 2024 e 2025, ministrada pela professora Dra. Tania Diniz.
+
+---
+
+## Modos de Jogo
+
+### 🏠 Modo Bairros
+- **Objetivo:** Localizar bairros específicos de Santos no mapa
+- **Mecânica:** O jogo apresenta um bairro e você deve clicar onde acredita que ele está localizado
+- **Pontuação:** Baseada na proximidade do clique (máximo 3000 pontos)
+- **Bônus:** Tempo extra para acertos precisos
+
+### 🏛️ Modo Lugares Famosos
+- **Objetivo:** Localizar pontos turísticos e lugares históricos de Santos
+- **Mecânica:** Modal com informações do lugar + localização no mapa
+- **Pontuação:** Sistema competitivo baseado na distância (máximo 3000 pontos)
+- **Acerto:** Dentro de 100 metros do local correto
+
+---
+
+## Gameplay - Modo Lugares Famosos
+
+O modo "Lugares Famosos" desafia os jogadores a localizar pontos turísticos, monumentos históricos e locais importantes de Santos. Veja como funciona:
+
+### Interface do Jogo
+
+![Gameplay 1 - Monumento Mães de Maio](readme2.png)
+*Localizando o Monumento Mães de Maio - Memorial em homenagem às vítimas dos Crimes de Maio de 2006*
+
+![Gameplay 2 - Parque Cultural Vila de São Vicente](readme3.png)
+*Encontrando o Parque Cultural Vila de São Vicente - Reconstrução da Vila de 1532*
+
+![Gameplay 3 - Quilombo do Pai Felipe](readme4.png)
+*Localizando o Quilombo do Pai Felipe - Comunidade histórica de resistência cultural*
+
+### Como Jogar
+
+1. **Modal Informativo**: O jogo mostra uma imagem e informações sobre o lugar famoso
+2. **Clique no Mapa**: Clique onde você acredita que o local está localizado
+3. **Feedback Imediato**: Veja a distância até o local correto e pontuação obtida
+4. **História e Contexto**: Leia sobre a importância histórica e cultural do local
+5. **Próxima Rodada**: Continue para o próximo desafio
+
+### Sistema de Pontuação
+
+- **Distância**: Quanto mais próximo do local correto, mais pontos
+- **Tempo**: Respostas rápidas ganham bônus de tempo
+- **Acerto Perfeito**: Dentro de 100 metros = pontuação máxima
+- **Bônus de Tempo**: Acertos precisos ganham segundos extras para próxima rodada
 
 ---
 
@@ -87,111 +136,56 @@ Os materiais cartográficos e textuais disponíveis foram produzidos pelas(os) e
 
 ---
 
-## Gameplay - Modo Lugares Famosos
-
-O modo "Lugares Famosos" desafia os jogadores a localizar pontos turísticos, monumentos históricos e locais importantes de Santos. Veja como funciona:
-
-### Interface do Jogo
-
-![Gameplay 1 - Monumento Mães de Maio](readme2.png)
-*Localizando o Monumento Mães de Maio - Memorial em homenagem às vítimas dos Crimes de Maio de 2006*
-
-![Gameplay 2 - Parque Cultural Vila de São Vicente](readme3.png)
-*Encontrando o Parque Cultural Vila de São Vicente - Reconstrução da Vila de 1532*
-
-![Gameplay 3 - Quilombo do Pai Felipe](readme4.png)
-*Localizando o Quilombo do Pai Felipe - Comunidade histórica de resistência cultural*
-
-### Como Jogar
-
-1. **Modal Informativo**: O jogo mostra uma imagem e informações sobre o lugar famoso
-2. **Clique no Mapa**: Clique onde você acredita que o local está localizado
-3. **Feedback Imediato**: Veja a distância até o local correto e pontuação obtida
-4. **História e Contexto**: Leia sobre a importância histórica e cultural do local
-5. **Próxima Rodada**: Continue para o próximo desafio
-
-### Sistema de Pontuação
-
-- **Distância**: Quanto mais próximo do local correto, mais pontos
-- **Tempo**: Respostas rápidas ganham bônus de tempo
-- **Acerto Perfeito**: Dentro de 100 metros = pontuação máxima
-- **Bônus de Tempo**: Acertos precisos ganham segundos extras para próxima rodada
-
----
-
-O jogo ainda está em uma versão inicial. Sugestões e contribuições são mais que bem-vindas! Encontrou um problema ou tem uma ideia para melhorar o jogo? Abra uma issue ou envie uma pull request. Esse é um jogo de código aberto e a sua ajuda é fundamental para tornar "GeoSantos" ainda melhor!
-
-A lógica desse jogo também pode ser usada em jogos de outras naturezas como aprendizado de anatomia, biologia, astronomia... o céu é o limite.
-
----
-
-# 🗺️ Geosantos - Jogo educativo de sobre a cidade
+## 🛠️ Tecnologias Utilizadas
 
 [![Deploy Status](https://img.shields.io/badge/status-online-brightgreen)](https://hericmr.github.io/geosantos/)
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue)](https://www.typescriptlang.org/)
 [![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-green)](https://leafletjs.com/)
 
-**🎮 Acesse o jogo:** https://hericmr.github.io/geosantos/
+### Frontend
+- **React 18.2.0** - Framework principal
+- **TypeScript 5.8.2** - Tipagem estática
+- **Vite 6.2.2** - Build tool e dev server
+- **Leaflet 1.9.4** - Biblioteca de mapas
+- **React Leaflet 4.2.1** - Integração React-Leaflet
+- **Lucide React 0.525.0** - Ícones modernos
 
-Um jogo educativo interativo para aprender sobre os bairros e lugares importantes de Santos, SP. Oferece uma experiência gamificada de aprendizado geográfico.
+### Backend & Dados
+- **Supabase** - Backend as a Service
+- **GeoJSON** - Dados geográficos dos bairros
+- **Turf.js** - Análise geoespacial
 
-## 🎯 Sobre o Jogo
+### Testes
+- **Vitest** - Framework de testes
+- **React Testing Library** - Testes de componentes
+- **Jest DOM** - Matchers para DOM
 
-O Geosantos é um jogo de geografia que desafia os jogadores a localizar bairros e lugares famosos de Santos no mapa. Com dois modos de jogo distintos, sistema de pontuação dinâmico e ranking competitivo, o jogo torna o aprendizado geográfico divertido e envolvente.
+---
 
-### 🏠 Modo Bairros
-- **Objetivo:** Localizar bairros específicos de Santos no mapa
-- **Mecânica:** O jogo apresenta um bairro e você deve clicar onde acredita que ele está localizado
-- **Pontuação:** Baseada na proximidade do clique (máximo 3000 pontos)
-- **Bônus:** Tempo extra para acertos precisos
+## 📁 Estrutura do Projeto
 
+```
 geosantos/
 ├── src/
 │   ├── components/
 │   │   ├── game/           # Componentes específicos do jogo
-│   │   │   ├── DistanceCircle.tsx
-│   │   │   ├── FamousPlacesManager.tsx
-│   │   │   ├── GameAudioManager.tsx
-│   │   │   ├── GeoJSONLayer.tsx
-│   │   │   ├── MapEvents.tsx
-│   │   │   └── NeighborhoodManager.tsx
 │   │   ├── ui/             # Componentes de interface
-│   │   │   ├── ActionButtons.tsx
-│   │   │   ├── AudioControls.tsx
-│   │   │   ├── FeedbackPanel.tsx
-│   │   │   ├── GameControls.tsx
-│   │   │   ├── GameOverModal.tsx
-│   │   │   ├── ScoreDisplay.tsx
-│   │   │   └── StartScreen.tsx
 │   │   ├── Game.tsx        # Componente principal do jogo
 │   │   └── Map.tsx         # Componente do mapa
 │   ├── hooks/              # Custom hooks
-│   │   ├── useFamousPlaces.ts
-│   │   ├── useGameState.ts
-│   │   ├── useMapGame.ts
-│   │   └── useMobileDetection.ts
 │   ├── types/              # Definições TypeScript
-│   │   ├── game.ts
-│   │   └── famousPlaces.ts
 │   ├── utils/              # Utilitários
-│   │   ├── gameUtils.ts
-│   │   └── gameConstants.ts
 │   ├── constants/          # Constantes do jogo
-│   │   └── game.ts
 │   ├── lib/                # Configurações externas
-│   │   └── supabase.ts
 │   └── styles/             # Estilos globais
-│       ├── modern-ui.css
-│       └── pixel-art-ui.css
 ├── public/
 │   ├── assets/             # Recursos estáticos
-│   │   ├── audio/          # Efeitos sonoros
-│   │   ├── images/         # Imagens e ícones
-│   │   └── data/           # Dados GeoJSON
 │   └── data/               # Dados dos bairros
 └── docs/                   # Documentação
 ```
+
+---
 
 ## 🚀 Como Executar Localmente
 
@@ -226,6 +220,8 @@ npm run lint         # Verificar código
 npm run deploy       # Deploy para GitHub Pages
 ```
 
+---
+
 ## 🧪 Testes
 
 O projeto inclui uma suíte completa de testes:
@@ -244,11 +240,7 @@ npm run test:ui
 npm run coverage
 ```
 
-### Estrutura de Testes
-- **Componentes:** Testes unitários para todos os componentes principais
-- **Hooks:** Testes para custom hooks
-- **Utilitários:** Testes para funções utilitárias
-- **Integração:** Testes de fluxo do jogo
+---
 
 ## 🎨 Características Técnicas
 
@@ -276,6 +268,8 @@ npm run coverage
 - **Controles de volume** independentes
 - **Mute** global
 
+---
+
 ## 📊 Sistema de Ranking
 
 - **Persistência** via Supabase
@@ -283,6 +277,8 @@ npm run coverage
 - **Estatísticas** detalhadas
 - **Posicionamento** em tempo real
 - **Compartilhamento** de resultados
+
+---
 
 ## 🔧 Configuração de Ambiente
 
@@ -310,6 +306,8 @@ CREATE TABLE rankings (
 );
 ```
 
+---
+
 ## 📈 Roadmap
 
 ### Próximas Funcionalidades
@@ -325,8 +323,15 @@ CREATE TABLE rankings (
 - [ ] Cache inteligente
 - [ ] Analytics avançado
 
+---
+
 ## 🤝 Contribuindo
 
+O jogo ainda está em uma versão inicial. Sugestões e contribuições são mais que bem-vindas! Encontrou um problema ou tem uma ideia para melhorar o jogo? Abra uma issue ou envie uma pull request. Esse é um jogo de código aberto e a sua ajuda é fundamental para tornar "GeoSantos" ainda melhor!
+
+A lógica desse jogo também pode ser usada em jogos de outras naturezas como aprendizado de anatomia, biologia, astronomia... o céu é o limite.
+
+### Como Contribuir
 1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
 3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
@@ -339,9 +344,7 @@ CREATE TABLE rankings (
 - **Prettier** para formatação
 - **Conventional Commits** para mensagens
 
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+---
 
 ## 👨‍💻 Autor
 
