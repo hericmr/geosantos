@@ -6,6 +6,9 @@ Jogo educativo sobre a cidade de Santos (SP)
 GeoSantos é um jogo casual educativo e acessível via navegador. Nele os jogadores precisam localizar bairros e locais importantes no território do município de Santos, SP. Em mapa interativo, o jogador clica no ponto que acredita ser o correto. A pontuação é baseada na distância em relação à localização real e no tempo de resposta. Funciona direto no navegador (em computadores) — sem necessidade de instalar nada. 
 Acesse o jogo em: https://hericmr.github.io/geosantos/
 
+![Tela Inicial do GeoSantos](readme1.png)
+*Interface principal do jogo GeoSantos - Desafio Geográfico de Santos*
+
 ---
 
 ## Sobre os dados incluídos no jogo e a pesquisa feita
