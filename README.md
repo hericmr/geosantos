@@ -22,22 +22,6 @@ Os materiais cartográficos e textuais disponíveis foram produzidos pelas(os) e
 
 ---
 
-## Modos de Jogo
-
-### 🏠 Modo Bairros
-- **Objetivo:** Localizar bairros específicos de Santos no mapa
-- **Mecânica:** O jogo apresenta um bairro e você deve clicar onde acredita que ele está localizado
-- **Pontuação:** Baseada na proximidade do clique (máximo 3000 pontos)
-- **Bônus:** Tempo extra para acertos precisos
-
-### 🏛️ Modo Lugares Famosos
-- **Objetivo:** Localizar pontos turísticos e lugares históricos de Santos
-- **Mecânica:** Modal com informações do lugar + localização no mapa
-- **Pontuação:** Sistema competitivo baseado na distância (máximo 3000 pontos)
-- **Acerto:** Dentro de 100 metros do local correto
-
----
-
 ## Gameplay - Modo Lugares Famosos
 
 O modo "Lugares Famosos" desafia os jogadores a localizar pontos turísticos, monumentos históricos e locais importantes de Santos. Veja como funciona:
@@ -53,22 +37,6 @@ O modo "Lugares Famosos" desafia os jogadores a localizar pontos turísticos, mo
 ![Gameplay 3 - Quilombo do Pai Felipe](readme4.png)
 *Localizando o Quilombo do Pai Felipe - Comunidade histórica de resistência cultural*
 
-### Como Jogar
-
-1. **Modal Informativo**: O jogo mostra uma imagem e informações sobre o lugar famoso
-2. **Clique no Mapa**: Clique onde você acredita que o local está localizado
-3. **Feedback Imediato**: Veja a distância até o local correto e pontuação obtida
-4. **História e Contexto**: Leia sobre a importância histórica e cultural do local
-5. **Próxima Rodada**: Continue para o próximo desafio
-
-### Sistema de Pontuação
-
-- **Distância**: Quanto mais próximo do local correto, mais pontos
-- **Tempo**: Respostas rápidas ganham bônus de tempo
-- **Acerto Perfeito**: Dentro de 100 metros = pontuação máxima
-- **Bônus de Tempo**: Acertos precisos ganham segundos extras para próxima rodada
-
----
 
 ## Locais presentes no jogo GeoSantos
 
@@ -206,126 +174,7 @@ npm install
 npm run dev
 ```
 
-### Acesse o jogo
-Abra seu navegador e acesse: `http://localhost:5173/geosantos/`
-
-### Scripts Disponíveis
-```bash
-npm run dev          # Servidor de desenvolvimento
-npm run build        # Build para produção
-npm run preview      # Preview do build
-npm run test         # Executar testes
-npm run test:watch   # Testes em modo watch
-npm run lint         # Verificar código
-npm run deploy       # Deploy para GitHub Pages
-```
-
----
-
-## 🧪 Testes
-
-O projeto inclui uma suíte completa de testes:
-
-```bash
-# Executar todos os testes
-npm test
-
-# Testes em modo watch
-npm run test:watch
-
-# Testes com UI
-npm run test:ui
-
-# Cobertura de testes
-npm run coverage
-```
-
----
-
-## 🎨 Características Técnicas
-
-### Performance
-- **Lazy Loading** de componentes
-- **Memoização** de cálculos pesados
-- **Otimização** de re-renders
-- **Preload** de recursos críticos
-
-### Acessibilidade
-- **Navegação por teclado** completa
-- **Screen reader** friendly
-- **Contraste** adequado
-- **Reduced motion** support
-
-### Responsividade
-- **Mobile-first** design
-- **Touch-friendly** interface
-- **Adaptive** layout
-- **Cross-browser** compatibility
-
-### Áudio
-- **Efeitos sonoros** para feedback
-- **Música de fundo** opcional
-- **Controles de volume** independentes
-- **Mute** global
-
----
-
-## 📊 Sistema de Ranking
-
-- **Persistência** via Supabase
-- **Top players** global
-- **Estatísticas** detalhadas
-- **Posicionamento** em tempo real
-- **Compartilhamento** de resultados
-
----
-
-## 🔧 Configuração de Ambiente
-
-### Variáveis de Ambiente
-Crie um arquivo `.env.local` na raiz do projeto:
-
-```env
-VITE_SUPABASE_URL=sua_url_do_supabase
-VITE_SUPABASE_ANON_KEY=sua_chave_anonima
-```
-
-### Supabase Setup
-1. Crie uma conta no [Supabase](https://supabase.com)
-2. Crie um novo projeto
-3. Configure a tabela de ranking:
-```sql
-CREATE TABLE rankings (
-  id SERIAL PRIMARY KEY,
-  player_name VARCHAR(50) NOT NULL,
-  score INTEGER NOT NULL,
-  play_time INTEGER NOT NULL,
-  rounds_played INTEGER NOT NULL,
-  accuracy DECIMAL(3,2) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-```
-
----
-
-## 📈 Roadmap
-
-### Próximas Funcionalidades
-- [ ] Modo multiplayer
-- [ ] Mais cidades brasileiras
-- [ ] Sistema de conquistas
-- [ ] Modo história
-- [ ] Integração com redes sociais
-
-### Melhorias Técnicas
-- [ ] PWA (Progressive Web App)
-- [ ] Offline mode
-- [ ] Cache inteligente
-- [ ] Analytics avançado
-
----
-
-## 🤝 Contribuindo
+# 🤝 Contribuindo
 
 O jogo ainda está em uma versão inicial. Sugestões e contribuições são mais que bem-vindas! Encontrou um problema ou tem uma ideia para melhorar o jogo? Abra uma issue ou envie uma pull request. Esse é um jogo de código aberto e a sua ajuda é fundamental para tornar "GeoSantos" ainda melhor!
 
@@ -338,12 +187,6 @@ A lógica desse jogo também pode ser usada em jogos de outras naturezas como ap
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-### Padrões de Código
-- **TypeScript** strict mode
-- **ESLint** para linting
-- **Prettier** para formatação
-- **Conventional Commits** para mensagens
-
 ---
 
 ## 👨‍💻 Autor
@@ -352,13 +195,5 @@ A lógica desse jogo também pode ser usada em jogos de outras naturezas como ap
 - GitHub: [@hericmr](https://github.com/hericmr)
 - LinkedIn: [Héric Moura](https://www.linkedin.com/in/heric-moura/)
 
-## 🙏 Agradecimentos
 
-- **Prefeitura de Santos** pelos dados geográficos
-- **Comunidade React** pelo ecossistema incrível
-- **Leaflet** pela biblioteca de mapas
-- **Supabase** pela infraestrutura backend
-
----
-
-**🎮 Divirta-se explorando Santos!** 🗺️
+**🎮 Espero que vcs se divirtam jogando como eu me diverti!** 🗺️
