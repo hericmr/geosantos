@@ -7,7 +7,7 @@ GeoSantos é um jogo casual educativo e acessível via navegador. Nele os jogado
 
 **🎮 Acesse o jogo:** https://hericmr.github.io/geosantos/
 
-![Tela Inicial do GeoSantos](readme1.png)
+![Tela Inicial do GeoSantos](public/assets/images/readme1.png)
 *Interface principal do jogo GeoSantos - Desafio Geográfico de Santos*
 
 ---
@@ -28,13 +28,13 @@ O modo "Lugares Famosos" desafia os jogadores a localizar pontos turísticos, mo
 
 ### Interface do Jogo
 
-![Gameplay 1 - Monumento Mães de Maio](readme2.png)
+![Gameplay 1 - Monumento Mães de Maio](public/assets/images/readme2.png)
 *Localizando o Monumento Mães de Maio - Memorial em homenagem às vítimas dos Crimes de Maio de 2006*
 
-![Gameplay 2 - Parque Cultural Vila de São Vicente](readme3.png)
+![Gameplay 2 - Parque Cultural Vila de São Vicente](public/assets/images/readme3.png)
 *Encontrando o Parque Cultural Vila de São Vicente - Reconstrução da Vila de 1532*
 
-![Gameplay 3 - Quilombo do Pai Felipe](readme4.png)
+![Gameplay 3 - Quilombo do Pai Felipe](public/assets/images/readme4.png)
 *Localizando o Quilombo do Pai Felipe - Comunidade histórica de resistência cultural*
 
 
