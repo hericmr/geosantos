@@ -100,9 +100,9 @@ export const GameControls: React.FC<GameControlsProps> = ({
             bottom: 0
           }}>
             <div style={{
-              width: `${(globalTimeLeft / 15) * 100}%`,
+              width: `${(globalTimeLeft / roundInitialTime) * 100}%`,
               height: '100%',
-              background: `linear-gradient(90deg, ${getProgressBarColor(globalTimeLeft, 15)}, ${getProgressBarColor(globalTimeLeft, 15)}CC)`,
+              background: `linear-gradient(90deg, ${getProgressBarColor(globalTimeLeft, roundInitialTime)}, ${getProgressBarColor(globalTimeLeft, roundInitialTime)}CC)`,
               transition: 'width 0.1s linear',
               position: 'absolute',
               left: 0,

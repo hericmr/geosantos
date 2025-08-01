@@ -587,9 +587,8 @@ export const useMapGame = (
       progressIntervalRef.current = null;
     }
 
+    // Não definir roundInitialTime e roundTimeLeft aqui, pois serão definidos no startNextRound
     updateGameState({
-      roundInitialTime: ROUND_TIME,
-      roundTimeLeft: ROUND_TIME,
       isPaused: false,
       showFeedback: false,
       feedbackOpacity: 0,

@@ -8,8 +8,8 @@ export const useGameState = () => {
     currentNeighborhood: '',
     score: 0,
     globalTimeLeft: INITIAL_TIME,
-    roundTimeLeft: ROUND_TIME,
-    roundInitialTime: ROUND_TIME,
+    roundTimeLeft: INITIAL_TIME, // Usar INITIAL_TIME em vez de ROUND_TIME
+    roundInitialTime: INITIAL_TIME, // Usar INITIAL_TIME em vez de ROUND_TIME
     roundNumber: 1,
     gameOver: false,
     gameStarted: false,
@@ -65,8 +65,8 @@ export const useGameState = () => {
         score: 0,
         gameOver: false,
         globalTimeLeft: INITIAL_TIME,
-        roundTimeLeft: ROUND_TIME,
-        roundInitialTime: ROUND_TIME,
+        roundTimeLeft: INITIAL_TIME, // Usar o tempo inicial como tempo da rodada
+        roundInitialTime: INITIAL_TIME, // Usar o tempo inicial como referência da barra
         roundNumber: 1,
         isCountingDown: false,
         isPaused: false,
@@ -100,8 +100,8 @@ export const useGameState = () => {
           showFeedback: false,
           feedbackOpacity: 0,
           globalTimeLeft: newGlobalTime, // Aplicar bônus
-          roundTimeLeft: ROUND_TIME,
-          roundInitialTime: ROUND_TIME,
+          roundTimeLeft: newGlobalTime, // Usar o tempo global disponível
+          roundInitialTime: newGlobalTime, // Usar o tempo global como tempo inicial da rodada
           roundNumber: nextRoundNumber,
           isCountingDown: false,
           currentNeighborhood: '',
@@ -119,8 +119,8 @@ export const useGameState = () => {
           showFeedback: false,
           feedbackOpacity: 0,
           globalTimeLeft: newGlobalTime, // Aplicar bônus
-          roundTimeLeft: ROUND_TIME,
-          roundInitialTime: ROUND_TIME,
+          roundTimeLeft: newGlobalTime, // Usar o tempo global disponível
+          roundInitialTime: newGlobalTime, // Usar o tempo global como tempo inicial da rodada
           roundNumber: nextRoundNumber,
           isCountingDown: false,
           currentNeighborhood: neighborhood,
