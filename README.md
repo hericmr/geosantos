@@ -87,6 +87,38 @@ Os materiais cartográficos e textuais disponíveis foram produzidos pelas(os) e
 
 ---
 
+## Gameplay - Modo Lugares Famosos
+
+O modo "Lugares Famosos" desafia os jogadores a localizar pontos turísticos, monumentos históricos e locais importantes de Santos. Veja como funciona:
+
+### Interface do Jogo
+
+![Gameplay 1 - Monumento Mães de Maio](readme2.png)
+*Localizando o Monumento Mães de Maio - Memorial em homenagem às vítimas dos Crimes de Maio de 2006*
+
+![Gameplay 2 - Parque Cultural Vila de São Vicente](readme3.png)
+*Encontrando o Parque Cultural Vila de São Vicente - Reconstrução da Vila de 1532*
+
+![Gameplay 3 - Quilombo do Pai Felipe](readme4.png)
+*Localizando o Quilombo do Pai Felipe - Comunidade histórica de resistência cultural*
+
+### Como Jogar
+
+1. **Modal Informativo**: O jogo mostra uma imagem e informações sobre o lugar famoso
+2. **Clique no Mapa**: Clique onde você acredita que o local está localizado
+3. **Feedback Imediato**: Veja a distância até o local correto e pontuação obtida
+4. **História e Contexto**: Leia sobre a importância histórica e cultural do local
+5. **Próxima Rodada**: Continue para o próximo desafio
+
+### Sistema de Pontuação
+
+- **Distância**: Quanto mais próximo do local correto, mais pontos
+- **Tempo**: Respostas rápidas ganham bônus de tempo
+- **Acerto Perfeito**: Dentro de 100 metros = pontuação máxima
+- **Bônus de Tempo**: Acertos precisos ganham segundos extras para próxima rodada
+
+---
+
 O jogo ainda está em uma versão inicial. Sugestões e contribuições são mais que bem-vindas! Encontrou um problema ou tem uma ideia para melhorar o jogo? Abra uma issue ou envie uma pull request. Esse é um jogo de código aberto e a sua ajuda é fundamental para tornar "GeoSantos" ainda melhor!
 
 A lógica desse jogo também pode ser usada em jogos de outras naturezas como aprendizado de anatomia, biologia, astronomia... o céu é o limite.
