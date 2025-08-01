@@ -203,21 +203,22 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           textAlign: 'center'
         }}>
           <h1 style={{
-            fontSize: 'clamp(4.5rem, 10vw, 8rem)',
+            fontSize: 'clamp(5rem, 12vw, 9rem)',
             margin: '0',
             fontFamily: "'LaCartoonerie', sans-serif",
             fontWeight: 800,
             color: '#000000',
             lineHeight: 1.2,
             textTransform: 'uppercase',
-            letterSpacing: '0px',
-            textShadow: '3px 3px 0px #fff, -3px -3px 0px #fff, 3px -3px 0px #fff, -3px 3px 0px #fff'
+            letterSpacing: '2px',
+            textShadow: '3px 3px 0px #fff, -3px -3px 0px #fff, 3px -3px 0px #fff, -3px 3px 0px #fff',
+            animation: 'titleFloat 5s ease-in-out infinite'
           }}>
             GEOSANTOS
           </h1>
           
           <p style={{
-            fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
+            fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
             margin: '10px 0 40px 0',
             fontFamily: "'VT323', monospace",
             color: '#FFFFFF',
@@ -460,6 +461,18 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           </p>
         </div>
       </div>
+      <style>
+        {`
+          @keyframes titleFloat {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-8px);
+            }
+          }
+        `}
+      </style>
     </>
   );
 }; 

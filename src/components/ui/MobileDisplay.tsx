@@ -126,12 +126,13 @@ export const MobileDisplay: React.FC<MobileDisplayProps> = ({ onClose }) => {
           animation: 'bounceIn 1s ease-out'
         }}>
           <h1 style={{
-            fontSize: 'clamp(2rem, 8vw, 3rem)',
-            color: 'var(--accent-green)',
+            fontSize: 'clamp(2.5rem, 10vw, 3.5rem)',
+            color: '#000000',
             margin: '0 0 10px 0',
             fontFamily: "'LaCartoonerie', cursive",
             textShadow: '3px 3px 0px rgba(0, 0, 0, 0.8)',
-            letterSpacing: '2px'
+            letterSpacing: '4px',
+            animation: 'titleFloat 5s ease-in-out infinite'
           }}>
             GEOSANTOS
           </h1>
@@ -286,6 +287,15 @@ export const MobileDisplay: React.FC<MobileDisplayProps> = ({ onClose }) => {
       {/* CSS Animations */}
       <style>
         {`
+          @keyframes titleFloat {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-8px);
+            }
+          }
+
           @keyframes bounceIn {
             0% { 
               opacity: 0; 
