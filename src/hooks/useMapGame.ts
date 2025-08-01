@@ -115,7 +115,7 @@ export const useMapGame = (
       
       // Calcular tempo gasto na rodada e bônus de tempo para próxima rodada
       const timeSpent = clickDuration;
-      const timeBonus = calculateTimeBonus(score);
+      const timeBonus = calculateTimeBonus(score, gameMode);
       const newGlobalTime = Math.max(gameState.globalTimeLeft - timeSpent, 0);
       const isGameOver = newGlobalTime <= 0;
       
@@ -334,7 +334,7 @@ export const useMapGame = (
         
         // Calcular tempo gasto na rodada e bônus de tempo para próxima rodada
         const timeSpent = clickDuration;
-        const timeBonus = calculateTimeBonus(score);
+        const timeBonus = calculateTimeBonus(score, gameMode);
         const newGlobalTime = Math.max(gameState.globalTimeLeft - timeSpent, 0);
         const isGameOver = newGlobalTime <= 0;
         
@@ -460,7 +460,7 @@ export const useMapGame = (
 
         // Calcular tempo gasto na rodada e bônus de tempo para próxima rodada
         const timeSpent = clickDuration;
-        const timeBonus = calculateTimeBonus(score);
+        const timeBonus = calculateTimeBonus(score, gameMode);
         const newGlobalTime = Math.max(gameState.globalTimeLeft - timeSpent, 0);
         const newTotalDistance = gameState.totalDistance + distance;
         const isGameOverByTime = newGlobalTime <= 0;

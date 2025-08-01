@@ -126,6 +126,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [targetIconPosition, setTargetIconPosition] = useState<L.LatLng | null>(null);
   const { playerName, initializePlayerName } = usePlayerName();
   const gameStartAudioRef = useRef<HTMLAudioElement>(null);
+  const backgroundMusicRef = useRef<HTMLAudioElement>(null);
   
   const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
   const [currentFamousPlace, setCurrentFamousPlace] = useState<FamousPlace | null>(null);
@@ -224,6 +225,29 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     }
   }, [mapRef.current]);
 
+  // Controlar música de fundo baseado no estado do jogo
+  useEffect(() => {
+    if (backgroundMusicRef.current) {
+      if (gameState.gameStarted && !gameState.gameOver && !gameState.isMuted) {
+        // Iniciar música quando o jogo começa
+        backgroundMusicRef.current.volume = gameState.volume * 0.3; // Volume mais baixo para música de fundo
+        backgroundMusicRef.current.play().catch((error) => {
+          console.log('Erro ao tocar música de fundo:', error);
+        });
+      } else if (gameState.gameOver || gameState.isMuted) {
+        // Parar música quando o jogo termina ou está mutado
+        backgroundMusicRef.current.pause();
+      }
+    }
+  }, [gameState.gameStarted, gameState.gameOver, gameState.isMuted, gameState.volume]);
+
+  // Atualizar volume da música de fundo quando o volume muda
+  useEffect(() => {
+    if (backgroundMusicRef.current) {
+      backgroundMusicRef.current.volume = gameState.volume * 0.3; // Volume mais baixo para música de fundo
+    }
+  }, [gameState.volume]);
+
   // Detectar game over e calcular estatísticas
   useEffect(() => {
     if (gameState.gameOver && !showGameOver) {
@@ -269,6 +293,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       <audio ref={successSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/sucess.mp3`} preload="auto" />
       <audio ref={errorSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/error.mp3`} preload="auto" />
       <audio ref={gameStartAudioRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/game-start.mp3`} preload="auto" />
+      <audio ref={backgroundMusicRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/game_music.mp3`} preload="auto" loop />
       
       <style>
         {`

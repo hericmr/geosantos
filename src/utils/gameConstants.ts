@@ -26,10 +26,12 @@ export const TIME_BONUS_AMOUNTS = {
 };
 
 // Função para calcular o bônus de tempo baseado na pontuação
-export const calculateTimeBonus = (score: number): number => {
+export const calculateTimeBonus = (score: number, gameMode: 'neighborhoods' | 'famous_places' = 'neighborhoods'): number => {
   // Pontuação máxima possível é 3000 (clique direto no bairro)
   const maxScore = 3000;
-  const maxBonus = 4.0; // Máximo de 4 segundos de bônus (mais fácil)
+  
+  // Bônus máximo diferente para cada modo
+  const maxBonus = gameMode === 'famous_places' ? 6.0 : 4.0; // 6 segundos para lugares famosos, 4 para bairros
   
   // Calcula o bônus proporcional à pontuação
   // Quanto maior a pontuação, maior o bônus
