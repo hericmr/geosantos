@@ -13,10 +13,12 @@ interface RankingPlayer {
 
 interface GameRankingProps {
   variant?: 'game' | 'startScreen';
+  onClose?: () => void;
 }
 
 export const GameRanking: React.FC<GameRankingProps> = ({
-  variant = 'game'
+  variant = 'game',
+  onClose
 }) => {
   const [ranking, setRanking] = useState<RankingPlayer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -171,7 +173,11 @@ export const GameRanking: React.FC<GameRankingProps> = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setIsExpanded(!isExpanded);
+              if (variant === 'startScreen' && onClose) {
+                onClose();
+              } else {
+                setIsExpanded(!isExpanded);
+              }
             }}
             style={{
               background: 'none',
@@ -190,7 +196,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
               right: variant === 'startScreen' ? '16px' : '8px',
               zIndex: 10
             }}
-            aria-label="Fechar ranking"
+            aria-label={variant === 'startScreen' ? "Fechar ranking" : "Expandir/Recolher ranking"}
           >
             ✕
           </button>

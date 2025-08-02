@@ -293,7 +293,21 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       <audio ref={successSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/sucess.mp3`} preload="auto" />
       <audio ref={errorSoundRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/error.mp3`} preload="auto" />
       <audio ref={gameStartAudioRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/game-start.mp3`} preload="auto" />
-      <audio ref={backgroundMusicRef} src={`${import.meta.env.BASE_URL || ''}/assets/audio/game_music.mp3`} preload="auto" loop />
+      <audio 
+        ref={backgroundMusicRef} 
+        src={`${import.meta.env.BASE_URL || ''}/assets/audio/game_music.mp3`} 
+        preload="auto" 
+        loop 
+        onError={(e) => {
+          console.error('Erro ao carregar game_music.mp3:', e);
+        }}
+        onLoadStart={() => {
+          console.log('Iniciando carregamento de game_music.mp3');
+        }}
+        onCanPlay={() => {
+          console.log('game_music.mp3 carregado com sucesso');
+        }}
+      />
       
       <style>
         {`

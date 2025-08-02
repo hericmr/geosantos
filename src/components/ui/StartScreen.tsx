@@ -31,6 +31,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [firstFrameDataUrl, setFirstFrameDataUrl] = useState<string | null>(null);
+  const [showRanking, setShowRanking] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -421,9 +422,12 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           </div>
         </div>
 
-        <GameRanking 
-          variant="startScreen" 
-        />
+        {showRanking && (
+          <GameRanking 
+            variant="startScreen" 
+            onClose={() => setShowRanking(false)}
+          />
+        )}
 
         {/* Créditos */}
         <div style={{
