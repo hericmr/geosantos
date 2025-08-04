@@ -200,20 +200,34 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
               Voltar
             </button>
             
-            <h1 style={{
-              fontFamily: "'LaCartoonerie', sans-serif",
-              color: 'var(--accent-green)',
-              fontSize: '1.3rem',
-              textAlign: 'center',
-              textTransform: 'uppercase',
-              fontWeight: 'bold',
-              letterSpacing: '1px',
-              textShadow: '2px 2px 0 #222',
-              margin: 0,
-              flex: 1
-            }}>
-              Sugerir Novo Lugar
-            </h1>
+                      <h1 style={{
+            fontFamily: "'LaCartoonerie', sans-serif",
+            color: 'var(--accent-green)',
+            fontSize: '1.3rem',
+            textAlign: 'center',
+            textTransform: 'uppercase',
+            fontWeight: 'bold',
+            letterSpacing: '1px',
+            textShadow: '2px 2px 0 #222',
+            margin: 0,
+            flex: 1
+          }}>
+            Sugerir Novo Lugar
+          </h1>
+          
+          <p style={{
+            fontSize: '1rem',
+            color: 'var(--text-secondary)',
+            textAlign: 'center',
+            fontFamily: "'LaCartoonerie', sans-serif",
+            lineHeight: 1.5,
+            margin: '16px 0 0 0',
+            maxWidth: '600px'
+          }}>
+            Conhece um lugar interessante em Santos que deveria estar no jogo? 
+            Sugira novos pontos turísticos, locais históricos ou lugares especiais 
+            para que outros jogadores possam descobrir!
+          </p>
             
             {/* Espaçador para manter o título centralizado */}
             <div style={{ width: '80px' }}></div>

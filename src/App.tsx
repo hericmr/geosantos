@@ -4,7 +4,6 @@ import { AdminFamousPlaces } from './components/admin/AdminFamousPlaces';
 import Map from './components/Map'
 import './App.css'
 import { FamousPlacesWiki } from './components/ui/FamousPlacesWiki';
-import { SuggestPlacePage } from './components/ui/SuggestPlacePage';
 import { MobileDisplay } from './components/ui/MobileDisplay';
 import { useMobileDetection } from './hooks/useMobileDetection';
 
@@ -19,7 +18,6 @@ function App() {
         <Routes>
           <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
           <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
-          <Route path="/sugerir-lugar" element={<SuggestPlacePage />} />
           <Route path="/" element={
             <MobileDisplay 
               onClose={() => setShowMobileDisplay(false)}
@@ -38,7 +36,6 @@ function App() {
           {/* <Route path="/" element={<AppMain />} /> */}
           <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
           <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
-          <Route path="/sugerir-lugar" element={<SuggestPlacePage />} />
           <Route path="/" element={
             <div style={{
               margin: 0,
