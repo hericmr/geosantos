@@ -7,7 +7,8 @@ import {
 } from './GameIcons';
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
-import { BookOpenIcon } from 'lucide-react';
+import { BookOpenIcon, PlusIcon } from 'lucide-react';
+import { PlaceSuggestionForm } from './PlaceSuggestionForm';
 import backgroundVideo from '../../assets/images/background.webm';
 
 
@@ -33,11 +34,12 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   const [videoError, setVideoError] = useState(false);
   const [firstFrameDataUrl, setFirstFrameDataUrl] = useState<string | null>(null);
   const [showRanking, setShowRanking] = useState(true);
+  const [showSuggestionForm, setShowSuggestionForm] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
 
-  const menuOptions = useMemo(() => [
+  const mainMenuOptions = useMemo(() => [
     { 
       id: 'play_neighborhoods', 
       label: 'MODO: BAIRROS', 
@@ -66,7 +68,10 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       icon: TrophyIcon, 
       action: onShowLeaderboard,
       description: 'Veja as maiores pontuações e sua posição no ranking.'
-    },
+    }
+  ], [onStartGame, onShowLeaderboard, onSelectMode]);
+
+  const secondaryMenuOptions = useMemo(() => [
     { 
       id: 'wiki', 
       label: 'WIKI-GEOSANTOS', 
@@ -75,27 +80,37 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       description: 'Explore informações e curiosidades sobre os lugares do jogo.',
       as: Link, // Renderiza como um componente Link
       to: '/lugares-famosos' // O destino do Link
+    },
+    { 
+      id: 'suggest_place', 
+      label: 'SUGERIR NOVO LOCAL', 
+      icon: PlusIcon, 
+      action: () => { 
+        setShowSuggestionForm(true);
+      },
+      description: 'Sugira novos lugares para serem adicionados ao jogo.',
+      as: 'button' // Renderiza como um botão normal
     }
-  ], [onStartGame, onShowLeaderboard, onSelectMode]);
+  ], []);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedOption(prev => {
-        let newOption = prev > 0 ? prev - 1 : menuOptions.length - 1;
+        let newOption = prev > 0 ? prev - 1 : mainMenuOptions.length - 1;
         return newOption;
       });
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedOption(prev => {
-        let newOption = prev < menuOptions.length - 1 ? prev + 1 : 0;
+        let newOption = prev < mainMenuOptions.length - 1 ? prev + 1 : 0;
         return newOption;
       });
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      menuOptions[selectedOption].action?.();
+      mainMenuOptions[selectedOption].action?.();
     }
-  }, [menuOptions, selectedOption]);
+  }, [mainMenuOptions, selectedOption]);
 
   const captureFirstFrame = useCallback(() => {
     const video = videoRef.current;
@@ -243,15 +258,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           }}>
             GEOSANTOS
           </h1>
-          <p style={{
-            fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-            margin: '10px 0 40px 0',
-            fontFamily: "'VT323', monospace",
-            color: '#FFFFFF',
-            textShadow: '2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000'
-          }}>
-            DESAFIO GEOGRÁFICO DE SANTOS
-          </p>
+
         </div>
 
         {/* Estatísticas do jogador */}
@@ -355,58 +362,134 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           flexDirection: 'column',
           gap: '12px',
           minWidth: '300px',
-          alignItems: 'center'
+          alignItems: 'center',
+          marginTop: '60px'
         }}>
-          {menuOptions.map((option, index) => {
+          {mainMenuOptions.map((option, index) => {
             const IconComponent = option.icon;
             const isSelected = index === selectedOption;
-            const Component = option.as || 'button';
 
-            const buttonProps = {
-              key: option.id,
-              onClick: option.action,
-              style: {
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-                padding: '16px 24px',
-                background: isSelected ? 'var(--accent-blue)' : 'var(--bg-secondary)',
-                border: '3px solid var(--text-primary)',
-                borderRadius: '4px',
-                color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontFamily: "'LaCartoonerie', sans-serif",
-                fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                fontWeight: 400,
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
-                transform: isSelected ? 'translate(-2px, -2px)' : 'translate(0, 0)',
-                position: 'relative',
-                overflow: 'hidden',
-                opacity: 1,
-                textDecoration: 'none',
-                width: '100%'
-              },
-              onMouseEnter: () => setSelectedOption(index),
-              onMouseLeave: () => setSelectedOption(0),
-              ...(Component === Link && { to: option.to }),
+            const buttonStyle = {
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              padding: '16px 24px',
+              background: isSelected ? 'var(--accent-blue)' : 'var(--bg-secondary)',
+              border: '3px solid var(--text-primary)',
+              borderRadius: '4px',
+              color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontFamily: "'LaCartoonerie', sans-serif",
+              fontSize: 'clamp(0.8rem, 2vw, 1rem)',
+              fontWeight: 400,
+              textTransform: 'uppercase' as const,
+              letterSpacing: '1px',
+              boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
+              transform: isSelected ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+              position: 'relative' as const,
+              overflow: 'hidden',
+              opacity: 1,
+              textDecoration: 'none',
+              width: '100%'
             };
 
             return (
-              <Component {...buttonProps}>
+              <button
+                key={option.id}
+                style={buttonStyle}
+                onClick={option.action}
+                onMouseEnter={() => setSelectedOption(index)}
+                onMouseLeave={() => setSelectedOption(0)}
+              >
                 <IconComponent 
                   size={24} 
                   color={isSelected ? 'var(--bg-primary)' : 'var(--text-primary)'} 
                 />
                 {option.label}
-                {isSelected && (
-                  <div style={{ position: 'absolute', right: '16px' }}>
-                    ▶
-                  </div>
-                )}
-              </Component>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Menu secundário - botões menores */}
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          marginTop: '20px',
+          justifyContent: 'center'
+        }}>
+          {secondaryMenuOptions.map((option) => {
+            const IconComponent = option.icon;
+            const Component = option.as || 'button';
+
+            const smallButtonStyle = {
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              background: 'var(--bg-accent)',
+              border: '2px solid var(--text-primary)',
+              borderRadius: '4px',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontFamily: "'LaCartoonerie', sans-serif",
+              fontSize: 'clamp(0.7rem, 1.5vw, 0.8rem)',
+              fontWeight: 400,
+              textTransform: 'uppercase' as const,
+              letterSpacing: '1px',
+              boxShadow: 'var(--shadow-md)',
+              textDecoration: 'none'
+            };
+
+            const children = (
+              <>
+                <IconComponent size={16} color="var(--text-primary)" />
+                {option.label}
+              </>
+            );
+
+            if (Component === Link) {
+              return (
+                <Link
+                  key={option.id}
+                  style={smallButtonStyle}
+                  to={option.to!}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--accent-blue)';
+                    e.currentTarget.style.color = 'var(--bg-primary)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'var(--bg-accent)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {children}
+                </Link>
+              );
+            }
+
+            return (
+              <button
+                key={option.id}
+                style={smallButtonStyle}
+                onClick={option.action}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--accent-blue)';
+                  e.currentTarget.style.color = 'var(--bg-primary)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-accent)';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                {children}
+              </button>
             );
           })}
         </div>
@@ -528,26 +611,41 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               color: 'var(--accent-yellow)',
               textTransform: 'uppercase'
             }}>
-              {menuOptions[selectedOption].label}
+              {mainMenuOptions[selectedOption].label}
             </h3>
             <p style={{
               margin: 0,
               fontSize: 'clamp(1rem, 2vw, 1.1rem)',
               lineHeight: 1.4
             }}>
-              {menuOptions[selectedOption].description}
+              {mainMenuOptions[selectedOption].description}
             </p>
           </div>
         </div>
       </div>
+
+      {/* Formulário de Sugestão */}
+      {showSuggestionForm && (
+        <PlaceSuggestionForm onClose={() => setShowSuggestionForm(false)} />
+      )}
+
       <style>
         {`
           @keyframes titleFloat {
             0%, 100% {
-              transform: translateY(0);
+              transform: translateY(0) rotate(-1deg);
             }
             50% {
-              transform: translateY(-8px);
+              transform: translateY(-8px) rotate(1deg);
+            }
+          }
+          
+          @keyframes titleGlow {
+            0%, 100% {
+              filter: drop-shadow(0 0 5px var(--accent-yellow));
+            }
+            50% {
+              filter: drop-shadow(0 0 15px var(--accent-yellow)) drop-shadow(0 0 25px var(--accent-yellow));
             }
           }
         `}

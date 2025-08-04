@@ -4,6 +4,7 @@ import { AdminFamousPlaces } from './components/admin/AdminFamousPlaces';
 import Map from './components/Map'
 import './App.css'
 import { FamousPlacesWiki } from './components/ui/FamousPlacesWiki';
+import { SuggestPlacePage } from './components/ui/SuggestPlacePage';
 import { MobileDisplay } from './components/ui/MobileDisplay';
 import { useMobileDetection } from './hooks/useMobileDetection';
 
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
           <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
+          <Route path="/sugerir-lugar" element={<SuggestPlacePage />} />
           <Route path="/" element={
             <MobileDisplay 
               onClose={() => setShowMobileDisplay(false)}
@@ -31,23 +33,24 @@ function App() {
   // Se não for mobile, mostra a interface normal
   return (
     <BrowserRouter basename="/geosantos">
-      <Routes>
-        {/* Outras rotas do seu app */}
-        {/* <Route path="/" element={<AppMain />} /> */}
-        <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
-        <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
-        <Route path="/" element={
-          <div style={{
-            margin: 0,
-            padding: 0,
-            width: '100vw',
-            height: '100vh',
-            overflow: 'hidden'
-          }}>
-            <Map center={[-23.9618, -46.3322]} zoom={13} />
-          </div>
-        } />
-      </Routes>
+              <Routes>
+          {/* Outras rotas do seu app */}
+          {/* <Route path="/" element={<AppMain />} /> */}
+          <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
+          <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
+          <Route path="/sugerir-lugar" element={<SuggestPlacePage />} />
+          <Route path="/" element={
+            <div style={{
+              margin: 0,
+              padding: 0,
+              width: '100vw',
+              height: '100vh',
+              overflow: 'hidden'
+            }}>
+              <Map center={[-23.9618, -46.3322]} zoom={13} />
+            </div>
+          } />
+        </Routes>
     </BrowserRouter>
   );
 }
