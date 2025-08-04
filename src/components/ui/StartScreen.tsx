@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   PlayIcon, 
   TrophyIcon, 
@@ -37,17 +38,44 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
 
   const menuOptions = useMemo(() => [
-    { id: 'famous_places', label: 'LUGARES FAMOSOS', icon: LandmarkIcon, action: () => { 
-      console.log('[StartScreen] Lugares famosos selecionado');
-      onSelectMode?.('famous_places'); 
-      onStartGame(); 
-    }, isMode: true },
-    { id: 'play', label: 'JOGAR', icon: PlayIcon, action: () => {
-      console.log('[StartScreen] Jogar selecionado');
-      onStartGame();
-    } },
-    { id: 'leaderboard', label: 'RANKING', icon: TrophyIcon, action: onShowLeaderboard },
-    { id: 'wiki', label: 'CONHEÇA OS LUGARES', icon: BookOpenIcon, action: () => { window.location.href = '/geosantos/lugares-famosos'; } }
+    { 
+      id: 'play_neighborhoods', 
+      label: 'MODO: BAIRROS', 
+      icon: PlayIcon, 
+      action: () => {
+        console.log('[StartScreen] Modo Bairros selecionado');
+        onSelectMode?.('neighborhoods');
+        onStartGame();
+      },
+      description: 'Teste seus conhecimentos sobre os bairros de Santos.'
+    },
+    { 
+      id: 'play_famous_places', 
+      label: 'MODO: LUGARES FAMOSOS', 
+      icon: LandmarkIcon, 
+      action: () => { 
+        console.log('[StartScreen] Modo Lugares Famosos selecionado');
+        onSelectMode?.('famous_places'); 
+        onStartGame(); 
+      },
+      description: 'Acerte a localização de pontos turísticos e locais famosos.'
+    },
+    { 
+      id: 'leaderboard', 
+      label: 'VER RANKING', 
+      icon: TrophyIcon, 
+      action: onShowLeaderboard,
+      description: 'Veja as maiores pontuações e sua posição no ranking.'
+    },
+    { 
+      id: 'wiki', 
+      label: 'WIKI-GEOSANTOS', 
+      icon: BookOpenIcon, 
+      action: () => { window.location.href = '/geosantos/lugares-famosos'; },
+      description: 'Explore informações e curiosidades sobre os lugares do jogo.',
+      as: Link, // Renderiza como um componente Link
+      to: '/lugares-famosos' // O destino do Link
+    }
   ], [onStartGame, onShowLeaderboard, onSelectMode]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -183,7 +211,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         </video>
       </div>
 
-      {/* Container principal */}
+      {/* Container principal que engloba tudo */}
       <div style={{
         position: 'fixed',
         top: 0,
@@ -200,9 +228,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       }}>
 
         {/* Logo e título */}
-        <div style={{
-          textAlign: 'center'
-        }}>
+        <div style={{ textAlign: 'center' }}>
           <h1 style={{
             fontSize: 'clamp(5rem, 12vw, 9rem)',
             margin: '0',
@@ -217,7 +243,6 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           }}>
             GEOSANTOS
           </h1>
-          
           <p style={{
             fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
             margin: '10px 0 40px 0',
@@ -235,7 +260,8 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             display: 'flex',
             gap: '20px',
             flexWrap: 'wrap',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            marginBottom: '40px'
           }}>
             {highScore > 0 && (
               <div style={{
@@ -328,55 +354,59 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: '12px',
-          minWidth: '300px'
+          minWidth: '300px',
+          alignItems: 'center'
         }}>
           {menuOptions.map((option, index) => {
             const IconComponent = option.icon;
             const isSelected = index === selectedOption;
-            // const isDisabled = option.disabled; // REMOVIDO
+            const Component = option.as || 'button';
+
+            const buttonProps = {
+              key: option.id,
+              onClick: option.action,
+              style: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                padding: '16px 24px',
+                background: isSelected ? 'var(--accent-blue)' : 'var(--bg-secondary)',
+                border: '3px solid var(--text-primary)',
+                borderRadius: '4px',
+                color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: "'LaCartoonerie', sans-serif",
+                fontSize: 'clamp(0.8rem, 2vw, 1rem)',
+                fontWeight: 400,
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
+                transform: isSelected ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+                position: 'relative',
+                overflow: 'hidden',
+                opacity: 1,
+                textDecoration: 'none',
+                width: '100%'
+              },
+              onMouseEnter: () => setSelectedOption(index),
+              onMouseLeave: () => setSelectedOption(0),
+              ...(Component === Link && { to: option.to }),
+            };
+
             return (
-              <button
-                key={option.id}
-                onClick={option.action}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  padding: '16px 24px',
-                  background: isSelected ? 'var(--accent-blue)' : 'var(--bg-secondary)',
-                  border: '3px solid var(--text-primary)',
-                  borderRadius: '4px',
-                  color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
-                  cursor: 'pointer',
-                  transition: 'all 0.1s steps(1)',
-                  fontFamily: "'LaCartoonerie', sans-serif",
-                  fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                  fontWeight: 400,
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
-                  transform: isSelected ? 'translate(-2px, -2px)' : 'translate(0, 0)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  opacity: 1
-                }}
-                onMouseEnter={() => setSelectedOption(index)}
-                onMouseLeave={() => setSelectedOption(0)}
-              >
+              <Component {...buttonProps}>
                 <IconComponent 
                   size={24} 
                   color={isSelected ? 'var(--bg-primary)' : 'var(--text-primary)'} 
                 />
                 {option.label}
                 {isSelected && (
-                  <div style={{
-                    position: 'absolute',
-                    right: '16px'
-                  }}>
+                  <div style={{ position: 'absolute', right: '16px' }}>
                     ▶
                   </div>
                 )}
-              </button>
+              </Component>
             );
           })}
         </div>
@@ -422,13 +452,6 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           </div>
         </div>
 
-        {showRanking && (
-          <GameRanking 
-            variant="startScreen" 
-            onClose={() => setShowRanking(false)}
-          />
-        )}
-
         {/* Créditos */}
         <div style={{
           textAlign: 'center',
@@ -453,16 +476,68 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#0066CC';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#000000';
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#0066CC'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#000000'; }}
             >
               hericmr
             </a>
           </p>
+        </div>
+
+        {/* Container para elementos nos cantos inferiores */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '20px',
+          right: '20px',
+          width: 'calc(100% - 40px)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          pointerEvents: 'none'
+        }}>
+          {/* Ranking no canto esquerdo */}
+          <div style={{ pointerEvents: 'auto' }}>
+            {showRanking && (
+              <GameRanking 
+                variant="startScreen" 
+                onClose={() => setShowRanking(false)}
+              />
+            )}
+          </div>
+
+          {/* Caixa de Descrição no canto direito */}
+          <div style={{
+            pointerEvents: 'auto',
+            width: '320px',
+            padding: '20px',
+            background: 'var(--bg-secondary)',
+            border: '3px solid var(--text-primary)',
+            borderRadius: '4px',
+            boxShadow: 'var(--shadow-md)',
+            fontFamily: "'LaCartoonerie', sans-serif",
+            color: 'var(--text-primary)',
+            transition: 'opacity 0.3s ease, transform 0.3s ease',
+            opacity: selectedOption !== 0 ? 1 : 0,
+            transform: selectedOption !== 0 ? 'translateY(0)' : 'translateY(20px)',
+            visibility: selectedOption !== 0 ? 'visible' : 'hidden'
+          }}>
+            <h3 style={{
+              margin: '0 0 10px 0',
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+              color: 'var(--accent-yellow)',
+              textTransform: 'uppercase'
+            }}>
+              {menuOptions[selectedOption].label}
+            </h3>
+            <p style={{
+              margin: 0,
+              fontSize: 'clamp(1rem, 2vw, 1.1rem)',
+              lineHeight: 1.4
+            }}>
+              {menuOptions[selectedOption].description}
+            </p>
+          </div>
         </div>
       </div>
       <style>

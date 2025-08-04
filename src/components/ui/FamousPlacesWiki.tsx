@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useFamousPlaces } from '../../hooks/useFamousPlaces';
 import { FamousPlace } from '../../types/famousPlaces';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -55,8 +56,8 @@ export const FamousPlacesWiki: React.FC = () => {
       flexWrap: 'wrap',
     }}>
       {/* Botão Voltar */}
-      <button
-        onClick={handleVoltar}
+      <Link
+        to="/"
         style={{
           position: 'absolute',
           top: '20px',
@@ -74,19 +75,12 @@ export const FamousPlacesWiki: React.FC = () => {
           alignItems: 'center',
           gap: '8px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-          transition: 'all 0.2s ease'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#2d6a4f';
-          e.currentTarget.style.transform = 'translateY(-1px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = '#1a4d2e';
-          e.currentTarget.style.transform = 'translateY(0)';
+          transition: 'all 0.2s ease',
+          textDecoration: 'none'
         }}
       >
         ← Voltar ao Jogo
-      </button>
+      </Link>
 
       {/* Coluna da lista de lugares */}
       <div style={{
