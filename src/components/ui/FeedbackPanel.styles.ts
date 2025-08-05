@@ -29,7 +29,7 @@ export const styles: FeedbackPanelStyles = {
     padding: 'clamp(16px, 3vw, 24px)',
     borderRadius: isMobile ? '4px 4px 0 0' : '4px',
     boxShadow: 'var(--shadow-xl)',
-    border: '3px solid var(--text-primary)',
+    border: 'none',
     margin: isMobile ? '0' : '10px',
     animation: gameOver ? 'slideUp 0.3s ease-out' : isMobile ? 'slideUp 0.3s ease-out' : 'fadeInScale 0.3s ease-out',
     maxHeight: isMobile ? '90vh' : '90vh',

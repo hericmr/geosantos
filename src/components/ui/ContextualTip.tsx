@@ -25,7 +25,7 @@ export const ContextualTip: React.FC<ContextualTipProps> = ({
     tipData = {
       description: currentFamousPlace.description,
       icon: "landmark",
-      category: "LUGAR FAMOSO"
+      category: currentFamousPlace.name?.toUpperCase() || "LUGAR FAMOSO"
     };
   } else {
     // Para bairros, não mostramos informações por enquanto

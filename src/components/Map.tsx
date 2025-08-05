@@ -131,6 +131,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
   const [currentFamousPlace, setCurrentFamousPlace] = useState<FamousPlace | null>(null);
   const [showFamousPlaceModal, setShowFamousPlaceModal] = useState(false);
+  const [isModalCentered, setIsModalCentered] = useState(true);
+  const [isTimerPaused, setIsTimerPaused] = useState(false);
+  const [modalTimeProgress, setModalTimeProgress] = useState(0);
   // Controle de lugares famosos já usados
   const { places: famousPlaces, isLoading: famousPlacesLoading, error: famousPlacesError, getRandomPlace } = useFamousPlaces();
   const lastFamousPlaceId = useRef<string | null>(null);
@@ -180,7 +183,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     setDistanceCircle,
     updateGameState,
     gameMode
-  } = useMapGame(geoJsonData, currentMode, currentFamousPlace, setTargetIconPosition);
+  } = useMapGame(geoJsonData, currentMode, currentFamousPlace, setTargetIconPosition, isTimerPaused);
 
   // Quando iniciar o jogo ou trocar para modo lugares famosos, seleciona o primeiro lugar
   useEffect(() => {
@@ -192,14 +195,53 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     }
   }, [currentMode, gameState.gameStarted, famousPlaces, selectNextFamousPlace]);
 
+  // Lógica de timing do modal de lugares famosos
   useEffect(() => {
-    if (currentMode === 'famous_places' && currentFamousPlace) {
-      console.log('[useEffect] Abrindo modal do lugar famoso:', currentFamousPlace);
+    if (currentMode === 'famous_places' && currentFamousPlace && gameState.gameStarted) {
+      console.log('[useEffect] Iniciando sequência do modal do lugar famoso:', currentFamousPlace);
+      
+      // 1. Mostra modal centralizado
+      setIsModalCentered(true);
       setShowFamousPlaceModal(true);
-    } else {
+      setIsTimerPaused(true);
+      setModalTimeProgress(0);
+      
+      // Barra de tempo de 2 segundos
+      const startTime = Date.now();
+      const duration = 2000;
+      
+      const progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min((elapsed / duration) * 100, 100);
+        setModalTimeProgress(progress);
+      }, 50); // Atualiza a cada 50ms para suavidade
+      
+      // 2. Após 2 segundos, move para o canto
+      const moveToCornerTimer = setTimeout(() => {
+        console.log('[Modal] Movendo para o canto após 2 segundos');
+        setIsModalCentered(false);
+        setModalTimeProgress(0);
+        clearInterval(progressInterval);
+      }, 2000);
+      
+      // 3. Após 2.3 segundos (tempo da animação), inicia o timer
+      const startTimerTimer = setTimeout(() => {
+        console.log('[Modal] Iniciando timer após transição');
+        setIsTimerPaused(false);
+      }, 2300);
+      
+      return () => {
+        clearTimeout(moveToCornerTimer);
+        clearTimeout(startTimerTimer);
+        clearInterval(progressInterval);
+      };
+    } else if (currentMode !== 'famous_places') {
       setShowFamousPlaceModal(false);
+      setIsModalCentered(true);
+      setIsTimerPaused(false);
+      setModalTimeProgress(0);
     }
-  }, [currentMode, currentFamousPlace]);
+  }, [currentMode, currentFamousPlace, gameState.gameStarted]);
 
   useEffect(() => {
     const fetchGeoJson = async () => {
@@ -612,7 +654,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           score={gameState.score}
           currentNeighborhood={gameState.currentNeighborhood}
           currentMode={currentMode}
-          currentFamousPlace={currentFamousPlace}
+          currentFamousPlace={currentFamousPlace || undefined}
         />
       )}
 
@@ -701,6 +743,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         open={showFamousPlaceModal}
         onClose={() => setShowFamousPlaceModal(false)}
         famousPlace={currentFamousPlace}
+        isCentered={isModalCentered}
+        timeProgress={modalTimeProgress}
       />
     </div>
   );

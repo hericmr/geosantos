@@ -3,7 +3,7 @@ import { LatLng } from 'leaflet';
 import { GameState } from '../types/game';
 import { ROUND_TIME, INITIAL_TIME, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS, calculateTimeBonus } from '../utils/gameConstants';
 
-export const useGameState = () => {
+export const useGameState = (externalPause: boolean = false) => {
   const [gameState, setGameState] = useState<GameState>({
     currentNeighborhood: '',
     score: 0,
@@ -34,7 +34,7 @@ export const useGameState = () => {
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (gameState.gameStarted && !gameState.gameOver && gameState.roundTimeLeft > 0 && gameState.globalTimeLeft > 0 && gameState.isCountingDown && !gameState.isPaused) {
+    if (gameState.gameStarted && !gameState.gameOver && gameState.roundTimeLeft > 0 && gameState.globalTimeLeft > 0 && gameState.isCountingDown && !gameState.isPaused && !externalPause) {
       const timer = setInterval(() => {
         setGameState(prev => {
           if (prev.roundTimeLeft <= 0 || prev.globalTimeLeft <= 0) {
@@ -50,7 +50,7 @@ export const useGameState = () => {
 
       return () => clearInterval(timer);
     }
-  }, [gameState.gameStarted, gameState.gameOver, gameState.isCountingDown, gameState.isPaused]);
+  }, [gameState.gameStarted, gameState.gameOver, gameState.isCountingDown, gameState.isPaused, externalPause]);
 
   const updateGameState = (updates: Partial<GameState>) => {
     setGameState(prev => ({ ...prev, ...updates }));

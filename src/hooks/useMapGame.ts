@@ -31,7 +31,8 @@ export const useMapGame = (
   geoJsonData: FeatureCollection | null,
   gameMode: GameMode = 'neighborhoods',
   currentFamousPlace: FamousPlace | null = null,
-  setTargetIconPosition: React.Dispatch<React.SetStateAction<L.LatLng | null>>
+  setTargetIconPosition: React.Dispatch<React.SetStateAction<L.LatLng | null>>,
+  externalPause: boolean = false
 ) => {
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonRef = useRef<L.GeoJSON>(null) as React.RefObject<L.GeoJSON>;
@@ -52,7 +53,7 @@ export const useMapGame = (
     startNextRound,
     clearFeedbackTimer,
     feedbackTimerRef
-  } = useGameState();
+  } = useGameState(externalPause);
 
   const handleMapClick = (latlng: L.LatLng) => {
     if (!gameState.gameStarted || !gameState.isCountingDown) return;
