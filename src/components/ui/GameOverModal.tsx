@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { rankingService } from '../../lib/supabase';
 import {
   ScoreDisplay,
@@ -22,6 +22,14 @@ interface GameOverModalProps {
   currentPlayerName: string;
 }
 
+// Mapeamento de frases para arquivos de áudio
+const audioMapping: { [key: string]: string } = {
+  "BOM JOGO! Mas ainda precisa andar mais pela zona noroeste!": "uau_bom_jogo.opus",
+  "Confundiu Santos com o interior do Mato Grosso!": "confundiu_santos_com_ointerior_do_mato_grosso.opus",
+  "Eita! Parece que você não sabe nada de Santos!": "eita_parece_que_voce_nao_sabe_nada_de_santos_mesmo.opus",
+  "Olha, confundiu Santos com": "olha_confundiu_santos_com.opus"
+};
+
 export const GameOverModal: React.FC<GameOverModalProps> = ({
   isOpen,
   onClose,
@@ -36,6 +44,47 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   const [rankingData, setRankingData] = useState<any[]>([]);
   const [playerPosition, setPlayerPosition] = useState<number | null>(null);
   const [showRankingPosition, setShowRankingPosition] = useState(false);
+  const [currentScoreMessage, setCurrentScoreMessage] = useState<string>("");
+  const gameOverAudioRef = useRef<HTMLAudioElement>(null);
+
+  // Função para obter a mensagem baseada na pontuação
+  const getScoreMessage = (score: number): string => {
+    const scoreLevels = [
+      { min: 100000, message: "REI DA GEOGRAFIA! Você conhece Santos!" },
+      { min: 80000, message: "MITO SANTISTA! Até as ondas do mar te aplaudem!" },
+      { min: 60000, message: "LENDÁRIO! Você é um Pelé da geografia santista!" },
+      { min: 50000, message: "MESTRE DOS BAIRROS! Você é um GPS ambulante!" },
+      { min: 40000, message: "IMPRESSIONANTE! Quase um GPS humano!!" },
+      { min: 30000, message: "VC É MAIS SANTISTA QUE PASTEL DE VENTO NA FEIRA!" },
+      { min: 25000, message: "SANTISTA DE CORAÇÃO! Você manja dos bairros!" },
+      { min: 20000, message: "MUITO BOM! Você deve ter ido em algumas aulas de geografia!" },
+      { min: 15000, message: "BOM JOGO! Mas ainda precisa andar mais pela zona noroeste!" },
+      { min: 12000, message: "QUASE LÁ! Dá um role no bondinho pra pegar umas dicas!" },
+      { min: 10000, message: "MAIS PERDIDO QUE DOIDO NA PONTA DA PRAIA!" },
+      { min: 8000, message: "Eita! Parece que você não sabe nada de Santos!" },
+      { min: 6000, message: "Confundiu Santos com o interior do Mato Grosso!" },
+      { min: 4000, message: "Te colocaram pra jogar vendado?" },
+      { min: 2000, message: "Você achava que o Boqueirão era em Salvador?" },
+      { min: 1000, message: "Eita! Parece que você não sabe nada de Santos!" },
+      { min: 500, message: "Confundiu Santos com o interior do Mato Grosso!" },
+      { min: 100, message: "Te colocaram pra jogar vendado?" },
+    ];
+
+    const level = scoreLevels.find(level => score >= level.min);
+    return level ? level.message : "Eita! Parece que você não sabe nada de Santos!";
+  };
+
+  // Função para tocar áudio baseado na mensagem
+  const playGameOverAudio = (message: string) => {
+    const audioFile = audioMapping[message];
+    if (audioFile && gameOverAudioRef.current) {
+      gameOverAudioRef.current.src = `${import.meta.env.BASE_URL || ''}/assets/audio/${audioFile}`;
+      gameOverAudioRef.current.volume = 0.7;
+      gameOverAudioRef.current.play().catch((error) => {
+        console.log('Erro ao tocar áudio de game over:', error);
+      });
+    }
+  };
 
   const fetchRanking = async () => {
     try {
@@ -74,8 +123,17 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
       setShowConfetti(false);
       setShowRankingPosition(false);
       setPlayerPosition(null);
+      
+      // Obter mensagem da pontuação e tocar áudio
+      const message = getScoreMessage(score);
+      setCurrentScoreMessage(message);
+      
+      // Tocar áudio com um pequeno delay para garantir que o modal carregou
+      setTimeout(() => {
+        playGameOverAudio(message);
+      }, 500);
     }
-  }, [isOpen]);
+  }, [isOpen, score]);
 
   if (!isOpen) return null;
 
@@ -88,6 +146,9 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
       data-testid="game-over-modal"
     >
       <ConfettiEffect isVisible={showConfetti} />
+
+      {/* Áudio para game over */}
+      <audio ref={gameOverAudioRef} preload="auto" />
 
       <div className={styles.modal}>
         {/* Header */}
