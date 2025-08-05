@@ -97,7 +97,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
     }}>
       <div style={{
         background: 'var(--bg-secondary)',
-        border: '3px solid var(--text-primary)',
+        border: 'none',
         borderRadius: '4px',
         padding: '24px',
         maxWidth: '800px',
@@ -138,7 +138,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: '20px',
-          borderBottom: '2px solid var(--text-primary)',
+          borderBottom: 'none',
           paddingBottom: '12px'
         }}>
           <div style={{
@@ -199,7 +199,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         {currentPlayerScore && currentPlayerName && playerPosition && (
           <div style={{
             background: 'var(--accent-green)',
-            border: '2px solid var(--text-primary)',
+            border: 'none',
             borderRadius: '4px',
             padding: '12px',
             marginBottom: '16px',
@@ -282,7 +282,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                 gap: '8px',
                 padding: '12px',
                 background: 'var(--bg-primary)',
-                border: '2px solid var(--text-primary)',
+                border: 'none',
                 borderRadius: '4px',
                 marginBottom: '8px',
                 fontFamily: "'LaCartoonerie', sans-serif",
@@ -324,7 +324,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                         gap: '8px',
                         padding: '8px 12px',
                         background: index % 2 === 0 ? 'var(--bg-primary)' : 'var(--bg-secondary)',
-                        border: '1px solid var(--text-primary)',
+                        border: 'none',
                         borderRadius: '2px',
                         alignItems: 'center',
                         fontFamily: "'LaCartoonerie', sans-serif",
@@ -370,7 +370,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
           justifyContent: 'center',
           marginTop: '16px',
           paddingTop: '12px',
-          borderTop: '2px solid var(--text-primary)'
+          borderTop: 'none'
         }}>
           <p style={{
             fontSize: 'clamp(0.8rem, 2vw, 1rem)',

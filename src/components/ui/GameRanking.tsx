@@ -111,7 +111,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
         minWidth: '340px',
         maxWidth: '400px',
         boxShadow: 'var(--shadow-md)',
-        border: '3px solid var(--text-primary)',
+        border: 'none',
         borderRadius: '4px',
         background: 'var(--bg-secondary)',
       };
@@ -133,7 +133,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
 
       <div className="ranking-container" style={{
         background: variant === 'startScreen' ? 'transparent' : 'var(--bg-secondary)',
-        border: variant === 'startScreen' ? 'none' : '2px solid var(--text-primary)',
+        border: 'none',
         borderRadius: variant === 'startScreen' ? '0' : '4px',
         boxShadow: variant === 'startScreen' ? 'none' : 'var(--shadow-md)',
         overflow: 'hidden',
@@ -160,7 +160,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
             borderTopRightRadius: variant === 'startScreen' ? '4px' : '0',
             letterSpacing: '1px',
             boxShadow: variant === 'startScreen' ? 'var(--shadow-md)' : 'none',
-            border: variant === 'startScreen' ? '3px solid var(--text-primary)' : 'none'
+            border: 'none'
           }}
         >
           <span style={{
@@ -295,7 +295,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
           <div style={{
             padding: '6px 8px',
             background: 'var(--bg-secondary)',
-            borderTop: '1px solid var(--text-primary)',
+            borderTop: 'none',
             fontSize: '0.8rem',
             color: 'var(--text-secondary)',
             textAlign: 'center'
