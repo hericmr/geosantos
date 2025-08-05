@@ -67,16 +67,18 @@ export const styles: FeedbackPanelStyles = {
 
   scoreUnit: {
     fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-    fontFamily: "'Inter', sans-serif",
-    fontWeight: 500,
+    fontFamily: "'LaCartoonerie', sans-serif",
+    fontWeight: 400,
     marginLeft: 'clamp(1px, 0.3vw, 2px)',
-    opacity: 0.9
+    opacity: 0.9,
+    textTransform: 'uppercase',
+    letterSpacing: '1px'
   },
 
   timeBonus: {
     fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-    fontFamily: "'Inter', sans-serif",
-    fontWeight: 500,
+    fontFamily: "'LaCartoonerie', sans-serif",
+    fontWeight: 400,
     marginLeft: 'clamp(4px, 1vw, 8px)',
     color: '#FFD700',
     display: 'flex',
@@ -86,23 +88,27 @@ export const styles: FeedbackPanelStyles = {
     padding: '2px 6px',
     borderRadius: '4px',
     border: '1px solid rgba(255, 215, 0, 0.2)',
-    animation: 'pulseText 1s infinite'
+    animation: 'pulseText 1s infinite',
+    textTransform: 'uppercase',
+    letterSpacing: '1px'
   },
 
   feedbackMessage: (isExcellent) => ({
     marginTop: 'clamp(4px, 1vw, 8px)',
     color: '#FFD700',
-    fontWeight: 600,
+    fontWeight: 400,
     fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
     textAlign: 'center',
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "'LaCartoonerie', sans-serif",
     animation: isExcellent ? 'pulseText 1s infinite' : 'none',
     opacity: 0.95,
     background: 'rgba(255, 215, 0, 0.1)',
     padding: 'clamp(4px, 1vw, 8px)',
     borderRadius: '6px',
     border: '1px solid rgba(255, 215, 0, 0.2)',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    textTransform: 'uppercase',
+    letterSpacing: '1px'
   }),
 
   buttonContainer: {

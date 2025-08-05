@@ -52,20 +52,84 @@ export const getProgressBarColor = (timeLeft: number, roundInitialTime: number):
   return '#FF4444';
 };
 
-export const getFeedbackMessage = (distance: number): string => {
+export const getFeedbackMessage = (distance: number, clickTime: number = 0, consecutiveCorrect: number = 0): string => {
   const distanceKm = distance / 1000;
   
-  if (distanceKm < 0.5) {
-    return "";
-  } else if (distanceKm < 1) {
-    return "";
-  } else if (distanceKm < 2) {
-    return "";
-  } else if (distanceKm < 5) {
-    return "";
-  } else {
-    return "";
+  // Mensagens para acertos perfeitos
+  if (distance === 0) {
+    const messages = [
+      "ACERTO PERFEITO!",
+      "BULLSEYE!",
+      "INCRÍVEL!",
+      "PERFEIÇÃO!",
+      "FANTÁSTICO!"
+    ];
+    
+    // Adicionar bônus de streak se aplicável
+    if (consecutiveCorrect >= 3) {
+      return `${messages[Math.floor(Math.random() * messages.length)]} ${consecutiveCorrect} acertos seguidos!`;
+    }
+    
+    return messages[Math.floor(Math.random() * messages.length)];
   }
+  
+  // Mensagens para acertos muito próximos
+  if (distanceKm < 0.5) {
+    const messages = [
+      "QUASE PERFEITO!",
+      "INCRÍVEL!",
+      "EXCELENTE!",
+      "FANTÁSTICO!",
+      "IMPRESSIONANTE!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+  
+  // Mensagens para acertos bons
+  if (distanceKm < 1) {
+    const messages = [
+      "MUITO BOM!",
+      "EXCELENTE!",
+      "ÓTIMO!",
+      "FANTÁSTICO!",
+      "IMPRESSIONANTE!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+  
+  // Mensagens para acertos razoáveis
+  if (distanceKm < 2) {
+    const messages = [
+      "BOM!",
+      "LEGAL!",
+      "OK!",
+      "ACEITÁVEL!",
+      "RAZOÁVEL!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+  
+  // Mensagens para acertos distantes
+  if (distanceKm < 5) {
+    const messages = [
+      "QUASE LÁ!",
+      "HMMM!",
+      "OPS!",
+      "QUASE!",
+      "TENTE NOVAMENTE!"
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+  
+  // Mensagens para acertos muito distantes
+  const messages = [
+    "OPS!",
+    "EITA!",
+    "UAU!",
+    "VENDADO?",
+    "CONFUSÃO!"
+  ];
+  return messages[Math.floor(Math.random() * messages.length)];
 };
 
 export const FASE_1_BAIRROS = [

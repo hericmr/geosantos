@@ -21,7 +21,20 @@ import {
   Navigation,
   Compass,
   Map,
-  Landmark
+  Landmark,
+  Sparkles,
+  ThumbsUp,
+  HelpCircle,
+  Frown,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Heart,
+  Flame,
+  Crown,
+  Medal,
+  Gift,
+  Lightbulb
 } from 'lucide-react';
 
 interface GameIconProps {
@@ -103,6 +116,42 @@ export const GameIcon: React.FC<GameIconProps> = ({
       return <Map {...iconProps} />;
     case 'landmark':
       return <Landmark {...iconProps} />;
+    case 'sparkles':
+    case 'incredible':
+      return <Sparkles {...iconProps} />;
+    case 'thumbsup':
+    case 'good':
+      return <ThumbsUp {...iconProps} />;
+    case 'helpcircle':
+    case 'almost':
+      return <HelpCircle {...iconProps} />;
+    case 'frown':
+    case 'ops':
+      return <Frown {...iconProps} />;
+    case 'checkcircle':
+    case 'perfect':
+      return <CheckCircle {...iconProps} />;
+    case 'xcircle':
+    case 'wrong':
+      return <XCircle {...iconProps} />;
+    case 'alertcircle':
+    case 'warning':
+      return <AlertCircle {...iconProps} />;
+    case 'heart':
+      return <Heart {...iconProps} />;
+    case 'flame':
+    case 'fire':
+    case 'streak':
+      return <Flame {...iconProps} />;
+    case 'crown':
+      return <Crown {...iconProps} />;
+    case 'medal':
+      return <Medal {...iconProps} />;
+    case 'gift':
+      return <Gift {...iconProps} />;
+    case 'lightbulb':
+    case 'tip':
+      return <Lightbulb {...iconProps} />;
     default:
       return <Target {...iconProps} />;
   }
@@ -207,6 +256,34 @@ export const MapIcon: React.FC<{ size?: number; color?: string }> = ({ size, col
 
 export const LandmarkIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
   <GameIcon name="landmark" size={size} color={color} />
+);
+
+export const SparklesIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
+  <GameIcon name="sparkles" size={size} color={color} />
+);
+
+export const ThumbsUpIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
+  <GameIcon name="thumbsup" size={size} color={color} />
+);
+
+export const HelpCircleIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
+  <GameIcon name="helpcircle" size={size} color={color} />
+);
+
+export const FrownIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
+  <GameIcon name="frown" size={size} color={color} />
+);
+
+export const CheckCircleIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
+  <GameIcon name="checkcircle" size={size} color={color} />
+);
+
+export const FlameIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
+  <GameIcon name="flame" size={size} color={color} />
+);
+
+export const LightbulbIcon: React.FC<{ size?: number; color?: string }> = ({ size, color }) => (
+  <GameIcon name="lightbulb" size={size} color={color} />
 ); 
 
 export const SkullIcon = ({ size = 40, color = 'var(--accent-red)' }: { size?: number; color?: string }) => (
