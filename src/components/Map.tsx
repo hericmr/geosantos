@@ -138,6 +138,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const { places: famousPlaces, isLoading: famousPlacesLoading, error: famousPlacesError, getRandomPlace } = useFamousPlaces();
   const lastFamousPlaceId = useRef<string | null>(null);
 
+  // Controle de zoom e movimento do mapa
+  const [currentZoom, setCurrentZoom] = useState(zoom);
+  const [mapCenter, setMapCenter] = useState(center);
+
   // Função para selecionar próximo lugar famoso (pode repetir, sempre aleatório)
   const selectNextFamousPlace = useCallback(() => {
     if (!famousPlaces || famousPlaces.length === 0) return;
@@ -194,6 +198,79 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       setCurrentFamousPlace(null);
     }
   }, [currentMode, gameState.gameStarted, famousPlaces, selectNextFamousPlace]);
+
+  // Controle de zoom e movimento com teclado
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Só processar se o jogo estiver ativo e o mapa estiver visível
+      if (!gameState.gameStarted || !mapRef.current) return;
+      
+      // Prevenir comportamento padrão para evitar scroll da página
+      event.preventDefault();
+      
+      const map = mapRef.current;
+      const currentMapZoom = map.getZoom();
+      const currentCenter = map.getCenter();
+      
+      switch (event.key.toLowerCase()) {
+        case 'z':
+          // Zoom in
+          if (currentMapZoom < 18) {
+            map.setZoom(currentMapZoom + 1);
+            setCurrentZoom(currentMapZoom + 1);
+          }
+          break;
+        case 'x':
+          // Zoom out
+          if (currentMapZoom > 10) {
+            map.setZoom(currentMapZoom - 1);
+            setCurrentZoom(currentMapZoom - 1);
+          }
+          break;
+        case 'arrowup':
+        case 'arrowdown':
+        case 'arrowleft':
+        case 'arrowright':
+          // Movimento do mapa
+          const panDistance = 0.01; // Distância de movimento em graus
+          let newLat = currentCenter.lat;
+          let newLng = currentCenter.lng;
+          
+          switch (event.key.toLowerCase()) {
+            case 'arrowup':
+              newLat += panDistance;
+              break;
+            case 'arrowdown':
+              newLat -= panDistance;
+              break;
+            case 'arrowleft':
+              newLng -= panDistance;
+              break;
+            case 'arrowright':
+              newLng += panDistance;
+              break;
+          }
+          
+          // Limitar o movimento para não sair muito da área de Santos
+          const newCenter = L.latLng(
+            Math.max(-24.1, Math.min(-23.8, newLat)), // Limites de latitude para Santos
+            Math.max(-46.5, Math.min(-46.2, newLng))  // Limites de longitude para Santos
+          );
+          
+          map.panTo(newCenter, { animate: true });
+          setMapCenter([newCenter.lat, newCenter.lng]);
+          break;
+      }
+    };
+
+    // Adicionar event listener
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [gameState.gameStarted]);
 
   // Lógica de timing do modal de lugares famosos
   useEffect(() => {
@@ -539,8 +616,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
       {gameState.gameStarted && (
         <MapContainer
-          center={center}
-          zoom={zoom}
+          center={mapCenter}
+          zoom={currentZoom}
           style={{ width: '100%', height: '100%', zIndex: 1 }}
           zoomControl={false}
           attributionControl={false}
@@ -636,6 +713,38 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         onModeChange={setCurrentMode}
         currentFamousPlace={currentFamousPlace || undefined}
       />
+
+      {/* Indicador de controles do mapa */}
+      {gameState.gameStarted && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          background: 'rgba(0, 0, 0, 0.8)',
+          color: 'var(--text-primary)',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '0.8rem',
+          fontFamily: "'LaCartoonerie', sans-serif",
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+          backdropFilter: 'blur(4px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: 'var(--accent-green)' }}>Z</span>
+            <span>Zoom In</span>
+            <span style={{ marginLeft: '8px', color: 'var(--accent-green)' }}>X</span>
+            <span>Zoom Out</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: 'var(--accent-blue)' }}>↑↓←→</span>
+            <span>Mover Mapa</span>
+          </div>
+        </div>
+      )}
 
       {gameState.showFeedback && !showGameOver && (
         <FeedbackPanel

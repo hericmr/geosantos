@@ -35,6 +35,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   const [firstFrameDataUrl, setFirstFrameDataUrl] = useState<string | null>(null);
   const [showRanking, setShowRanking] = useState(true);
   const [showSuggestionForm, setShowSuggestionForm] = useState(false);
+  const [showControls, setShowControls] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -90,27 +91,45 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       },
       description: 'Sugira novos lugares para serem adicionados ao jogo.',
       as: 'button' // Renderiza como um botão normal
+    },
+    { 
+      id: 'controls', 
+      label: 'CONTROLES', 
+      icon: () => <span style={{ fontSize: '16px' }}>🎮</span>, 
+      action: () => {}, // Ação vazia, só para hover
+      description: 'Veja os controles do mapa.',
+      as: 'button', // Renderiza como um botão normal
+      onMouseEnter: () => setShowControls(true),
+      onMouseLeave: () => setShowControls(false)
     }
   ], []);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const totalOptions = mainMenuOptions.length + secondaryMenuOptions.length;
+    
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedOption(prev => {
-        let newOption = prev > 0 ? prev - 1 : mainMenuOptions.length - 1;
+        let newOption = prev > 0 ? prev - 1 : totalOptions - 1;
         return newOption;
       });
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedOption(prev => {
-        let newOption = prev < mainMenuOptions.length - 1 ? prev + 1 : 0;
+        let newOption = prev < totalOptions - 1 ? prev + 1 : 0;
         return newOption;
       });
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      mainMenuOptions[selectedOption].action?.();
+      // Determinar se é um botão principal ou secundário
+      if (selectedOption < mainMenuOptions.length) {
+        mainMenuOptions[selectedOption].action?.();
+      } else {
+        const secondaryIndex = selectedOption - mainMenuOptions.length;
+        secondaryMenuOptions[secondaryIndex].action?.();
+      }
     }
-  }, [mainMenuOptions, selectedOption]);
+  }, [mainMenuOptions, secondaryMenuOptions, selectedOption]);
 
   const captureFirstFrame = useCallback(() => {
     const video = videoRef.current;
@@ -372,10 +391,11 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             const buttonStyle = {
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '16px',
               padding: '16px 24px',
               background: isSelected ? 'var(--accent-blue)' : 'var(--bg-secondary)',
-              border: '3px solid var(--text-primary)',
+              border: 'none',
               borderRadius: '4px',
               color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
               cursor: 'pointer',
@@ -419,19 +439,21 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           marginTop: '20px',
           justifyContent: 'center'
         }}>
-          {secondaryMenuOptions.map((option) => {
+          {secondaryMenuOptions.map((option, index) => {
             const IconComponent = option.icon;
             const Component = option.as || 'button';
+            const isSelected = selectedOption === (mainMenuOptions.length + index);
 
             const smallButtonStyle = {
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '8px',
               padding: '8px 16px',
-              background: 'var(--bg-accent)',
-              border: '2px solid var(--text-primary)',
+              background: isSelected ? 'var(--accent-blue)' : 'var(--bg-accent)',
+              border: 'none',
               borderRadius: '4px',
-              color: 'var(--text-primary)',
+              color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               fontFamily: "'LaCartoonerie', sans-serif",
@@ -439,8 +461,9 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               fontWeight: 400,
               textTransform: 'uppercase' as const,
               letterSpacing: '1px',
-              boxShadow: 'var(--shadow-md)',
-              textDecoration: 'none'
+              boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
+              textDecoration: 'none',
+              transform: isSelected ? 'translateY(-2px)' : 'translateY(0)'
             };
 
             const children = (
@@ -481,11 +504,16 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                   e.currentTarget.style.background = 'var(--accent-blue)';
                   e.currentTarget.style.color = 'var(--bg-primary)';
                   e.currentTarget.style.transform = 'translateY(-2px)';
+                  setSelectedOption(mainMenuOptions.length + index);
+                  option.onMouseEnter?.();
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-accent)';
-                  e.currentTarget.style.color = 'var(--text-primary)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  if (selectedOption !== (mainMenuOptions.length + index)) {
+                    e.currentTarget.style.background = 'var(--bg-accent)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }
+                  option.onMouseLeave?.();
                 }}
               >
                 {children}
@@ -532,6 +560,90 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             <p style={{ margin: '15px 0' }}>
               • Use as setas do teclado para navegar no menu
             </p>
+            
+            {/* Controles do mapa (aparece no hover) */}
+            {showControls && (
+              <div style={{
+                position: 'fixed',
+                bottom: '80px',
+                right: '20px',
+                padding: '15px',
+                background: 'var(--bg-secondary)',
+                borderRadius: '4px',
+                border: '2px solid var(--accent-green)',
+                boxShadow: 'var(--shadow-xl)',
+                animation: 'fadeIn 0.3s ease-in',
+                zIndex: 1000,
+                minWidth: '280px'
+              }}>
+                <h4 style={{
+                  fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                  margin: '0 0 10px 0',
+                  fontFamily: "'LaCartoonerie', sans-serif",
+                  color: 'var(--accent-green)',
+                  textTransform: 'uppercase',
+                  fontWeight: 'bold',
+                  textAlign: 'center'
+                }}>
+                  🎮 CONTROLES DO MAPA
+                </h4>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '6px',
+                  fontSize: 'clamp(0.75rem, 1.6vw, 0.85rem)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ 
+                      color: 'var(--accent-green)', 
+                      fontWeight: 'bold',
+                      fontSize: '1.1em'
+                    }}>Z</span>
+                    <span>Zoom In</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ 
+                      color: 'var(--accent-green)', 
+                      fontWeight: 'bold',
+                      fontSize: '1.1em'
+                    }}>X</span>
+                    <span>Zoom Out</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ 
+                      color: 'var(--accent-blue)', 
+                      fontWeight: 'bold',
+                      fontSize: '1.1em'
+                    }}>↑</span>
+                    <span>Mover ↑</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ 
+                      color: 'var(--accent-blue)', 
+                      fontWeight: 'bold',
+                      fontSize: '1.1em'
+                    }}>↓</span>
+                    <span>Mover ↓</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ 
+                      color: 'var(--accent-blue)', 
+                      fontWeight: 'bold',
+                      fontSize: '1.1em'
+                    }}>←</span>
+                    <span>Mover ←</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ 
+                      color: 'var(--accent-blue)', 
+                      fontWeight: 'bold',
+                      fontSize: '1.1em'
+                    }}>→</span>
+                    <span>Mover →</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -595,15 +707,15 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             width: '320px',
             padding: '20px',
             background: 'var(--bg-secondary)',
-            border: '3px solid var(--text-primary)',
+            border: 'none',
             borderRadius: '4px',
             boxShadow: 'var(--shadow-md)',
             fontFamily: "'LaCartoonerie', sans-serif",
             color: 'var(--text-primary)',
             transition: 'opacity 0.3s ease, transform 0.3s ease',
-            opacity: selectedOption !== 0 ? 1 : 0,
-            transform: selectedOption !== 0 ? 'translateY(0)' : 'translateY(20px)',
-            visibility: selectedOption !== 0 ? 'visible' : 'hidden'
+            opacity: selectedOption >= 0 ? 1 : 0,
+            transform: selectedOption >= 0 ? 'translateY(0)' : 'translateY(20px)',
+            visibility: selectedOption >= 0 ? 'visible' : 'hidden'
           }}>
             <h3 style={{
               margin: '0 0 10px 0',
@@ -611,14 +723,18 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               color: 'var(--accent-yellow)',
               textTransform: 'uppercase'
             }}>
-              {mainMenuOptions[selectedOption].label}
+              {selectedOption < mainMenuOptions.length 
+                ? mainMenuOptions[selectedOption].label 
+                : secondaryMenuOptions[selectedOption - mainMenuOptions.length].label}
             </h3>
             <p style={{
               margin: 0,
               fontSize: 'clamp(1rem, 2vw, 1.1rem)',
               lineHeight: 1.4
             }}>
-              {mainMenuOptions[selectedOption].description}
+              {selectedOption < mainMenuOptions.length 
+                ? mainMenuOptions[selectedOption].description 
+                : secondaryMenuOptions[selectedOption - mainMenuOptions.length].description}
             </p>
           </div>
         </div>
