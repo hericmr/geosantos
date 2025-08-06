@@ -261,23 +261,23 @@ export const StartScreen: React.FC<StartScreenProps> = ({
         boxSizing: 'border-box'
       }}>
 
-        {/* Logo e título */}
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{
-            fontSize: 'clamp(5rem, 12vw, 9rem)',
-            margin: '0',
-            fontFamily: "'LaCartoonerie', sans-serif",
-            fontWeight: 800,
-            color: '#000000',
-            lineHeight: 1.2,
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-            textShadow: '3px 3px 0px #fff, -3px -3px 0px #fff, 3px -3px 0px #fff, -3px 3px 0px #fff',
-            animation: 'titleFloat 5s ease-in-out infinite'
-          }}>
-            GEOSANTOS
-          </h1>
-
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+          <img 
+            src={new URL('/assets/images/logo.png', import.meta.url).href}
+            alt="Geo Santos Logo"
+            style={{
+              maxWidth: '100%',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              margin: '0',
+              animation: 'titleFloat 5s ease-in-out infinite',
+              filter: 'drop-shadow(3px 3px 0px #fff) drop-shadow(-3px -3px 0px #fff) drop-shadow(3px -3px 0px #fff) drop-shadow(-3px 3px 0px #fff)',
+              imageRendering: 'crisp-edges'
+            }}
+          />
         </div>
 
         {/* Estatísticas do jogador */}
@@ -287,7 +287,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             gap: '20px',
             flexWrap: 'wrap',
             justifyContent: 'center',
-            marginBottom: '40px'
+            marginBottom: '-50px'
           }}>
             {highScore > 0 && (
               <div style={{
@@ -382,7 +382,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           gap: '12px',
           minWidth: '300px',
           alignItems: 'center',
-          marginTop: '60px'
+          marginTop: '-20px'
         }}>
           {mainMenuOptions.map((option, index) => {
             const IconComponent = option.icon;

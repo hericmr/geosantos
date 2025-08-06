@@ -10,6 +10,7 @@ import {
   ActionButtons
 } from './GameOverModal/index';
 import styles from './GameOverModal.module.css';
+import { getAudioUrl } from '../../utils/assetUtils';
 
 interface GameOverModalProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   const playGameOverAudio = (message: string) => {
     const audioFile = audioMapping[message];
     if (audioFile && gameOverAudioRef.current) {
-      gameOverAudioRef.current.src = `${import.meta.env.BASE_URL || ''}/assets/audio/${audioFile}`;
+      gameOverAudioRef.current.src = getAudioUrl(audioFile);
       gameOverAudioRef.current.volume = 0.7;
       gameOverAudioRef.current.play().catch((error) => {
         console.log('Erro ao tocar áudio de game over:', error);

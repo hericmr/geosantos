@@ -58,7 +58,7 @@
 
 /* Cursor especial para o mapa - tema pixel art */
 .leaflet-container {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect x='15' y='0' width='2' height='32' fill='%23ffffff'/%3E%3Crect x='0' y='15' width='32' height='2' fill='%23ffffff'/%3E%3Crect x='14' y='14' width='4' height='4' fill='%23ffffff'/%3E%3C/svg%3E") 16 16, crosshair !important;
+  cursor: url("/geosantos/assets/images/80.png") 9 9, crosshair !important;
 }
 
 /* Efeito de brilho para elementos importantes */

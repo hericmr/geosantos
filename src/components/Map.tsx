@@ -64,7 +64,7 @@ L.Icon.Default.mergeOptions({
 
 // Create custom icon for bandeira2
 const bandeira2Icon = new L.Icon({
-  iconUrl: `${import.meta.env.BASE_URL || ''}/assets/images/bandeira2.png`,
+  iconUrl: getImageUrl('bandeira2.png'),
   iconSize: [70, 70],
   iconAnchor: [30, 60],
   popupAnchor: [0, -50],
@@ -73,7 +73,7 @@ const bandeira2Icon = new L.Icon({
 
 // Create custom icon for bandeira1
 const bandeira1Icon = new L.Icon({
-  iconUrl: `${import.meta.env.BASE_URL || ''}/assets/images/bandeira1.png`, // Corrigido para usar o caminho público
+  iconUrl: getImageUrl('bandeira1.png'),
   iconSize: [70, 70],
   iconAnchor: [30, 60],
   popupAnchor: [0, -50],
@@ -82,6 +82,8 @@ const bandeira1Icon = new L.Icon({
 
 import { renderToStaticMarkup } from 'react-dom/server';
 import { TargetIcon } from './ui/GameIcons';
+import { getImageUrl } from '../utils/assetUtils';
+import { useCursorStyle } from '../hooks/useCursorStyle';
 
 // Função utilitária para criar um ícone customizado para lugares famosos
 const createFamousPlaceIcon = (imageUrl: string) => new L.Icon({
@@ -105,13 +107,16 @@ const targetIcon = new L.DivIcon({
 });
 
 const Map: React.FC<MapProps> = ({ center, zoom }) => {
+  // Aplicar cursor personalizado
+  useCursorStyle();
+  
   // Pré-carregar as imagens das bandeiras
   useEffect(() => {
     const preloadImages = () => {
       const bandeira1 = new Image();
       const bandeira2 = new Image();
-      bandeira1.src = `${import.meta.env.BASE_URL || ''}/assets/images/bandeira1.png`;
-      bandeira2.src = `${import.meta.env.BASE_URL || ''}/assets/images/bandeira2.png`;
+      bandeira1.src = getImageUrl('bandeira1.png');
+      bandeira2.src = getImageUrl('bandeira2.png');
     };
     preloadImages();
   }, []);
@@ -453,14 +458,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
           
 
-          /* Forçar cursor crosshair em todos os elementos do mapa */
-          .leaflet-container,
-          .leaflet-container *,
-          .leaflet-interactive,
-          .leaflet-interactive * {
-            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='1' fill='%23000000'/%3E%3Cline x1='16' y1='2' x2='16' y2='8' stroke='%23000000' stroke-width='2'/%3E%3Cline x1='16' y1='24' x2='16' y2='30' stroke='%23000000' stroke-width='2'/%3E%3Cline x1='2' y1='16' x2='8' y2='16' stroke='%23000000' stroke-width='2'/%3E%3Cline x1='24' y1='16' x2='30' y2='16' stroke='%23000000' stroke-width='2'/%3E%3C/svg%3E") 16 16, crosshair !important;
-            touch-action: none !important;
-          }
+
 
           /* Ajustes para dispositivos móveis */
           @media (max-width: 768px) {

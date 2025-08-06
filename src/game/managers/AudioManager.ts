@@ -11,9 +11,9 @@ export class AudioManager {
 
     private loadSounds() {
         // Carrega os sons
-        this.scene.load.audio('success', `${import.meta.env.BASE_URL || ''}/assets/audio/sucess.mp3`);
-        this.scene.load.audio('error', `${import.meta.env.BASE_URL || ''}/assets/audio/error.mp3`);
-        this.scene.load.audio('background', `${import.meta.env.BASE_URL || ''}/assets/audio/game_music.mp3`);
+        this.scene.load.audio('success', '/geosantos/assets/audio/sucess.mp3');
+        this.scene.load.audio('error', '/geosantos/assets/audio/error.mp3');
+        this.scene.load.audio('background', '/geosantos/assets/audio/game_music.mp3');
     }
 
     public playSound(key: string) {
