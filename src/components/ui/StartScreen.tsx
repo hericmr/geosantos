@@ -7,7 +7,7 @@ import {
 } from './GameIcons';
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
-import { BookOpenIcon, PlusIcon } from 'lucide-react';
+import { BookOpenIcon, PlusIcon, MapPin } from 'lucide-react';
 import { PlaceSuggestionForm } from './PlaceSuggestionForm';
 import backgroundVideo from '../../assets/images/background.webm';
 
@@ -43,32 +43,32 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   const mainMenuOptions = useMemo(() => [
     { 
       id: 'play_neighborhoods', 
-      label: 'MODO: BAIRROS', 
-      icon: PlayIcon, 
+      label: 'BAIRROS', 
+      icon: MapPin, 
       action: () => {
         console.log('[StartScreen] Modo Bairros selecionado');
         onSelectMode?.('neighborhoods');
         onStartGame();
       },
-      description: 'Teste seus conhecimentos sobre os bairros de Santos.'
+      description: 'Clique no mapa onde você acha que está o bairro. Quanto mais próximo da localização correta, mais pontos você ganha!'
     },
     { 
       id: 'play_famous_places', 
-      label: 'MODO: LUGARES FAMOSOS', 
+      label: 'LUGARES FAMOSOS', 
       icon: LandmarkIcon, 
       action: () => { 
         console.log('[StartScreen] Modo Lugares Famosos selecionado');
         onSelectMode?.('famous_places'); 
         onStartGame(); 
       },
-      description: 'Acerte a localização de pontos turísticos e locais famosos.'
+      description: 'Localize pontos turísticos e lugares históricos de Santos. Teste seus conhecimentos sobre a cidade!'
     },
     { 
       id: 'leaderboard', 
       label: 'VER RANKING', 
       icon: TrophyIcon, 
       action: onShowLeaderboard,
-      description: 'Veja as maiores pontuações e sua posição no ranking.'
+      description: 'Veja as maiores pontuações e descubra sua posição no ranking dos melhores jogadores.'
     }
   ], [onStartGame, onShowLeaderboard, onSelectMode]);
 
@@ -263,21 +263,18 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-          <img 
-            src={new URL('/assets/images/logo.png', import.meta.url).href}
-            alt="Geo Santos Logo"
-            style={{
-              maxWidth: '100%',
-              width: 'auto',
-              height: 'auto',
-              objectFit: 'contain',
-              objectPosition: 'center',
-              margin: '0',
-              animation: 'titleFloat 5s ease-in-out infinite',
-              filter: 'drop-shadow(3px 3px 0px #fff) drop-shadow(-3px -3px 0px #fff) drop-shadow(3px -3px 0px #fff) drop-shadow(-3px 3px 0px #fff)',
-              imageRendering: 'crisp-edges'
-            }}
-          />
+          <h1 style={{
+            fontSize: 'clamp(6.5rem, 26vw, 12rem)',
+            fontFamily: "'LaCartoonerie', sans-serif",
+            margin: '0',
+            animation: 'titleFloat 5s ease-in-out infinite',
+            filter: 'drop-shadow(3px 3px 0px #fff) drop-shadow(-3px -3px 0px #fff) drop-shadow(3px -3px 0px #fff) drop-shadow(-3px 3px 0px #fff)',
+            fontWeight: 'bold',
+            lineHeight: 1.2
+          }}>
+            <span style={{ color: '#22c55e' }}>Geo</span>
+            <span style={{ color: '#3b82f6' }}>Santos</span>
+          </h1>
         </div>
 
         {/* Estatísticas do jogador */}
@@ -401,7 +398,6 @@ export const StartScreen: React.FC<StartScreenProps> = ({
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               fontFamily: "'LaCartoonerie', sans-serif",
-              fontSize: 'clamp(0.8rem, 2vw, 1rem)',
               fontWeight: 400,
               textTransform: 'uppercase' as const,
               letterSpacing: '1px',
@@ -426,7 +422,13 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                   size={24} 
                   color={isSelected ? 'var(--bg-primary)' : 'var(--text-primary)'} 
                 />
-                {option.label}
+                <div style={{ 
+                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                  fontWeight: 'bold',
+                  lineHeight: 1.2
+                }}>
+                  {option.label}
+                </div>
               </button>
             );
           })}
