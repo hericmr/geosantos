@@ -86,6 +86,11 @@ export const useMapGame = (
     // Marcar como processando
     isProcessingClickRef.current = true;
     
+    // DEBOUNCE: Definir timeout para resetar o flag após um delay
+    clickDebounceRef.current = setTimeout(() => {
+      isProcessingClickRef.current = false;
+    }, 100);
+    
     const clickDuration = gameState.roundInitialTime - gameState.roundTimeLeft;
 
     // FUNÇÃO PARA LIMPAR TODOS OS TIMERS ANTES DE INICIAR NOVOS
@@ -227,11 +232,6 @@ export const useMapGame = (
       
               // Executar sequência de feedback
         handleFeedbackSequence();
-        
-        // Reset do flag de processamento após delay
-        setTimeout(() => {
-          isProcessingClickRef.current = false;
-        }, 100);
         
         return;
       }
@@ -454,11 +454,6 @@ export const useMapGame = (
         
         // Executar sequência de feedback para modo bairros
         handleNeighborhoodFeedback();
-        
-        // Reset do flag de processamento após delay
-        setTimeout(() => {
-          isProcessingClickRef.current = false;
-        }, 100);
       }
     }
   };
@@ -501,6 +496,8 @@ export const useMapGame = (
       gameOver: gameState.gameOver,
       roundNumber: gameState.roundNumber
     });
+    
+
     
     setIsPaused(false);
     if (audioRef.current && gameState.gameStarted && !gameState.gameOver && !gameState.isMuted) {

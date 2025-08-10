@@ -108,7 +108,6 @@ export const GameControls: React.FC<GameControlsProps> = ({
               left: 0,
               top: 0,
               bottom: 0,
-              backgroundColor: '#1B4D3E',
               boxShadow: globalTimeLeft <= 3 ? '0 0 20px rgba(255, 0, 0, 0.3)' : '0 0 15px rgba(255, 255, 255, 0.1)',
               animation: globalTimeLeft <= 3 ? 'pulse 1s infinite' : 'none'
             }} />
