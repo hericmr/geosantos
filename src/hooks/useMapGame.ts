@@ -33,6 +33,13 @@ export const useMapGame = (
   currentFamousPlace: FamousPlace | null = null,
   externalPause: boolean = false
 ) => {
+  // DEBUG: Verificar se geoJsonData está sendo passado corretamente
+  console.log('[useMapGame] DEBUG - Hook inicializado com:', {
+    geoJsonData: !!geoJsonData,
+    gameMode,
+    currentFamousPlace: !!currentFamousPlace,
+    externalPause
+  });
   // SISTEMA DE DEBOUNCE PARA MELHORAR PERFORMANCE
   const clickDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingClickRef = useRef(false);
