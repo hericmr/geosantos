@@ -30,11 +30,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           Pausar
         </button>
       )}
-      {(feedbackProgress > 0 || currentMode === 'famous_places') && (
+      {/* Botão Próximo - sempre visível quando não é game over */}
+      {!gameOver && (
         <button
           onClick={onNextRound}
-          className={`pixel-btn ${gameOver ? 'pixel-btn--danger' : 'pixel-btn--success'}`}
-          style={styles.button(gameOver ? 'retry' : 'next')}
+          className="pixel-btn pixel-btn--success"
+          style={styles.button('next')}
         >
           <div style={styles.progressBar(feedbackProgress, 'rgba(50, 205, 50, 0.3)')} />
           <div style={styles.progressBar(100 - feedbackProgress, 'rgba(255, 0, 0, 0.5)')} />
@@ -45,17 +46,28 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             alignItems: 'center',
             gap: '4px'
           }}>
-            {gameOver ? (
-              <>
-                <RetryIcon size={16} color="var(--text-primary)" />
-                Tente Outra Vez
-              </>
-            ) : (
-              <>
-                <NextIcon size={16} color="var(--text-primary)" />
-                Próximo
-              </>
-            )}
+            <NextIcon size={16} color="var(--text-primary)" />
+            Próximo
+          </span>
+        </button>
+      )}
+      
+      {/* Botão Tente Outra Vez - apenas quando game over */}
+      {gameOver && (
+        <button
+          onClick={onNextRound}
+          className="pixel-btn pixel-btn--danger"
+          style={styles.button('retry')}
+        >
+          <span style={{
+            position: 'relative',
+            zIndex: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            <RetryIcon size={16} color="var(--text-primary)" />
+            Tente Outra Vez
           </span>
         </button>
       )}

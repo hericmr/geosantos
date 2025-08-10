@@ -165,7 +165,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
 
 
       <ActionButtons
-        gameOver={false}
+        gameOver={gameOver}
         onPauseGame={onPauseGame}
         onNextRound={() => {
           if (geoJsonData) {

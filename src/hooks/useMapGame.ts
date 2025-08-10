@@ -525,7 +525,7 @@ export const useMapGame = (
       isCountingDown: true, // CORREÇÃO: Restaurar estado de clique
       showFeedback: false,
       feedbackOpacity: 0,
-      feedbackProgress: 100,
+      feedbackProgress: 0, // CORREÇÃO: Resetar para 0 para nova rodada
       clickedPosition: null,
       arrowPath: null,
       revealedNeighborhoods: new Set()
