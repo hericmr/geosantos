@@ -228,13 +228,20 @@ export const useMapGame = (
             
             // CORREÇÃO: Avançar automaticamente para próxima rodada após 5 segundos
             console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo lugares famosos)');
+            console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData, 'isAutoAdvancing:', isAutoAdvancingRef.current);
             
             // Aguardar um pequeno delay para o usuário ver o progresso completo
             setTimeout(() => {
+              console.log('[useMapGame] DEBUG - Executando setTimeout para avanço automático (modo lugares famosos)');
               if (geoJsonData && !isAutoAdvancingRef.current) {
                 isAutoAdvancingRef.current = true; // Proteção contra chamadas duplas
                 console.log('[useMapGame] Iniciando próxima rodada automaticamente (modo lugares famosos)');
                 startNextRound(geoJsonData);
+              } else {
+                console.log('[useMapGame] DEBUG - Condições não atendidas para avanço automático:', {
+                  geoJsonData: !!geoJsonData,
+                  isAutoAdvancing: isAutoAdvancingRef.current
+                });
               }
             }, 500); // 500ms de delay para visualização
           } else {
@@ -463,13 +470,20 @@ export const useMapGame = (
               
               // CORREÇÃO: Avançar automaticamente para próxima rodada após 5 segundos
               console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo bairros)');
+              console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData, 'isAutoAdvancing:', isAutoAdvancingRef.current);
               
               // Aguardar um pequeno delay para o usuário ver o progresso completo
               setTimeout(() => {
+                console.log('[useMapGame] DEBUG - Executando setTimeout para avanço automático (modo bairros)');
                 if (geoJsonData && !isAutoAdvancingRef.current) {
                   isAutoAdvancingRef.current = true; // Proteção contra chamadas duplas
                   console.log('[useMapGame] Iniciando próxima rodada automaticamente (modo bairros)');
                   startNextRound(geoJsonData);
+                } else {
+                  console.log('[useMapGame] DEBUG - Condições não atendidas para avanço automático:', {
+                    geoJsonData: !!geoJsonData,
+                    isAutoAdvancing: isAutoAdvancingRef.current
+                  });
                 }
               }, 500); // 500ms de delay para visualização
             } else {
@@ -527,6 +541,8 @@ export const useMapGame = (
     
     // CORREÇÃO: Resetar flag de avanço automático
     isAutoAdvancingRef.current = false;
+    
+    console.log('[handleNextRound] DEBUG - Flag isAutoAdvancing resetada para false');
     
 
     
