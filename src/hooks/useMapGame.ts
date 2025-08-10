@@ -36,6 +36,7 @@ export const useMapGame = (
   // SISTEMA DE DEBOUNCE PARA MELHORAR PERFORMANCE
   const clickDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingClickRef = useRef(false);
+  const isAutoAdvancingRef = useRef(false); // CORREÇÃO: Proteção contra avanço automático duplo
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonRef = useRef<L.GeoJSON>(null) as React.RefObject<L.GeoJSON>;
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -216,8 +217,8 @@ export const useMapGame = (
           }, 400); // CORREÇÃO: Reduzido de 727ms para 400ms
         }
         
-        // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA
-        // CORREÇÃO: Implementar barra de progresso de 5 segundos
+        // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA AUTOMÁTICA
+        // CORREÇÃO: Implementar barra de progresso de 5 segundos com avanço automático
         let progress = 0;
         const progressInterval = setInterval(() => {
           progress += 2; // 2% a cada 100ms = 100% em 5 segundos
@@ -225,16 +226,17 @@ export const useMapGame = (
             progress = 100;
             clearInterval(progressInterval);
             
-            // Restaurar isCountingDown para true automaticamente
-            console.log('[useMapGame] Restaurando isCountingDown para true (modo lugares famosos)');
-            updateGameState({
-              isCountingDown: true, // CORREÇÃO: Restaurar estado de clique
-              feedbackProgress: 100,
-              feedbackOpacity: 1
-            });
+            // CORREÇÃO: Avançar automaticamente para próxima rodada após 5 segundos
+            console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo lugares famosos)');
             
-            // Modo lugares famosos sempre aguarda clique do botão
-            console.log('[useMapGame] Modo lugares famosos - aguardando clique do botão próximo');
+            // Aguardar um pequeno delay para o usuário ver o progresso completo
+            setTimeout(() => {
+              if (geoJsonData && !isAutoAdvancingRef.current) {
+                isAutoAdvancingRef.current = true; // Proteção contra chamadas duplas
+                console.log('[useMapGame] Iniciando próxima rodada automaticamente (modo lugares famosos)');
+                startNextRound(geoJsonData);
+              }
+            }, 500); // 500ms de delay para visualização
           } else {
             updateGameState({
               feedbackProgress: progress
@@ -450,8 +452,8 @@ export const useMapGame = (
             }, 400); // CORREÇÃO: Reduzido de 727ms para 400ms
           }
           
-          // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA
-          // CORREÇÃO: Implementar barra de progresso de 5 segundos
+          // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA AUTOMÁTICA
+          // CORREÇÃO: Implementar barra de progresso de 5 segundos com avanço automático
           let progress = 0;
           const progressInterval = setInterval(() => {
             progress += 2; // 2% a cada 100ms = 100% em 5 segundos
@@ -459,15 +461,17 @@ export const useMapGame = (
               progress = 100;
               clearInterval(progressInterval);
               
-              // Restaurar isCountingDown para true automaticamente
-              console.log('[useMapGame] Restaurando isCountingDown para true (modo bairros)');
-              updateGameState({
-                isCountingDown: true // CORREÇÃO: Restaurar estado de clique
-              });
+              // CORREÇÃO: Avançar automaticamente para próxima rodada após 5 segundos
+              console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo bairros)');
               
-              // CORREÇÃO: Aguardar clique do botão "Próximo" em vez de avançar automaticamente
-              // Isso evita conflitos com handleNextRound
-              console.log('[useMapGame] Modo bairros - aguardando clique do botão próximo');
+              // Aguardar um pequeno delay para o usuário ver o progresso completo
+              setTimeout(() => {
+                if (geoJsonData && !isAutoAdvancingRef.current) {
+                  isAutoAdvancingRef.current = true; // Proteção contra chamadas duplas
+                  console.log('[useMapGame] Iniciando próxima rodada automaticamente (modo bairros)');
+                  startNextRound(geoJsonData);
+                }
+              }, 500); // 500ms de delay para visualização
             } else {
               updateGameState({
                 feedbackProgress: progress
@@ -520,6 +524,9 @@ export const useMapGame = (
       gameOver: gameState.gameOver,
       roundNumber: gameState.roundNumber
     });
+    
+    // CORREÇÃO: Resetar flag de avanço automático
+    isAutoAdvancingRef.current = false;
     
 
     
