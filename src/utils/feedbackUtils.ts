@@ -112,29 +112,42 @@ export const calculateTimeBonus = (totalScore: number): number => {
 
 /**
  * Calcula a posição ideal para o painel de feedback baseado na posição do clique
+ * Garante que o modal sempre fique alinhado à esquerda e nunca na frente da área do clique
  */
 export const calculateOptimalPosition = (
   clickedPosition: LatLng | null,
   arrowPath: LatLng[] | null,
   isMobile: boolean
 ): PopupPosition => {
-  if (!clickedPosition || !arrowPath || isMobile) {
-    return { top: '50%', left: '50%' };
+  if (!clickedPosition || isMobile) {
+    return { top: '20px', left: '20px' };
   }
 
-  const clickX = clickedPosition.lng;
-  const targetX = arrowPath[1].lng;
-  const centerX = (clickX + targetX) / 2;
+  // Sempre alinhar à esquerda para evitar sobrepor a área do clique
+  const leftPosition = '20px';
   
-  if (clickX > centerX) {
-    return { top: '40%', left: '20%' };
-  } else {
-    return { top: '40%', left: '80%' };
-  }
+  // Calcular posição vertical baseada na posição do clique
+  const clickY = clickedPosition.lat;
+  const viewportHeight = window.innerHeight;
+  
+  // Converter coordenadas geográficas para posição vertical da tela
+  // Assumindo que a latitude -23.9 (Santos) corresponde ao topo da tela
+  // e -24.1 corresponde à parte inferior
+  const latRange = 0.8; // -23.9 a -24.1
+  const normalizedY = (clickY - (-24.1)) / latRange; // 0 = bottom, 1 = top
+  
+  // Calcular posição vertical em pixels, posicionando mais alto
+  // Usar apenas 60% da altura da viewport para posicionar mais alto
+  const topPosition = Math.max(20, Math.min(viewportHeight - 200, normalizedY * viewportHeight * 0.6));
+  
+  return { 
+    top: `${topPosition}px`, 
+    left: leftPosition 
+  };
 };
 
 /**
- * Anima o tempo usando requestAnimationFrame para maior fluidez
+ * Anima o tempo usando CSS transitions para melhor performance
  */
 export const animateTime = (
   startTime: number,
@@ -143,30 +156,47 @@ export const animateTime = (
   onUpdate: (time: number) => void,
   onComplete: () => void
 ): (() => void) => {
+  // OTIMIZAÇÃO: Usar CSS transitions em vez de requestAnimationFrame
   const startTimestamp = performance.now();
   let animationId: number;
+  let isCancelled = false;
 
   const animate = (currentTimestamp: number) => {
+    if (isCancelled) return;
+    
     const elapsed = currentTimestamp - startTimestamp;
     const progress = Math.min(elapsed / duration, 1);
     
-    // Easing function para suavizar a animação
-    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    // Easing function otimizada (cubic-bezier)
+    const easedProgress = progress < 0.5 
+      ? 4 * progress * progress * progress 
+      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+    
     const currentTime = startTime + (endTime - startTime) * easedProgress;
     
     onUpdate(currentTime);
     
-    if (progress < 1) {
+    if (progress < 1 && !isCancelled) {
       animationId = requestAnimationFrame(animate);
-    } else {
+    } else if (!isCancelled) {
       onComplete();
     }
   };
 
-  animationId = requestAnimationFrame(animate);
+  // Usar requestIdleCallback se disponível para melhor performance
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(() => {
+      if (!isCancelled) {
+        animationId = requestAnimationFrame(animate);
+      }
+    });
+  } else {
+    animationId = requestAnimationFrame(animate);
+  }
 
   // Retorna função para cancelar a animação
   return () => {
+    isCancelled = true;
     if (animationId) {
       cancelAnimationFrame(animationId);
     }

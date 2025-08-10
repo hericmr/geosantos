@@ -1,3 +1,128 @@
+# Melhorias no Loop Principal do Jogo
+
+## 1. Estrutura do Loop Principal
+- Substituir setInterval por requestAnimationFrame para melhor performance
+- Implementar sistema de estados finitos (FSM) para gerenciar estados do jogo
+- Separar lógica de timer em componentes específicos
+- Implementar pooling para objetos temporários
+- Reorganizar componentes do Map para melhor performance
+- Implementar sistema de debounce centralizado
+- Unificar gerenciamento de referências
+- Melhorar integração com controles do jogo
+- Implementar sistema de estados centralizado
+- Otimizar cálculos de distância e pontuação
+- Implementar sistema de eventos robusto
+- Refatorar tipos e interfaces para melhor clareza
+
+## 2. Performance
+- Remover múltiplos timers sobrepostos
+- Implementar pooling para objetos de estado temporários
+- Otimizar cálculos de tempo usando requestIdleCallback
+- Implementar cache para valores que não mudam frequentemente
+- Otimizar renderização de marcadores e camadas
+- Implementar culling de elementos fora da visão
+- Implementar pooling para referências de elementos
+- Otimizar animações e transições
+- Implementar pooling para cálculos de pontuação
+- Implementar cache para cálculos de distância
+- Otimizar tratamento de eventos
+- Implementar pooling para objetos de estado
+
+## 3. Organização do Código
+- Criar classes para gerenciar diferentes modos do jogo (Lugares Famosos e Bairros)
+- Implementar sistema de eventos para comunicação entre componentes
+- Separar responsabilidades em módulos específicos:
+  - Sistema de pontuação
+  - Sistema de feedback visual
+  - Sistema de áudio
+  - Sistema de transições
+  - Gerenciamento de marcadores e camadas
+  - Sistema de animações
+  - Sistema de interações do mapa
+  - Sistema de controles do jogo
+  - Gerenciamento centralizado de estado
+  - Lógica de cálculos centralizada
+  - Sistema de eventos robusto
+  - Sistema de tipos e interfaces
+
+## 4. Debug e Testes
+- Adicionar logs de performance para análise do loop principal
+- Implementar sistema de profiling para identificar gargalos
+- Criar testes unitários para cada componente
+- Adicionar sistema de debug visual para transições
+- Implementar testes de integração para interações do mapa
+- Adicionar logs de interação do usuário
+- Implementar sistema de monitoramento de estado
+- Testar usabilidade dos controles
+- Testar integração de estados
+- Testar precisão dos cálculos
+- Testar sistema de eventos
+- Testar consistência dos tipos
+
+## 5. Melhorias Incrementais
+1. Primeira fase: Reescrita do sistema de estados e timers
+   - Substituir setInterval por requestAnimationFrame
+   - Implementar sistema de estados finitos
+   - Unificar gerenciamento de timers
+   - Reorganizar componentes do Map
+   - Implementar sistema de debounce centralizado
+   - Melhorar controles do jogo
+   - Implementar sistema de estados centralizado
+   - Otimizar cálculos de distância e pontuação
+   - Implementar sistema de eventos robusto
+   - Refatorar tipos e interfaces
+
+2. Segunda fase: Implementação de pooling e cache
+   - Pooling para objetos temporários
+   - Cache para cálculos frequentes
+   - Otimização de renderização
+   - Implementação de culling
+   - Pooling para referências de elementos
+   - Otimização de animações
+   - Pooling para cálculos de pontuação
+   - Cache para cálculos de distância
+   - Otimizar tratamento de eventos
+   - Pooling para objetos de estado
+
+3. Terceira fase: Sistema de eventos e comunicação
+   - Implementar sistema de eventos
+   - Separar responsabilidades
+   - Melhorar comunicação entre componentes
+   - Otimizar sistema de animações
+   - Implementar sistema de interações do mapa
+   - Melhorar controles do jogo
+   - Implementar sistema de estados centralizado
+   - Otimizar lógica de cálculos
+   - Implementar sistema de eventos robusto
+   - Refatorar tipos e interfaces
+
+4. Quarta fase: Testes e otimizações finais
+   - Adicionar logs de performance
+   - Implementar profiling
+   - Testes unitários e de integração
+   - Otimizações finas
+   - Implementar sistema de monitoramento completo
+   - Testar usabilidade completa
+   - Testar integração de estados
+   - Testar precisão dos cálculos
+   - Testar sistema de eventos
+   - Testar consistência dos tipos
+
+## 6. Métricas de Sucesso
+- FPS mais estáveis (alvo: 60 FPS)
+- Tempo de transição entre rounds reduzido (alvo: < 500ms)
+- Memória mais otimizada
+- Código mais organizado e manutenível
+- Melhor sincronização entre elementos visuais e lógica
+- Resposta mais rápida às interações do usuário
+- Redução de bugs de estado
+- Melhor experiência de debug
+- Melhor usabilidade dos controles
+- Estados mais consistentes
+- Cálculos mais precisos e otimizados
+- Sistema de eventos mais robusto
+- Tipagem mais forte e consistente
+
 # 📋 Plano: Transformar Tempo em Cronômetro Global
 
 ## 🎯 Objetivo
@@ -156,4 +281,4 @@ const handleMapClick = (latlng: L.LatLng) => {
 
 ---
 
-*Este plano será atualizado conforme a implementação progride.* 
+*Este plano será atualizado conforme a implementação progride.*

@@ -12,7 +12,9 @@ export const getAssetUrl = (path: string): string => {
   const baseUrl = import.meta.env.BASE_URL || '';
   // Remove barra inicial se existir para evitar duplicação
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-  return `${baseUrl}${cleanPath}`;
+  const finalUrl = `${baseUrl}${cleanPath}`;
+  console.log('🌐 getAssetUrl:', { path, baseUrl, cleanPath, finalUrl });
+  return finalUrl;
 };
 
 /**
@@ -21,7 +23,9 @@ export const getAssetUrl = (path: string): string => {
  * @returns URL completa da imagem
  */
 export const getImageUrl = (filename: string): string => {
-  return getAssetUrl(`assets/images/${filename}`);
+  const url = getAssetUrl(`assets/images/${filename}`);
+  console.log('🔗 getImageUrl (utils):', { filename, url });
+  return url;
 };
 
 /**
@@ -49,4 +53,26 @@ export const getDataUrl = (filename: string): string => {
  */
 export const getFontUrl = (filename: string): string => {
   return getAssetUrl(`assets/${filename}`);
+};
+
+/**
+ * Obtém a URL para um sprite na pasta assets/markerclick
+ * @param filename - Nome do arquivo do sprite
+ * @returns URL completa do sprite
+ */
+export const getSpriteUrl = (filename: string): string => {
+  const url = getAssetUrl(`assets/markerclick/${filename}`);
+  console.log('🎭 getSpriteUrl:', { filename, url, fullPath: `assets/markerclick/${filename}` });
+  return url;
+};
+
+/**
+ * Obtém a URL para um sprite na pasta assets/marker_bandeira_lugar_correto
+ * @param filename - Nome do arquivo do sprite
+ * @returns URL completa do sprite
+ */
+export const getBandeiraCorretaSpriteUrl = (filename: string): string => {
+  const url = getAssetUrl(`assets/marker_bandeira_lugar_correto/${filename}`);
+  console.log('🏁 getBandeiraCorretaSpriteUrl:', { filename, url, fullPath: `assets/marker_bandeira_lugar_correto/${filename}` });
+  return url;
 }; 

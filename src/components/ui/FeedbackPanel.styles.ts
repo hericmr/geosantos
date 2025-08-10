@@ -20,24 +20,35 @@ export const styles: FeedbackPanelStyles = {
     bottom: isMobile ? 0 : gameOver ? 0 : 'auto',
     left: gameOver ? 0 : isMobile ? 0 : popupPosition.left,
     right: isMobile ? 0 : 'auto',
-    transform: gameOver ? 'none' : isMobile ? 'none' : 'translate(-50%, -50%)',
-    width: isMobile ? '100%' : '90%',
-    maxWidth: gameOver ? '100%' : '400px',
+    transform: gameOver ? 'none' : isMobile ? 'none' : 'none', // Removido translate para posicionamento absoluto
+    width: isMobile ? '100%' : 'clamp(320px, 25vw, 450px)', // Largura responsiva
+    maxWidth: gameOver ? '100%' : '450px',
     background: 'var(--bg-secondary)',
     color: 'var(--text-primary)',
     zIndex: 9999,
     padding: 'clamp(16px, 3vw, 24px)',
-    borderRadius: isMobile ? '4px 4px 0 0' : '4px',
+    borderRadius: isMobile ? '4px 4px 0 0' : '8px',
     boxShadow: 'var(--shadow-xl)',
     border: 'none',
-    margin: isMobile ? '0' : '10px',
-    animation: gameOver ? 'slideUp 0.3s ease-out' : isMobile ? 'slideUp 0.3s ease-out' : 'fadeInScale 0.3s ease-out',
-    maxHeight: isMobile ? '90vh' : '90vh',
+    margin: isMobile ? '0' : '0',
+    animation: gameOver ? 'slideUp 0.3s ease-out' : isMobile ? 'slideUp 0.3s ease-out' : 'slideInLeft 0.3s ease-out',
+    maxHeight: isMobile ? '90vh' : '85vh',
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
     gap: 'clamp(12px, 2vw, 16px)',
-    fontFamily: "'VT323', monospace"
+    fontFamily: "'VT323', monospace",
+    // Garantir que não sobreponha a área do clique
+    pointerEvents: 'auto',
+    // Melhorar responsividade
+    '@media (max-width: 1200px)': {
+      width: 'clamp(300px, 30vw, 400px)',
+      maxWidth: '400px'
+    },
+    '@media (max-width: 768px)': {
+      width: '100%',
+      maxWidth: '100%'
+    }
   }),
 
   contentContainer: {

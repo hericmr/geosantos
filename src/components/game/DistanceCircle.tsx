@@ -46,7 +46,7 @@ export const DistanceCircle: React.FC<DistanceCircleProps> = ({
     setTimeout(() => {
       map.removeLayer(circle);
       onAnimationComplete?.();
-    }, 800); // Tempo que o círculo permanece visível
+    }, 1200); // Tempo sincronizado: aparece quando sprite termina (727ms) + permanece visível por mais tempo
 
   }, [map, distanceCircle, onAnimationComplete]);
 

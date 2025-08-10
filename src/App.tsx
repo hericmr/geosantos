@@ -4,6 +4,8 @@ import { AdminFamousPlaces } from './components/admin/AdminFamousPlaces';
 import Map from './components/Map'
 import './App.css'
 import { FamousPlacesWiki } from './components/ui/FamousPlacesWiki';
+import SpriteTestPage from './components/ui/SpriteTestPage';
+import SpriteDebug from './components/ui/SpriteDebug';
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
       <Routes>
         <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
         <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
+        <Route path="/teste-sprites" element={<SpriteTestPage />} />
+        <Route path="/debug-sprites" element={<SpriteDebug />} />
         <Route path="/" element={
           <div style={{
             margin: 0,

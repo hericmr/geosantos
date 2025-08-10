@@ -68,7 +68,7 @@ export const useGameState = (externalPause: boolean = false) => {
         roundTimeLeft: INITIAL_TIME, // Usar o tempo inicial como tempo da rodada
         roundInitialTime: INITIAL_TIME, // Usar o tempo inicial como referência da barra
         roundNumber: 1,
-        isCountingDown: false,
+        isCountingDown: true, // CORREÇÃO: Definir como true imediatamente
         isPaused: false,
         revealedNeighborhoods: new Set(),
         totalDistance: 0,
@@ -76,65 +76,64 @@ export const useGameState = (externalPause: boolean = false) => {
         currentNeighborhood: isFamousPlaces ? '' : prev.currentNeighborhood,
       };
     });
-    // O controle do lugar famoso é feito pelo FamousPlacesManager
-    setTimeout(() => {
-      setGameState(prev => ({
-        ...prev,
-        isCountingDown: true,
-      }));
-    }, 100);
+    // REMOVIDO: Não precisamos mais do delay para isCountingDown
+    // O isCountingDown já é definido como true imediatamente acima
   };
 
   const startNextRound = (geoJsonData: any) => {
-    setGameState(prev => {
-      const nextRoundNumber = prev.roundNumber + 1;
-      const timeBonus = prev.timeBonus || 0; // Pegar bônus armazenado
-      const newGlobalTime = Math.max(prev.globalTimeLeft + timeBonus, 0); // Aplicar bônus ao tempo global
+    // OTIMIZAÇÃO: Usar requestIdleCallback para melhor performance
+    const scheduleNextRound = () => {
+      setGameState(prev => {
+        const nextRoundNumber = prev.roundNumber + 1;
+        const timeBonus = prev.timeBonus || 0;
+        const newGlobalTime = Math.max(prev.globalTimeLeft + timeBonus, 0);
+        
+        // ESTADO BASE COMUM (evita duplicação)
+        const baseState = {
+          clickedPosition: null,
+          arrowPath: null,
+          showFeedback: false,
+          feedbackOpacity: 0,
+          globalTimeLeft: newGlobalTime,
+          roundTimeLeft: newGlobalTime,
+          roundInitialTime: newGlobalTime,
+          roundNumber: nextRoundNumber,
+          isCountingDown: true, // CORREÇÃO: Definir como true imediatamente
+          timeBonus: 0
+        };
+        
+        if (prev.gameMode === 'famous_places') {
+          return {
+            ...prev,
+            ...baseState,
+            currentNeighborhood: '',
+            revealedNeighborhoods: new Set()
+          };
+        } else {
+          // OTIMIZAÇÃO: Seleção mais eficiente de bairro
+          const features = geoJsonData.features;
+          const randomIndex = Math.floor(Math.random() * features.length);
+          const neighborhood = features[randomIndex].properties?.NOME;
+          
+          return {
+            ...prev,
+            ...baseState,
+            currentNeighborhood: neighborhood,
+            revealedNeighborhoods: new Set()
+          };
+        }
+      });
       
-      if (prev.gameMode === 'famous_places') {
-        // O controle do lugar famoso é feito pelo FamousPlacesManager
-        return {
-          ...prev,
-          clickedPosition: null,
-          arrowPath: null,
-          showFeedback: false,
-          feedbackOpacity: 0,
-          globalTimeLeft: newGlobalTime, // Aplicar bônus
-          roundTimeLeft: newGlobalTime, // Usar o tempo global disponível
-          roundInitialTime: newGlobalTime, // Usar o tempo global como tempo inicial da rodada
-          roundNumber: nextRoundNumber,
-          isCountingDown: false,
-          currentNeighborhood: '',
-          revealedNeighborhoods: new Set(),
-          timeBonus: 0 // Resetar bônus após aplicar
-        };
-      } else {
-        const features = geoJsonData.features;
-        const randomIndex = Math.floor(Math.random() * features.length);
-        const neighborhood = features[randomIndex].properties?.NOME;
-        return {
-          ...prev,
-          clickedPosition: null,
-          arrowPath: null,
-          showFeedback: false,
-          feedbackOpacity: 0,
-          globalTimeLeft: newGlobalTime, // Aplicar bônus
-          roundTimeLeft: newGlobalTime, // Usar o tempo global disponível
-          roundInitialTime: newGlobalTime, // Usar o tempo global como tempo inicial da rodada
-          roundNumber: nextRoundNumber,
-          isCountingDown: false,
-          currentNeighborhood: neighborhood,
-          revealedNeighborhoods: new Set(),
-          timeBonus: 0 // Resetar bônus após aplicar
-        };
-      }
-    });
-    setTimeout(() => {
-      setGameState(prev => ({
-        ...prev,
-        isCountingDown: true
-      }));
-    }, 100);
+      // REMOVIDO: Não precisamos mais do delay para isCountingDown
+      // O isCountingDown já é definido como true imediatamente acima
+    };
+    
+    // Usar requestIdleCallback se disponível, senão executar imediatamente
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(scheduleNextRound);
+    } else {
+      scheduleNextRound();
+    }
   };
 
   const clearFeedbackTimer = () => {

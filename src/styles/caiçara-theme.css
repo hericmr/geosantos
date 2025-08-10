@@ -278,5 +278,5 @@
 .modern-modal__subtitle,
 .modern-modal__actions {
   position: relative;
-  z-index: 1;
+  z-index: 10;
 } 

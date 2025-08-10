@@ -129,10 +129,13 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   }
 
   return (
-    <div style={{
-      ...styles.container(false, isMobile, popupPosition),
-      zIndex: 10020
-    }}>
+    <div 
+      className="feedback-panel-container"
+      style={{
+        ...styles.container(false, isMobile, popupPosition),
+        zIndex: 10020
+      }}
+    >
       {clickedPosition && (
         <div style={styles.contentContainer}>
           <AchievementHeader 
@@ -221,6 +224,16 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
               transform: translate(-50%, 0);
             }
           }
+          @keyframes slideInLeft {
+            0% {
+              opacity: 0;
+              transform: translateX(-100%);
+            }
+            100% {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
           @keyframes slideUp {
             0% {
               opacity: 0;
@@ -240,6 +253,30 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             }
             100% { 
               box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+            }
+          }
+
+          /* Estilos responsivos para o modal */
+          @media (max-width: 1200px) {
+            .feedback-panel-container {
+              width: clamp(300px, 30vw, 400px) !important;
+              max-width: 400px !important;
+            }
+          }
+          
+          @media (max-width: 768px) {
+            .feedback-panel-container {
+              width: 100% !important;
+              max-width: 100% !important;
+              left: 0 !important;
+              right: 0 !important;
+            }
+          }
+          
+          @media (max-width: 480px) {
+            .feedback-panel-container {
+              padding: 12px !important;
+              gap: 8px !important;
             }
           }
 
