@@ -81,12 +81,26 @@ export const useGameState = (externalPause: boolean = false) => {
   };
 
   const startNextRound = (geoJsonData: any) => {
+    console.log('[startNextRound] Iniciando próxima rodada, estado atual:', {
+      isCountingDown: gameState.isCountingDown,
+      roundNumber: gameState.roundNumber,
+      globalTimeLeft: gameState.globalTimeLeft,
+      timeBonus: gameState.timeBonus
+    });
+    
     // OTIMIZAÇÃO: Usar requestIdleCallback para melhor performance
     const scheduleNextRound = () => {
       setGameState(prev => {
         const nextRoundNumber = prev.roundNumber + 1;
         const timeBonus = prev.timeBonus || 0;
         const newGlobalTime = Math.max(prev.globalTimeLeft + timeBonus, 0);
+        
+        console.log('[startNextRound] Configurando nova rodada:', {
+          nextRoundNumber,
+          timeBonus,
+          newGlobalTime,
+          prevIsCountingDown: prev.isCountingDown
+        });
         
         // ESTADO BASE COMUM (evita duplicação)
         const baseState = {
@@ -114,6 +128,8 @@ export const useGameState = (externalPause: boolean = false) => {
           const features = geoJsonData.features;
           const randomIndex = Math.floor(Math.random() * features.length);
           const neighborhood = features[randomIndex].properties?.NOME;
+          
+          console.log('[startNextRound] Novo bairro selecionado:', neighborhood);
           
           return {
             ...prev,

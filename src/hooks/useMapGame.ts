@@ -73,7 +73,9 @@ export const useMapGame = (
       gameStarted: gameState.gameStarted,
       isCountingDown: gameState.isCountingDown,
       roundNumber: gameState.roundNumber,
-      gameMode: gameState.gameMode
+      gameMode: gameState.gameMode,
+      showFeedback: gameState.showFeedback,
+      isPaused: gameState.isPaused
     });
     
     if (!gameState.gameStarted || !gameState.isCountingDown) {
@@ -444,12 +446,9 @@ export const useMapGame = (
               isCountingDown: true // CORREÇÃO: Restaurar estado de clique
             });
             
-            // CORREÇÃO: Avançar automaticamente após 2 segundos (tempo unificado)
-            // Removido o progressInterval conflitante
-            setTimeout(() => {
-              console.log('[useMapGame] Avançando automaticamente para próxima rodada (modo bairros)');
-              startNextRound(geoJsonData!);
-            }, 2000); // CORREÇÃO: Tempo unificado de 2 segundos
+            // CORREÇÃO: Aguardar clique do botão "Próximo" em vez de avançar automaticamente
+            // Isso evita conflitos com handleNextRound
+            console.log('[useMapGame] Modo bairros - aguardando clique do botão próximo');
           }, 300); // CORREÇÃO: Reduzido de 1000ms para 300ms
         };
         
@@ -496,6 +495,13 @@ export const useMapGame = (
   };
 
   const handleNextRound = (geoJsonData: FeatureCollection) => {
+    console.log('[handleNextRound] Iniciando próxima rodada, estado atual:', {
+      isCountingDown: gameState.isCountingDown,
+      gameStarted: gameState.gameStarted,
+      gameOver: gameState.gameOver,
+      roundNumber: gameState.roundNumber
+    });
+    
     setIsPaused(false);
     if (audioRef.current && gameState.gameStarted && !gameState.gameOver && !gameState.isMuted) {
       audioRef.current.play();
@@ -523,6 +529,11 @@ export const useMapGame = (
       clickedPosition: null,
       arrowPath: null,
       revealedNeighborhoods: new Set()
+    });
+
+    console.log('[handleNextRound] Estado após updateGameState:', {
+      isCountingDown: gameState.isCountingDown,
+      showFeedback: gameState.showFeedback
     });
 
     startNextRound(geoJsonData);
