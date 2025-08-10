@@ -103,6 +103,8 @@ export const useMapGame = (
         clearTimeout(feedbackTimerRef.current);
         feedbackTimerRef.current = null;
       }
+      // CORREÇÃO: Limpar também os intervalos de progresso locais
+      // Isso será feito automaticamente quando as funções de feedback terminarem
     };
 
     // Limpar todos os timers existentes antes de iniciar novos
@@ -197,7 +199,7 @@ export const useMapGame = (
           gameOver: isGameOver,
           showFeedback: true,
           feedbackOpacity: 1,
-          feedbackProgress: 100,
+          feedbackProgress: 0, // CORREÇÃO: Iniciar em 0 para animação progressiva
           feedbackMessage: feedbackMessage,
           revealedNeighborhoods: isCorrectPlace ? new Set([...gameState.revealedNeighborhoods, currentFamousPlace.name]) : gameState.revealedNeighborhoods,
           arrowPath: arrowPath,
@@ -214,20 +216,31 @@ export const useMapGame = (
           }, 400); // CORREÇÃO: Reduzido de 727ms para 400ms
         }
         
-        // 3. PRÓXIMA RODADA (CORREÇÃO: Ajustar tempo para 800ms para ser mais consistente)
-        setTimeout(() => {
-          // CORREÇÃO: Restaurar isCountingDown para true automaticamente
-          // para permitir cliques na nova rodada sem aguardar botão
-          console.log('[useMapGame] Restaurando isCountingDown para true (modo lugares famosos)');
-          updateGameState({
-            isCountingDown: true, // CORREÇÃO: Restaurar estado de clique
-            feedbackProgress: 100,
-            feedbackOpacity: 1
-          });
-          
-          // Modo lugares famosos sempre aguarda clique do botão
-          console.log('[useMapGame] Modo lugares famosos - aguardando clique do botão próximo');
-        }, 800); // CORREÇÃO: Ajustado de 500ms para 800ms para ser mais consistente
+        // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA
+        // CORREÇÃO: Implementar barra de progresso de 5 segundos
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+          progress += 2; // 2% a cada 100ms = 100% em 5 segundos
+          if (progress >= 100) {
+            progress = 100;
+            clearInterval(progressInterval);
+            
+            // Restaurar isCountingDown para true automaticamente
+            console.log('[useMapGame] Restaurando isCountingDown para true (modo lugares famosos)');
+            updateGameState({
+              isCountingDown: true, // CORREÇÃO: Restaurar estado de clique
+              feedbackProgress: 100,
+              feedbackOpacity: 1
+            });
+            
+            // Modo lugares famosos sempre aguarda clique do botão
+            console.log('[useMapGame] Modo lugares famosos - aguardando clique do botão próximo');
+          } else {
+            updateGameState({
+              feedbackProgress: progress
+            });
+          }
+        }, 100); // Atualizar a cada 100ms para animação suave
       };
       
               // Executar sequência de feedback
@@ -315,7 +328,7 @@ export const useMapGame = (
             gameOver: isGameOver,
             showFeedback: true,
             feedbackOpacity: 1,
-            feedbackProgress: 100,
+            feedbackProgress: 0, // CORREÇÃO: Iniciar em 0 para animação progressiva
             feedbackMessage: "",
             revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
             arrowPath: null,
@@ -418,7 +431,7 @@ export const useMapGame = (
             timeBonus: timeBonus,
             showFeedback: true,
             feedbackOpacity: 1,
-            feedbackProgress: 100,
+            feedbackProgress: 0, // CORREÇÃO: Iniciar em 0 para animação progressiva
             feedbackMessage: feedbackMessage,
             gameOver: isGameOver,
             revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
@@ -437,19 +450,30 @@ export const useMapGame = (
             }, 400); // CORREÇÃO: Reduzido de 727ms para 400ms
           }
           
-          // 3. PROGRESS BAR UNIFICADO (CORREÇÃO: Lógica simplificada sem conflitos)
-          setTimeout(() => {
-            // CORREÇÃO: Restaurar isCountingDown para true automaticamente
-            // para permitir cliques na nova rodada
-            console.log('[useMapGame] Restaurando isCountingDown para true (modo bairros)');
-            updateGameState({
-              isCountingDown: true // CORREÇÃO: Restaurar estado de clique
-            });
-            
-            // CORREÇÃO: Aguardar clique do botão "Próximo" em vez de avançar automaticamente
-            // Isso evita conflitos com handleNextRound
-            console.log('[useMapGame] Modo bairros - aguardando clique do botão próximo');
-          }, 300); // CORREÇÃO: Reduzido de 1000ms para 300ms
+          // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA
+          // CORREÇÃO: Implementar barra de progresso de 5 segundos
+          let progress = 0;
+          const progressInterval = setInterval(() => {
+            progress += 2; // 2% a cada 100ms = 100% em 5 segundos
+            if (progress >= 100) {
+              progress = 100;
+              clearInterval(progressInterval);
+              
+              // Restaurar isCountingDown para true automaticamente
+              console.log('[useMapGame] Restaurando isCountingDown para true (modo bairros)');
+              updateGameState({
+                isCountingDown: true // CORREÇÃO: Restaurar estado de clique
+              });
+              
+              // CORREÇÃO: Aguardar clique do botão "Próximo" em vez de avançar automaticamente
+              // Isso evita conflitos com handleNextRound
+              console.log('[useMapGame] Modo bairros - aguardando clique do botão próximo');
+            } else {
+              updateGameState({
+                feedbackProgress: progress
+              });
+            }
+          }, 100); // Atualizar a cada 100ms para animação suave
         };
         
         // Executar sequência de feedback para modo bairros
