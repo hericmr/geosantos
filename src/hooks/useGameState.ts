@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { LatLng } from 'leaflet';
 import { GameState } from '../types/game';
-import { ROUND_TIME, INITIAL_TIME, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS, calculateTimeBonus } from '../utils/gameConstants';
+import { INITIAL_TIME, ROUND_TIME, TIME_BONUS_THRESHOLDS, TIME_BONUS_AMOUNTS, calculateTimeBonus } from '../utils/gameConstants';
 
 export const useGameState = (externalPause: boolean = false) => {
   const [gameState, setGameState] = useState<GameState>({
