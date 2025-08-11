@@ -1,0 +1,47 @@
+/* GeoSantos - Estilos Responsivos (Mobile-First) */
+
+/* Estilos base (mobile) já estão definidos em App.css */
+
+/* Tablet (≥ 768px) */
+@media (min-width: 768px) {
+  :root {
+    font-size: 18px; /* Aumenta a base da fonte para telas maiores */
+  }
+
+  .start-screen .game-title {
+    font-size: 4.5rem; /* Título maior */
+  }
+
+  .start-button {
+    padding: 18px 35px;
+    font-size: 1.8rem;
+  }
+}
+
+/* Desktop (≥ 1024px) */
+@media (min-width: 1024px) {
+  :root {
+    font-size: 20px; /* Aumenta ainda mais a fonte base */
+  }
+
+  .start-screen .game-title {
+    font-size: 5rem;
+  }
+
+  .start-button {
+    padding: 20px 40px;
+    font-size: 2rem;
+    margin-top: 40px;
+  }
+
+  .game-options {
+    margin-top: 30px;
+  }
+}
+
+/* Ocultar o indicador de controles de mapa em telas pequenas */
+@media (max-width: 767px) {
+  .map-controls-indicator {
+    display: none !important; /* Usar !important para garantir a sobreposição do estilo inline */
+  }
+}
