@@ -1,4 +1,5 @@
 export const GAME_CONSTANTS = {
+    INITIAL_TIME: 15, // Tempo inicial em segundos
     TIME_UPDATE_INTERVAL: 20,
     TIME_UPDATE_AMOUNT: 0.02,
     WARNING_TIME: 5,
