@@ -1,0 +1,17 @@
+# CODEOWNERS
+# Este arquivo define quem é responsável por diferentes partes do código
+
+# Proprietários do repositório
+* @hericmr
+
+# Workflows e configurações do GitHub
+.github/ @hericmr
+
+# Configurações de deploy
+.github/workflows/ @hericmr
+
+# Documentação
+docs/ @hericmr
+
+# Scripts de automação
+scripts/ @hericmr 
