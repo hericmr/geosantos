@@ -3,13 +3,13 @@ import * as L from 'leaflet';
 import { FamousPlace } from '../../types/famousPlaces';
 import { 
   FamousPlacesGameState, 
-  FamousPlacesValidation, 
   FamousPlacesConfig,
   FamousPlacesVisualFeedback,
   FamousPlacesRound
 } from '../../types/modes/famousPlaces';
+import { ClickValidation } from '../../types/common';
 import { validateFamousPlaceClick } from '../../utils/modes/famousPlaces/validation';
-import { calculateFamousPlacesScore } from '../../utils/modes/famousPlaces/scoring';
+import { calculateFamousPlacesScore } from '../../utils/shared';
 
 export const useFamousPlacesGame = (
   famousPlaces: FamousPlace[],
@@ -128,7 +128,7 @@ export const useFamousPlacesGame = (
 
   // Lidar com clique no mapa
   const handleMapClick = useCallback((latlng: L.LatLng) => {
-    if (!gameState.isActive || !currentRound.targetPlaces.length) {
+    if (!gameState.isActive || !currentRound.places.length) {
       console.log('[useFamousPlacesGame] Clique ignorado - jogo não ativo ou sem lugares selecionados');
       return;
     }
@@ -157,8 +157,8 @@ export const useFamousPlacesGame = (
       const scoreCalculation = calculateFamousPlacesScore(
         validation.distance,
         gameState.roundTimeLeft,
-        validation.precision || 0,
-        gameState.consecutiveCorrect
+        validation.precisionBonus || 0,
+        0 // consecutiveCorrect não existe no estado atual
       );
 
       console.log('[useFamousPlacesGame] Pontuação:', scoreCalculation);
@@ -167,17 +167,18 @@ export const useFamousPlacesGame = (
       setGameState(prev => ({
         ...prev,
         score: prev.score + scoreCalculation.total,
-        feedback: validation,
-        consecutiveCorrect: validation.isCorrect ? prev.consecutiveCorrect + 1 : 0,
-        totalPlacesFound: validation.isCorrect ? prev.totalPlacesFound + 1 : prev.totalPlacesFound
+        feedback: validation
       }));
 
       // Atualizar rodada atual
-      if (validation.isCorrect) {
+      if (validation.isPerfect) {
+        const newPlacesFound = new Set(currentRound.placesFound);
+        newPlacesFound.add(currentPlace.id);
+        
         setCurrentRound(prev => ({
           ...prev,
-          placesFound: [...prev.placesFound, currentPlace],
-          roundScore: prev.roundScore + scoreCalculation.total
+          placesFound: newPlacesFound,
+          score: prev.score + scoreCalculation.total
         }));
       }
 
@@ -187,14 +188,14 @@ export const useFamousPlacesGame = (
         showDistanceCircle: defaultConfig.showDistanceCircle,
         distanceCircleCenter: latlng,
         distanceCircleRadius: validation.distance,
-        showArrow: defaultConfig.showArrow && !validation.isCorrect,
-        arrowPath: validation.isCorrect ? null : [latlng, { lat: currentPlace.latitude, lng: currentPlace.longitude }] as [L.LatLng, L.LatLng],
-        highlightPlace: validation.isCorrect,
-        placeColor: validation.isCorrect ? '#00ff00' : '#ff0000'
+        showArrow: defaultConfig.showArrow && !validation.isPerfect,
+        arrowPath: validation.isPerfect ? null : [latlng, { lat: currentPlace.latitude, lng: currentPlace.longitude }] as [L.LatLng, L.LatLng],
+        highlightPlace: validation.isPerfect,
+        placeMarker: validation.isPerfect ? L.latLng(currentPlace.latitude, currentPlace.longitude) : null
       }));
 
       // Se acertou, avançar para próximo lugar
-      if (validation.isCorrect) {
+      if (validation.isPerfect) {
         setTimeout(() => {
           advanceToNextPlace();
           completeCurrentRound();
@@ -204,7 +205,7 @@ export const useFamousPlacesGame = (
     } catch (error) {
       console.error('[useFamousPlacesGame] Erro ao processar clique:', error);
     }
-  }, [gameState.isActive, gameState.roundTimeLeft, gameState.consecutiveCorrect, currentRound, defaultConfig, selectPlaceFromRound, advanceToNextPlace, completeCurrentRound]);
+  }, [gameState.isActive, gameState.roundTimeLeft, currentRound, defaultConfig, selectPlaceFromRound, advanceToNextPlace, completeCurrentRound]);
 
   // Atualizar timer
   const updateTimer = useCallback((timeLeft: number) => {
@@ -224,10 +225,8 @@ export const useFamousPlacesGame = (
     setGameState(prev => ({
       ...prev,
       isActive: true,
-      currentRound: 1,
-      score: 0,
-      consecutiveCorrect: 0,
-      totalPlacesFound: 0
+      roundNumber: 1,
+      score: 0
     }));
     generateNewRound();
   }, [generateNewRound]);
@@ -283,8 +282,8 @@ export const useFamousPlacesGame = (
 
   // Obter rodada atual
   const getCurrentRound = useCallback(() => {
-    return gameState.currentRound;
-  }, [gameState.currentRound]);
+    return currentRound;
+  }, [currentRound]);
 
   // Obter tempo restante
   const getRoundTimeLeft = useCallback(() => {

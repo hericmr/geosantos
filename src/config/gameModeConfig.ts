@@ -7,46 +7,46 @@
 
 export const GAME_MODE_CONFIG = {
   // Flag global para usar versões refatoradas
-  useRefactoredModules: false,
+  useRefactoredModules: true,
   
   // Configurações específicas por modo
   neighborhood: {
-    useRefactored: false,
+    useRefactored: true,
     fallbackToOriginal: true,
     components: {
-      mode: false,        // NeighborhoodMode
-      hook: false,        // useNeighborhoodGame
-      validation: false,  // validation
-      scoring: false,     // scoring
-      types: false        // neighborhood types
+      mode: true,        // NeighborhoodMode
+      hook: true,        // useNeighborhoodGame
+      validation: true,  // validation
+      scoring: true,     // scoring
+      types: true        // neighborhood types
     }
   },
   
   famousPlaces: {
-    useRefactored: false,
+    useRefactored: true,
     fallbackToOriginal: true,
     components: {
-      mode: false,        // FamousPlacesMode
-      hook: false,        // useFamousPlacesGame
-      validation: false,  // validation
-      scoring: false,     // scoring
-      types: false        // famousPlaces types
+      mode: true,        // FamousPlacesMode
+      hook: true,        // useFamousPlacesGame
+      validation: true,  // validation
+      scoring: true,     // scoring
+      types: true        // famousPlaces types
     }
   },
   
   // Configurações compartilhadas
   common: {
-    useRefactored: false,
+    useRefactored: true,
     fallbackToOriginal: true,
     components: {
-      baseGameMode: false, // BaseGameMode
-      types: false         // common types
+      baseGameMode: true, // BaseGameMode
+      types: true         // common types
     }
   },
   
   // Hook principal
   gameMode: {
-    useRefactored: false,
+    useRefactored: true,
     fallbackToOriginal: true
   }
 };

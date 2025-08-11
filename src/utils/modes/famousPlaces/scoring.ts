@@ -1,120 +1,41 @@
 import { FamousPlacesScoreCalculation } from '../../../types/modes/famousPlaces';
+import {
+  calculateFamousPlacesScore,
+  calculateTotalScore,
+  calculateScoreMultiplier,
+  calculateScoreStats,
+  calculatePlayerRanking,
+  formatScore,
+  formatTime,
+  formatDistance
+} from '../../shared';
 
-// Configurações de pontuação para o modo lugares famosos
-export const FAMOUS_PLACES_SCORING_CONFIG = {
-  PERFECT_SCORE: 2000,           // Pontuação base para acerto perfeito
-  MAX_DISTANCE_SCORE: 1500,      // Pontuação máxima baseada na distância
-  PRECISION_BONUS_MAX: 1000,     // Bônus máximo por precisão
-  TIME_BONUS_MAX: 1000,          // Bônus máximo de tempo
-  TIME_BONUS_THRESHOLD: 5,       // Tempo limite para bônus (segundos)
-  DISTANCE_PENALTY_FACTOR: 3,    // Fator de penalidade por distância (km)
-  DISTANCE_THRESHOLD: 100,       // Distância para considerar acerto (metros)
-  CONSECUTIVE_BONUS: 200,        // Bônus por acertos consecutivos
-  MAX_CONSECUTIVE_BONUS: 1000    // Máximo de bônus por acertos consecutivos
-};
+/**
+ * Sistema de pontuação para o modo de lugares famosos usando utilitários compartilhados
+ * 
+ * Este arquivo foi refatorado para usar os utilitários compartilhados
+ * em vez de duplicar código entre modos.
+ */
 
-// Função principal para calcular pontuação de lugares famosos
-export const calculateFamousPlacesScore = (
+// ============================================================================
+// FUNÇÕES DE PONTUAÇÃO ESPECÍFICAS DO MODO LUGARES FAMOSOS
+// ============================================================================
+
+/**
+ * Calcula pontuação para modo de lugares famosos
+ */
+export const calculateFamousPlacesScoreRefactored = (
   distance: number,
   timeLeft: number,
   precision: number = 0,
   consecutiveCorrect: number = 0
 ): FamousPlacesScoreCalculation => {
-  let baseScore = 0;
-  let placeBonus = 0;
-  let precisionBonus = 0;
-  let timeAccuracyBonus = 0;
-  let distancePenalty = 0;
-
-  // Verificar se acertou o lugar
-  if (distance <= FAMOUS_PLACES_SCORING_CONFIG.DISTANCE_THRESHOLD) {
-    // Acerto: pontuação base máxima
-    baseScore = FAMOUS_PLACES_SCORING_CONFIG.PERFECT_SCORE;
-    placeBonus = FAMOUS_PLACES_SCORING_CONFIG.PERFECT_SCORE;
-    
-    // Bônus de precisão: até 1000 pontos baseado na distância
-    precisionBonus = Math.round(
-      (1 - (distance / FAMOUS_PLACES_SCORING_CONFIG.DISTANCE_THRESHOLD)) * 
-      FAMOUS_PLACES_SCORING_CONFIG.PRECISION_BONUS_MAX
-    );
-    
-    // Bônus de tempo: até 1000 pontos se tempo < 5s
-    if (timeLeft <= FAMOUS_PLACES_SCORING_CONFIG.TIME_BONUS_THRESHOLD) {
-      timeAccuracyBonus = Math.round(
-        (timeLeft / FAMOUS_PLACES_SCORING_CONFIG.TIME_BONUS_THRESHOLD) * 
-        FAMOUS_PLACES_SCORING_CONFIG.TIME_BONUS_MAX
-      );
-    }
-  } else {
-    // Erro: pontuação baseada na distância
-    const distanceKm = distance / 1000;
-    const distanceScore = Math.max(
-      0, 
-      FAMOUS_PLACES_SCORING_CONFIG.MAX_DISTANCE_SCORE * 
-      (1 - (distanceKm / FAMOUS_PLACES_SCORING_CONFIG.DISTANCE_PENALTY_FACTOR))
-    );
-    
-    baseScore = Math.round(distanceScore);
-    distancePenalty = FAMOUS_PLACES_SCORING_CONFIG.MAX_DISTANCE_SCORE - baseScore;
-    
-    // Bônus de tempo reduzido para erros
-    if (timeLeft <= FAMOUS_PLACES_SCORING_CONFIG.TIME_BONUS_THRESHOLD) {
-      timeAccuracyBonus = Math.round(
-        (timeLeft / FAMOUS_PLACES_SCORING_CONFIG.TIME_BONUS_THRESHOLD) * 
-        (FAMOUS_PLACES_SCORING_CONFIG.TIME_BONUS_MAX / 2)
-      );
-    }
-  }
-
-  // Bônus por acertos consecutivos
-  let consecutiveBonus = 0;
-  if (consecutiveCorrect > 1 && distance <= FAMOUS_PLACES_SCORING_CONFIG.DISTANCE_THRESHOLD) {
-    consecutiveBonus = Math.min(
-      consecutiveCorrect * FAMOUS_PLACES_SCORING_CONFIG.CONSECUTIVE_BONUS,
-      FAMOUS_PLACES_SCORING_CONFIG.MAX_CONSECUTIVE_BONUS
-    );
-  }
-
-  const total = baseScore + precisionBonus + timeAccuracyBonus + consecutiveBonus;
-
-  return {
-    total: Math.round(total),
-    distancePoints: Math.round(baseScore * 0.6),
-    timePoints: timeAccuracyBonus,
-    bonus: placeBonus + precisionBonus + consecutiveBonus,
-    placeBonus,
-    precisionBonus,
-    timeAccuracyBonus,
-    distancePenalty
-  };
+  return calculateFamousPlacesScore(distance, timeLeft, precision, consecutiveCorrect);
 };
 
-// Função para calcular bônus de precisão baseado na distância
-export const calculatePrecisionBonus = (distance: number, threshold: number = 100): number => {
-  if (distance <= threshold) {
-    const precision = 1 - (distance / threshold);
-    return Math.round(precision * FAMOUS_PLACES_SCORING_CONFIG.PRECISION_BONUS_MAX);
-  }
-  return 0;
-};
-
-// Função para calcular bônus de tempo baseado na precisão
-export const calculateTimeBonus = (timeLeft: number, isCorrect: boolean): number => {
-  if (!isCorrect) return 0;
-  
-  if (timeLeft <= 1) {
-    return 1000; // Muito rápido
-  } else if (timeLeft <= 2) {
-    return 800; // Rápido
-  } else if (timeLeft <= 3) {
-    return 600; // Moderado
-  } else if (timeLeft <= 5) {
-    return 400; // Lento
-  }
-  return 0; // Muito lento
-};
-
-// Função para calcular pontuação total com todos os bônus
+/**
+ * Calcula pontuação total com fatores adicionais
+ */
 export const calculateTotalFamousPlacesScore = (
   distance: number,
   timeLeft: number,
@@ -127,128 +48,28 @@ export const calculateTotalFamousPlacesScore = (
     timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night';
   } = {}
 ): number => {
-  // Pontuação base
-  const baseCalculation = calculateFamousPlacesScore(
-    distance, 
-    timeLeft, 
-    precision, 
-    consecutiveCorrect
-  );
-  
-  let totalScore = baseCalculation.total;
-  
-  // Bônus por dificuldade
-  if (additionalFactors.difficulty) {
-    switch (additionalFactors.difficulty) {
-      case 'hard':
-        totalScore += 500;
-        break;
-      case 'medium':
-        totalScore += 250;
-        break;
-      case 'easy':
-        totalScore += 100;
-        break;
-    }
-  }
-  
-  // Bônus por tipo de lugar
-  if (additionalFactors.placeType) {
-    switch (additionalFactors.placeType) {
-      case 'monument':
-        totalScore += 300;
-        break;
-      case 'museum':
-        totalScore += 250;
-        break;
-      case 'park':
-        totalScore += 200;
-        break;
-      case 'beach':
-        totalScore += 150;
-        break;
-      default:
-        totalScore += 100;
-    }
-  }
-  
-  // Bônus por horário do dia
-  if (additionalFactors.timeOfDay) {
-    switch (additionalFactors.timeOfDay) {
-      case 'morning':
-        totalScore += 100;
-        break;
-      case 'afternoon':
-        totalScore += 50;
-        break;
-      case 'evening':
-        totalScore += 150;
-        break;
-      case 'night':
-        totalScore += 200;
-        break;
-    }
-  }
-  
-  // Bônus especial (eventos, conquistas, etc.)
-  if (additionalFactors.specialBonus) {
-    totalScore += 1000;
-  }
-  
-  return Math.round(totalScore);
+  const baseScore = calculateFamousPlacesScore(distance, timeLeft, precision, consecutiveCorrect).total;
+  return calculateTotalScore(baseScore, {
+    consecutiveCorrect,
+    ...additionalFactors
+  });
 };
 
-// Função para calcular multiplicador de pontuação baseado no desempenho
-export const calculateScoreMultiplier = (
+/**
+ * Calcula multiplicador de pontuação baseado em performance
+ */
+export const calculateFamousPlacesScoreMultiplier = (
   consecutiveCorrect: number,
   averageAccuracy: number,
   totalPlaces: number
 ): number => {
-  let multiplier = 1.0;
-  
-  // Multiplicador por acertos consecutivos
-  if (consecutiveCorrect >= 10) {
-    multiplier += 1.0; // +100%
-  } else if (consecutiveCorrect >= 7) {
-    multiplier += 0.75; // +75%
-  } else if (consecutiveCorrect >= 5) {
-    multiplier += 0.5; // +50%
-  } else if (consecutiveCorrect >= 3) {
-    multiplier += 0.25; // +25%
-  } else if (consecutiveCorrect >= 2) {
-    multiplier += 0.1; // +10%
-  }
-  
-  // Multiplicador por precisão média
-  if (averageAccuracy >= 0.95) {
-    multiplier += 0.5; // +50%
-  } else if (averageAccuracy >= 0.9) {
-    multiplier += 0.3; // +30%
-  } else if (averageAccuracy >= 0.8) {
-    multiplier += 0.2; // +20%
-  } else if (averageAccuracy >= 0.7) {
-    multiplier += 0.1; // +10%
-  }
-  
-  // Multiplicador por quantidade de lugares encontrados
-  if (totalPlaces >= 20) {
-    multiplier += 0.3; // +30%
-  } else if (totalPlaces >= 15) {
-    multiplier += 0.2; // +20%
-  } else if (totalPlaces >= 10) {
-    multiplier += 0.1; // +10%
-  }
-  
-  return Math.min(multiplier, 3.0); // Máximo de 3x
+  return calculateScoreMultiplier(consecutiveCorrect, averageAccuracy, totalPlaces);
 };
 
-// Função para formatar pontuação com separadores
-export const formatScore = (score: number): string => {
-  return score.toLocaleString('pt-BR');
-};
-
-// Função para calcular estatísticas de pontuação
-export const calculateScoreStats = (scores: number[]): {
+/**
+ * Calcula estatísticas de pontuação para lugares famosos
+ */
+export const calculateFamousPlacesScoreStats = (scores: number[]): {
   total: number;
   average: number;
   highest: number;
@@ -257,103 +78,291 @@ export const calculateScoreStats = (scores: number[]): {
   perfectScores: number;
   averageAccuracy: number;
 } => {
-  if (scores.length === 0) {
-    return {
-      total: 0,
-      average: 0,
-      highest: 0,
-      lowest: 0,
-      count: 0,
-      perfectScores: 0,
-      averageAccuracy: 0
-    };
-  }
+  const baseStats = calculateScoreStats(scores);
   
-  const total = scores.reduce((sum, score) => sum + score, 0);
-  const average = total / scores.length;
-  const highest = Math.max(...scores);
-  const lowest = Math.min(...scores);
-  const perfectScores = scores.filter(score => score >= FAMOUS_PLACES_SCORING_CONFIG.PERFECT_SCORE).length;
-  const averageAccuracy = perfectScores / scores.length;
+  // Calcular acertos perfeitos (pontuação >= 2000)
+  const perfectScores = scores.filter(score => score >= 2000).length;
+  
+  // Calcular precisão média baseada na pontuação
+  const averageAccuracy = baseStats.average / 2000; // Normalizar para 0-1
   
   return {
-    total,
-    average: Math.round(average),
-    highest,
-    lowest,
-    count: scores.length,
+    ...baseStats,
     perfectScores,
-    averageAccuracy
+    averageAccuracy: Math.round(averageAccuracy * 100) / 100
   };
 };
 
-// Função para calcular ranking de jogadores
-export const calculatePlayerRanking = (
-  players: Array<{ name: string; score: number; accuracy: number; time: number }>
-): Array<{ rank: number; name: string; score: number; accuracy: number; time: number; bonus: number }> => {
+/**
+ * Calcula ranking de jogadores para lugares famosos
+ */
+export const calculateFamousPlacesPlayerRanking = (
+  players: Array<{ name: string; score: number; accuracy: number; time: number; placesFound: number }>
+): Array<{ 
+  rank: number; 
+  name: string; 
+  score: number; 
+  accuracy: number; 
+  time: number; 
+  bonus: number;
+  placesFound: number;
+}> => {
   return players
     .map(player => ({
       ...player,
-      bonus: Math.round(player.score * (player.accuracy * 0.5 + (1 / player.time) * 0.5))
+      bonus: Math.round(player.score * 0.1) // Bônus de 10% da pontuação
     }))
-    .sort((a, b) => (b.score + b.bonus) - (a.score + a.bonus))
+    .sort((a, b) => b.score - a.score)
     .map((player, index) => ({
       ...player,
       rank: index + 1
     }));
 };
 
-// Função para calcular conquistas baseadas na pontuação
-export const calculateAchievements = (
+/**
+ * Calcula conquistas para lugares famosos
+ */
+export const calculateFamousPlacesAchievements = (
   totalScore: number,
   perfectPlaces: number,
   consecutiveCorrect: number,
   totalPlaces: number
 ): Array<{ name: string; description: string; unlocked: boolean; icon: string }> => {
-  const achievements = [
-    {
-      name: 'Primeiro Passo',
-      description: 'Encontre seu primeiro lugar famoso',
-      unlocked: perfectPlaces >= 1,
-      icon: '🎯'
-    },
-    {
-      name: 'Explorador',
-      description: 'Encontre 5 lugares famosos',
-      unlocked: perfectPlaces >= 5,
-      icon: '🗺️'
-    },
-    {
-      name: 'Conquistador',
-      description: 'Encontre 10 lugares famosos',
-      unlocked: perfectPlaces >= 10,
+  const achievements = [];
+  
+  // Conquista por pontuação total
+  if (totalScore >= 10000) {
+    achievements.push({
+      name: 'Explorador Experiente',
+      description: 'Alcançou 10.000 pontos',
+      unlocked: true,
       icon: '🏆'
-    },
-    {
-      name: 'Mestre da Precisão',
-      description: 'Acertou 3 lugares consecutivos',
-      unlocked: consecutiveCorrect >= 3,
+    });
+  } else if (totalScore >= 5000) {
+    achievements.push({
+      name: 'Explorador Intermediário',
+      description: 'Alcançou 5.000 pontos',
+      unlocked: true,
+      icon: '🥈'
+    });
+  } else if (totalScore >= 1000) {
+    achievements.push({
+      name: 'Explorador Iniciante',
+      description: 'Alcançou 1.000 pontos',
+      unlocked: true,
+      icon: '🥉'
+    });
+  }
+  
+  // Conquista por acertos perfeitos
+  if (perfectPlaces >= 10) {
+    achievements.push({
+      name: 'Precisão Absoluta',
+      description: '10 acertos perfeitos',
+      unlocked: true,
       icon: '🎯'
-    },
-    {
-      name: 'Lenda',
-      description: 'Acertou 10 lugares consecutivos',
-      unlocked: consecutiveCorrect >= 10,
-      icon: '👑'
-    },
-    {
-      name: 'Pontuação Alta',
-      description: 'Alcance 50.000 pontos',
-      unlocked: totalScore >= 50000,
-      icon: '⭐'
-    },
-    {
-      name: 'Completista',
-      description: 'Encontre todos os lugares disponíveis',
-      unlocked: perfectPlaces >= totalPlaces,
-      icon: '💎'
-    }
-  ];
+    });
+  } else if (perfectPlaces >= 5) {
+    achievements.push({
+      name: 'Precisão Alta',
+      description: '5 acertos perfeitos',
+      unlocked: true,
+      icon: '🎯'
+    });
+  }
+  
+  // Conquista por acertos consecutivos
+  if (consecutiveCorrect >= 5) {
+    achievements.push({
+      name: 'Sequência Imparável',
+      description: '5 acertos consecutivos',
+      unlocked: true,
+      icon: '🔥'
+    });
+  } else if (consecutiveCorrect >= 3) {
+    achievements.push({
+      name: 'Sequência Quente',
+      description: '3 acertos consecutivos',
+      unlocked: true,
+      icon: '🔥'
+    });
+  }
+  
+  // Conquista por quantidade de lugares
+  if (totalPlaces >= 20) {
+    achievements.push({
+      name: 'Colecionador',
+      description: 'Explorou 20 lugares',
+      unlocked: true,
+      icon: '🗺️'
+    });
+  } else if (totalPlaces >= 10) {
+    achievements.push({
+      name: 'Viajante',
+      description: 'Explorou 10 lugares',
+      unlocked: true,
+      icon: '🗺️'
+    });
+  }
   
   return achievements;
+};
+
+// ============================================================================
+// FUNÇÕES DE FORMATAÇÃO ESPECÍFICAS
+// ============================================================================
+
+/**
+ * Formata pontuação para exibição
+ */
+export const formatFamousPlacesScore = (score: number): string => {
+  return formatScore(score);
+};
+
+/**
+ * Formata tempo para exibição
+ */
+export const formatFamousPlacesTime = (seconds: number): string => {
+  return formatTime(seconds);
+};
+
+/**
+ * Formata distância para exibição
+ */
+export const formatFamousPlacesDistance = (meters: number): string => {
+  return formatDistance(meters);
+};
+
+/**
+ * Formata precisão para exibição
+ */
+export const formatPrecision = (precision: number): string => {
+  return `${Math.round(precision * 100)}%`;
+};
+
+/**
+ * Formata direção para exibição
+ */
+export const formatDirection = (direction: string): string => {
+  const directionMap: Record<string, string> = {
+    'north': 'Norte',
+    'south': 'Sul',
+    'east': 'Leste',
+    'west': 'Oeste',
+    'northeast': 'Nordeste',
+    'northwest': 'Noroeste',
+    'southeast': 'Sudeste',
+    'southwest': 'Sudoeste'
+  };
+  
+  return directionMap[direction] || direction;
+};
+
+// ============================================================================
+// FUNÇÕES DE ANÁLISE DE PERFORMANCE
+// ============================================================================
+
+/**
+ * Analisa performance de um jogador
+ */
+export const analyzeFamousPlacesPerformance = (
+  scores: number[],
+  times: number[],
+  distances: number[]
+): {
+  overallScore: number;
+  averageTime: number;
+  averageDistance: number;
+  consistency: number;
+  improvement: number;
+  recommendations: string[];
+} => {
+  if (scores.length === 0) {
+    return {
+      overallScore: 0,
+      averageTime: 0,
+      averageDistance: 0,
+      consistency: 0,
+      improvement: 0,
+      recommendations: []
+    };
+  }
+  
+  const overallScore = scores.reduce((sum, score) => sum + score, 0);
+  const averageTime = times.reduce((sum, time) => sum + time, 0) / times.length;
+  const averageDistance = distances.reduce((sum, distance) => sum + distance, 0) / distances.length;
+  
+  // Calcular consistência (desvio padrão dos scores)
+  const meanScore = overallScore / scores.length;
+  const variance = scores.reduce((sum, score) => sum + Math.pow(score - meanScore, 2), 0) / scores.length;
+  const consistency = Math.sqrt(variance);
+  
+  // Calcular melhoria (tendência dos scores)
+  let improvement = 0;
+  if (scores.length > 1) {
+    const firstHalf = scores.slice(0, Math.ceil(scores.length / 2));
+    const secondHalf = scores.slice(Math.ceil(scores.length / 2));
+    const firstHalfAvg = firstHalf.reduce((sum, score) => sum + score, 0) / firstHalf.length;
+    const secondHalfAvg = secondHalf.reduce((sum, score) => sum + score, 0) / secondHalf.length;
+    improvement = secondHalfAvg - firstHalfAvg;
+  }
+  
+  // Gerar recomendações
+  const recommendations: string[] = [];
+  
+  if (averageDistance > 500) {
+    recommendations.push('Tente clicar mais próximo dos lugares famosos para melhorar sua pontuação');
+  }
+  
+  if (averageTime > 10) {
+    recommendations.push('Tente responder mais rapidamente para ganhar bônus de tempo');
+  }
+  
+  if (consistency > 1000) {
+    recommendations.push('Tente manter uma performance mais consistente entre as rodadas');
+  }
+  
+  if (improvement < 0) {
+    recommendations.push('Continue praticando para melhorar sua performance');
+  }
+  
+  return {
+    overallScore,
+    averageTime,
+    averageDistance,
+    consistency,
+    improvement,
+    recommendations
+  };
+};
+
+/**
+ * Calcula nível de dificuldade baseado na performance
+ */
+export const calculateDifficultyLevel = (
+  averageScore: number,
+  averageTime: number,
+  averageDistance: number
+): 'beginner' | 'intermediate' | 'advanced' | 'expert' => {
+  let points = 0;
+  
+  // Pontos por pontuação
+  if (averageScore >= 1500) points += 3;
+  else if (averageScore >= 1000) points += 2;
+  else if (averageScore >= 500) points += 1;
+  
+  // Pontos por tempo
+  if (averageTime <= 3) points += 3;
+  else if (averageTime <= 6) points += 2;
+  else if (averageTime <= 10) points += 1;
+  
+  // Pontos por precisão
+  if (averageDistance <= 100) points += 3;
+  else if (averageDistance <= 250) points += 2;
+  else if (averageDistance <= 500) points += 1;
+  
+  if (points >= 8) return 'expert';
+  if (points >= 6) return 'advanced';
+  if (points >= 4) return 'intermediate';
+  return 'beginner';
 }; 

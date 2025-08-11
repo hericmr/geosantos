@@ -374,8 +374,36 @@ export const useMapGame = (
             totalDistance: gameState.totalDistance
           });
           
-          // CORREÇÃO: Removido progressInterval conflitante
-          // O progresso agora é gerenciado de forma unificada acima
+          // CORREÇÃO: Implementar barra de progresso para quando acerta o bairro
+          let progress = 0;
+          console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (acertou bairro)');
+          
+          const progressInterval = setInterval(() => {
+            progress += 3.33; // 3.33% a cada 100ms = 100% em 3 segundos
+            console.log('[useMapGame] DEBUG - Progresso atual (acertou):', progress, '%');
+            
+            if (progress >= 100) {
+              progress = 100;
+              clearInterval(progressInterval);
+              console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 100% (acertou)');
+              
+              // Avançar automaticamente para próxima rodada após 3 segundos
+              console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (acertou bairro)');
+              
+              setTimeout(() => {
+                if (geoJsonData) {
+                  console.log('[useMapGame] Iniciando próxima rodada automaticamente (acertou bairro)');
+                  startNextRound(geoJsonData);
+                } else {
+                  console.log('[useMapGame] DEBUG - geoJsonData não disponível para avanço automático');
+                }
+              }, 500); // 500ms de delay para visualização
+            } else {
+              updateGameState({
+                feedbackProgress: progress
+              });
+            }
+          }, 100); // Atualizar a cada 100ms para animação suave
         }, 0);
         
         return;

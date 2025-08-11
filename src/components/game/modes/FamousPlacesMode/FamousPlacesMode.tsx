@@ -9,7 +9,7 @@ import {
   FamousPlacesRound
 } from '../../../../types/modes/famousPlaces';
 import { validateFamousPlaceClick } from '../../../../utils/modes/famousPlaces/validation';
-import { calculateFamousPlacesScore } from '../../../../utils/modes/famousPlaces/scoring';
+import { calculateFamousPlacesScore } from '../../../../utils/shared';
 import { FamousPlace } from '../../../../types/famousPlaces';
 
 interface FamousPlacesModeProps {

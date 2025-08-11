@@ -250,6 +250,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [isTimerPaused, setIsTimerPaused] = useState(false);
   const [modalTimeProgress, setModalTimeProgress] = useState(0);
   const spriteIdRef = useRef<string>('');
+  
+
+  
   // Controle de lugares famosos já usados
   const { places: famousPlaces, isLoading: famousPlacesLoading, error: famousPlacesError, getRandomPlace } = useFamousPlaces();
   const lastFamousPlaceId = useRef<string | null>(null);
@@ -258,6 +261,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const [currentZoom, setCurrentZoom] = useState(zoom);
   const [mapCenter, setMapCenter] = useState(center);
   const spriteContainerRef = useRef<HTMLDivElement | null>(null);
+
+
 
   // Desestruturação do useMapGame deve vir antes do useEffect que usa gameState
   const {

@@ -1,13 +1,27 @@
 import * as L from 'leaflet';
 import { FamousPlacesValidation, DistanceValidation } from '../../../types/modes/famousPlaces';
 import { FamousPlace } from '../../../types/famousPlaces';
+import {
+  calculateDistance,
+  calculateDirection,
+  getDirectionText,
+  findNearestElement
+} from '../../shared';
 
-// Função para calcular distância entre dois pontos
-export const calculateDistance = (point1: L.LatLng, point2: L.LatLng): number => {
-  return point1.distanceTo(point2);
-};
+/**
+ * Validação de cliques para o modo de lugares famosos usando utilitários compartilhados
+ * 
+ * Este arquivo foi refatorado para usar os utilitários compartilhados
+ * em vez de duplicar código entre modos.
+ */
 
-// Função para validar se um ponto está dentro do threshold de distância
+// ============================================================================
+// FUNÇÕES DE VALIDAÇÃO ESPECÍFICAS DO MODO LUGARES FAMOSOS
+// ============================================================================
+
+/**
+ * Valida se um ponto está dentro do threshold de distância
+ */
 export const validateDistance = (
   clickedPoint: L.LatLng,
   targetPoint: L.LatLng,
@@ -31,36 +45,9 @@ export const validateDistance = (
   };
 };
 
-// Função para calcular a direção do clique em relação ao alvo
-export const calculateDirection = (clickedPoint: L.LatLng, targetPoint: L.LatLng): 
-  'north' | 'south' | 'east' | 'west' | 'northeast' | 'northwest' | 'southeast' | 'southwest' => {
-  
-  const latDiff = clickedPoint.lat - targetPoint.lat;
-  const lngDiff = clickedPoint.lng - targetPoint.lng;
-  
-  const absLatDiff = Math.abs(latDiff);
-  const absLngDiff = Math.abs(lngDiff);
-  
-  // Determinar direção principal
-  if (absLatDiff > absLngDiff * 2) {
-    // Diferença de latitude é dominante
-    return latDiff > 0 ? 'north' : 'south';
-  } else if (absLngDiff > absLatDiff * 2) {
-    // Diferença de longitude é dominante
-    return lngDiff > 0 ? 'east' : 'west';
-  } else {
-    // Diferença mista - direção diagonal
-    if (latDiff > 0 && lngDiff > 0) return 'northeast';
-    if (latDiff > 0 && lngDiff < 0) return 'northwest';
-    if (latDiff < 0 && lngDiff > 0) return 'southeast';
-    if (latDiff < 0 && lngDiff < 0) return 'southwest';
-    
-    // Fallback para casos extremos
-    return 'north';
-  }
-};
-
-// Função para validar clique em um lugar famoso específico
+/**
+ * Valida clique em um lugar famoso específico
+ */
 export const validateFamousPlaceClick = (
   clickedPoint: L.LatLng,
   targetPlace: FamousPlace,
@@ -98,30 +85,16 @@ export const validateFamousPlaceClick = (
     isPerfect: isCorrectPlace,
     isCorrectPlace,
     placeName: targetPlace.name,
-    targetLatLng,
+    targetLatLng: targetLatLng,
     clickedLatLng: clickedPoint,
-    distanceThreshold,
-    precisionBonus
+    distanceThreshold: distanceThreshold,
+    precisionBonus: Math.round(distanceValidation.precision * 1000)
   };
 };
 
-// Função para obter texto descritivo da direção
-export const getDirectionText = (direction: string): string => {
-  const directionMap: Record<string, string> = {
-    'north': 'norte',
-    'south': 'sul',
-    'east': 'leste',
-    'west': 'oeste',
-    'northeast': 'nordeste',
-    'northwest': 'noroeste',
-    'southeast': 'sudeste',
-    'southwest': 'sudoeste'
-  };
-  
-  return directionMap[direction] || direction;
-};
-
-// Função para encontrar o lugar famoso mais próximo de um ponto
+/**
+ * Encontra o lugar famoso mais próximo de um ponto
+ */
 export const findNearestFamousPlace = (
   clickedPoint: L.LatLng,
   famousPlaces: FamousPlace[]
@@ -147,14 +120,16 @@ export const findNearestFamousPlace = (
   };
 };
 
-// Função para calcular área de busca baseada no threshold
+/**
+ * Calcula área de busca circular
+ */
 export const calculateSearchArea = (
   centerPoint: L.LatLng,
   radius: number
 ): { bounds: L.LatLngBounds; center: L.LatLng; radius: number } => {
   const bounds = L.latLngBounds(
-    L.latLng(centerPoint.lat - (radius / 111000), centerPoint.lng - (radius / (111000 * Math.cos(centerPoint.lat * Math.PI / 180)))),
-    L.latLng(centerPoint.lat + (radius / 111000), centerPoint.lng + (radius / (111000 * Math.cos(centerPoint.lat * Math.PI / 180))))
+    [centerPoint.lat - (radius / 111000), centerPoint.lng - (radius / (111000 * Math.cos(centerPoint.lat * Math.PI / 180)))],
+    [centerPoint.lat + (radius / 111000), centerPoint.lng + (radius / (111000 * Math.cos(centerPoint.lat * Math.PI / 180)))]
   );
   
   return {
@@ -164,7 +139,9 @@ export const calculateSearchArea = (
   };
 };
 
-// Função para verificar se um ponto está dentro de uma área de busca
+/**
+ * Verifica se um ponto está dentro da área de busca
+ */
 export const isPointInSearchArea = (
   point: L.LatLng,
   searchArea: { bounds: L.LatLngBounds; center: L.LatLng; radius: number }
@@ -172,7 +149,9 @@ export const isPointInSearchArea = (
   return searchArea.bounds.contains(point);
 };
 
-// Função para obter dicas baseadas na distância e direção
+/**
+ * Gera dicas baseadas na distância e direção
+ */
 export const getPlaceHints = (
   distance: number,
   direction: string,
@@ -181,37 +160,38 @@ export const getPlaceHints = (
   const hints: string[] = [];
   
   if (distance < 100) {
-    hints.push('Você está muito perto!');
-    hints.push('Continue procurando na área!');
-  } else if (distance < 250) {
-    hints.push(`O ${placeName} está a ${Math.round(distance)}m de distância`);
-    hints.push(`Continue na direção ${getDirectionText(direction)}`);
+    hints.push(`Você está muito próximo de ${placeName}!`);
+    hints.push(`Continue procurando na área!`);
   } else if (distance < 500) {
-    hints.push(`O ${placeName} está a ${Math.round(distance)}m de distância`);
-    hints.push(`Mova-se na direção ${getDirectionText(direction)}`);
+    hints.push(`Você está próximo de ${placeName}`);
+    hints.push(`Procure na direção ${getDirectionText(direction)}`);
   } else if (distance < 1000) {
-    hints.push(`O ${placeName} está a ${(distance / 1000).toFixed(1)}km de distância`);
-    hints.push(`Você precisa ir para o ${getDirectionText(direction)}`);
+    hints.push(`Você está a uma distância média de ${placeName}`);
+    hints.push(`Mova-se na direção ${getDirectionText(direction)}`);
   } else {
-    hints.push(`O ${placeName} está muito longe`);
-    hints.push(`Considere usar o mapa para navegar`);
+    hints.push(`Você está longe de ${placeName}`);
+    hints.push(`Comece se movendo na direção ${getDirectionText(direction)}`);
   }
   
   return hints;
 };
 
-// Função para calcular precisão do clique (0-100%)
+/**
+ * Calcula a precisão do clique baseado na distância
+ */
 export const calculateClickPrecision = (
   distance: number,
   threshold: number
 ): number => {
   if (distance <= threshold) {
-    return Math.round((1 - (distance / threshold)) * 100);
+    return 1 - (distance / threshold);
   }
   return 0;
 };
 
-// Função para validar múltiplos cliques (anti-spam)
+/**
+ * Valida sequência de cliques para evitar spam
+ */
 export const validateClickSequence = (
   clicks: Array<{ latlng: L.LatLng; timestamp: number }>,
   minInterval: number = 500
@@ -223,4 +203,147 @@ export const validateClickSequence = (
   
   const timeDiff = lastClick.timestamp - previousClick.timestamp;
   return timeDiff >= minInterval;
+};
+
+// ============================================================================
+// FUNÇÕES DE VALIDAÇÃO AVANÇADAS
+// ============================================================================
+
+/**
+ * Valida se um conjunto de lugares famosos forma uma sequência válida
+ */
+export const validateFamousPlacesSequence = (
+  places: FamousPlace[],
+  minPlaces: number = 3,
+  maxPlaces: number = 20
+): boolean => {
+  if (places.length < minPlaces || places.length > maxPlaces) {
+    return false;
+  }
+  
+  // Verificar se todos os lugares têm coordenadas válidas
+  for (const place of places) {
+    if (typeof place.latitude !== 'number' || 
+        typeof place.longitude !== 'number' ||
+        isNaN(place.latitude) || 
+        isNaN(place.longitude)) {
+      return false;
+    }
+  }
+  
+  return true;
+};
+
+/**
+ * Calcula estatísticas de precisão para um conjunto de cliques
+ */
+export const calculateFamousPlacesAccuracy = (
+  clicks: Array<{ latlng: L.LatLng; timestamp: number; isCorrect: boolean; distance: number }>
+): {
+  totalClicks: number;
+  correctClicks: number;
+  accuracy: number;
+  averageDistance: number;
+  averageTime: number;
+  consecutiveCorrect: number;
+} => {
+  if (clicks.length === 0) {
+    return {
+      totalClicks: 0,
+      correctClicks: 0,
+      accuracy: 0,
+      averageDistance: 0,
+      averageTime: 0,
+      consecutiveCorrect: 0
+    };
+  }
+  
+  const correctClicks = clicks.filter(click => click.isCorrect).length;
+  const accuracy = correctClicks / clicks.length;
+  
+  // Calcular distância média
+  const totalDistance = clicks.reduce((sum, click) => sum + click.distance, 0);
+  const averageDistance = totalDistance / clicks.length;
+  
+  // Calcular tempo médio entre cliques
+  let totalTime = 0;
+  for (let i = 1; i < clicks.length; i++) {
+    totalTime += clicks[i].timestamp - clicks[i - 1].timestamp;
+  }
+  const averageTime = clicks.length > 1 ? totalTime / (clicks.length - 1) : 0;
+  
+  // Calcular acertos consecutivos
+  let consecutiveCorrect = 0;
+  let maxConsecutive = 0;
+  for (const click of clicks) {
+    if (click.isCorrect) {
+      consecutiveCorrect++;
+      maxConsecutive = Math.max(maxConsecutive, consecutiveCorrect);
+    } else {
+      consecutiveCorrect = 0;
+    }
+  }
+  
+  return {
+    totalClicks: clicks.length,
+    correctClicks,
+    accuracy,
+    averageDistance,
+    averageTime,
+    consecutiveCorrect: maxConsecutive
+  };
+};
+
+/**
+ * Gera feedback baseado na precisão do clique
+ */
+export const generatePrecisionFeedback = (
+  distance: number,
+  threshold: number,
+  placeName: string
+): string => {
+  if (distance <= threshold) {
+    return `Excelente precisão! Você encontrou ${placeName}!`;
+  } else if (distance <= threshold * 2) {
+    return `Boa tentativa! Você está muito próximo de ${placeName}`;
+  } else if (distance <= threshold * 5) {
+    return `Continue tentando! Você está no caminho certo para ${placeName}`;
+  } else {
+    return `Você ainda está longe de ${placeName}. Continue explorando!`;
+  }
+};
+
+/**
+ * Valida se um lugar famoso está dentro de uma área específica
+ */
+export const validatePlaceInArea = (
+  place: FamousPlace,
+  area: { bounds: L.LatLngBounds; center: L.LatLng; radius: number }
+): boolean => {
+  const placeLatLng = L.latLng(place.latitude, place.longitude);
+  return isPointInSearchArea(placeLatLng, area);
+};
+
+/**
+ * Filtra lugares famosos por área de busca
+ */
+export const filterPlacesByArea = (
+  places: FamousPlace[],
+  area: { bounds: L.LatLngBounds; center: L.LatLng; radius: number }
+): FamousPlace[] => {
+  return places.filter(place => validatePlaceInArea(place, area));
+};
+
+/**
+ * Ordena lugares famosos por proximidade de um ponto
+ */
+export const sortPlacesByProximity = (
+  places: FamousPlace[],
+  referencePoint: L.LatLng
+): FamousPlace[] => {
+  return [...places].sort((a, b) => {
+    const distanceA = calculateDistance(referencePoint, L.latLng(a.latitude, a.longitude));
+    const distanceB = calculateDistance(referencePoint, L.latLng(b.latitude, b.longitude));
+    return distanceA - distanceB;
+  });
 }; 

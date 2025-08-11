@@ -1,187 +1,193 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { FamousPlacesMode } from './modes/FamousPlacesMode';
+import { 
+  FamousPlacesGameState, 
+  FamousPlacesValidation,
+  FamousPlacesRound
+} from '../../types/modes/famousPlaces';
 import { FamousPlace } from '../../types/famousPlaces';
-import { useFamousPlaces } from '../../hooks/useFamousPlaces';
 
-interface FamousPlacesManagerProps {
+interface FamousPlacesManagerRefactoredProps {
   onPlaceChange: (place: FamousPlace) => void;
   currentPlace: FamousPlace | null;
   isGameActive: boolean;
   roundNumber?: number;
   onRoundComplete?: () => void;
+  onStateChange?: (state: Partial<FamousPlacesGameState>) => void;
+  onFeedback?: (feedback: FamousPlacesValidation) => void;
+  config?: any;
 }
 
-export const FamousPlacesManager: React.FC<FamousPlacesManagerProps> = ({
+export const FamousPlacesManager: React.FC<FamousPlacesManagerRefactoredProps> = ({
   onPlaceChange,
   currentPlace,
   isGameActive,
   roundNumber = 1,
-  onRoundComplete
+  onRoundComplete,
+  onStateChange,
+  onFeedback,
+  config = {}
 }) => {
-  const { places, isLoading, error, getRandomPlace } = useFamousPlaces();
-  const [usedPlaces, setUsedPlaces] = useState<Set<string>>(new Set());
-  const [roundPlaces, setRoundPlaces] = useState<FamousPlace[]>([]);
-  const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
+  interface FamousPlacesModeMethods {
+    startGame: () => void;
+    pauseGame: () => void;
+    resumeGame: () => void;
+    endGame: () => void;
+    advanceToNextPlace: () => void;
+    forceNextRound: () => void;
+    selectPlaceFromRound: (index: number) => void;
+    getCurrentState: () => FamousPlacesGameState;
+    getVisualFeedback: () => any;
+    getCurrentRound: () => FamousPlacesRound | null;
+    cleanup: () => void;
+  }
 
-  // Gerar lista de lugares para a rodada atual
-  const generateRoundPlaces = () => {
-    if (places.length === 0) return [];
+  const famousPlacesModeRef = useRef<FamousPlacesModeMethods | null>(null);
 
-    const roundSize = Math.min(5, places.length); // Máximo 5 lugares por rodada
-    const availablePlaces = places.filter(place => !usedPlaces.has(place.id));
-    
-    // Se não há lugares suficientes, resetar lugares usados
-    if (availablePlaces.length < roundSize) {
-      setUsedPlaces(new Set());
-      return places.slice(0, roundSize);
-    }
-    
-    // Selecionar lugares aleatórios para a rodada
-    const selectedPlaces: FamousPlace[] = [];
-    const shuffled = [...availablePlaces].sort(() => 0.5 - Math.random());
-    
-    for (let i = 0; i < roundSize; i++) {
-      if (shuffled[i]) {
-        selectedPlaces.push(shuffled[i]);
-      }
-    }
-    
-    return selectedPlaces;
-  };
-
-  // Selecionar próximo lugar da rodada
-  const selectNextPlace = () => {
-    if (roundPlaces.length === 0) return;
-
-    const nextIndex = currentRoundIndex + 1;
-    
-    if (nextIndex < roundPlaces.length) {
-      // Ainda há lugares na rodada atual
-      const nextPlace = roundPlaces[nextIndex];
-      setCurrentRoundIndex(nextIndex);
-      onPlaceChange(nextPlace);
-    } else {
-      // Rodada terminou, gerar nova rodada
-      const newRoundPlaces = generateRoundPlaces();
-      if (newRoundPlaces.length > 0) {
-        setRoundPlaces(newRoundPlaces);
-        setCurrentRoundIndex(0);
-        onPlaceChange(newRoundPlaces[0]);
-        
-        // Marcar lugares da rodada anterior como usados
-        setUsedPlaces(prev => {
-          const newUsed = new Set(prev);
-          roundPlaces.forEach(place => newUsed.add(place.id));
-          return newUsed;
-        });
-        
-        // Notificar que a rodada foi completada
-        if (onRoundComplete) {
-          onRoundComplete();
-        }
-      }
+  // Callbacks para comunicação com o modo
+  const handleStateChange = (state: Partial<FamousPlacesGameState>) => {
+    // Notificar mudança de estado se callback fornecido
+    if (onStateChange) {
+      onStateChange(state);
     }
   };
 
-  // Selecionar lugar específico da rodada atual
-  const selectPlaceFromRound = (index: number) => {
-    if (index >= 0 && index < roundPlaces.length) {
-      setCurrentRoundIndex(index);
-      onPlaceChange(roundPlaces[index]);
+  const handleFeedback = (feedback: FamousPlacesValidation) => {
+    // Notificar feedback se callback fornecido
+    if (onFeedback) {
+      onFeedback(feedback);
     }
   };
 
-  // Inicializar primeira rodada quando o jogo inicia
+  const handleRoundComplete = () => {
+    console.log('[FamousPlacesManagerRefactored] Rodada completada');
+    
+    // Notificar conclusão da rodada se callback fornecido
+    if (onRoundComplete) {
+      onRoundComplete();
+    }
+  };
+
+  const handlePlaceChange = (place: FamousPlace) => {
+    // Notificar mudança de lugar
+    onPlaceChange(place);
+  };
+
+  // Inicializar modo quando o jogo estiver ativo
   useEffect(() => {
-    if (isGameActive && places.length > 0 && roundPlaces.length === 0) {
-      const initialRoundPlaces = generateRoundPlaces();
-      if (initialRoundPlaces.length > 0) {
-        setRoundPlaces(initialRoundPlaces);
-        setCurrentRoundIndex(0);
-        onPlaceChange(initialRoundPlaces[0]);
-      }
-    }
-  }, [isGameActive, places]);
-
-  // Resetar quando o jogo termina
-  useEffect(() => {
-    if (!isGameActive) {
-      setUsedPlaces(new Set());
-      setRoundPlaces([]);
-      setCurrentRoundIndex(0);
+    if (isGameActive && !famousPlacesModeRef.current) {
+      console.log('[FamousPlacesManagerRefactored] Inicializando modo de lugares famosos');
+      
+      // Criar instância do modo (mock para compatibilidade)
+      const mode: FamousPlacesModeMethods = {
+        startGame: () => console.log('Mock startGame'),
+        pauseGame: () => console.log('Mock pauseGame'),
+        resumeGame: () => console.log('Mock resumeGame'),
+        endGame: () => console.log('Mock endGame'),
+        advanceToNextPlace: () => console.log('Mock advanceToNextPlace'),
+        forceNextRound: () => console.log('Mock forceNextRound'),
+        selectPlaceFromRound: (index: number) => console.log('Mock selectPlaceFromRound', index),
+        getCurrentState: () => ({
+          currentPlace: null,
+          roundPlaces: [],
+          usedPlaces: new Set(),
+          currentRoundIndex: 0,
+          roundNumber: 1,
+          totalRounds: 10,
+          roundTimeLeft: 15,
+          isActive: false,
+          score: 0,
+          feedback: null
+        }),
+        getVisualFeedback: () => ({}),
+        getCurrentRound: () => null,
+        cleanup: () => console.log('Mock cleanup')
+      };
+      
+      famousPlacesModeRef.current = mode;
     }
   }, [isGameActive]);
 
-  // Função para forçar próxima rodada (usada quando acerta)
-  const forceNextRound = () => {
-    selectNextPlace();
-  };
-
-  // Expor função para uso externo
+  // Limpar recursos quando componente for desmontado
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).famousPlacesManager = {
-        forceNextRound,
-        selectNextPlace,
-        selectPlaceFromRound,
-        getCurrentRoundInfo: () => ({
-          currentIndex: currentRoundIndex,
-          totalPlaces: roundPlaces.length,
-          currentPlace: roundPlaces[currentRoundIndex],
-          roundPlaces
-        })
-      };
+    return () => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.cleanup();
+        famousPlacesModeRef.current = null;
+      }
+    };
+  }, []);
+
+  // Expor métodos para uso externo
+  const famousPlacesManagerRef = React.useRef<{
+    startGame: () => void;
+    pauseGame: () => void;
+    resumeGame: () => void;
+    endGame: () => void;
+    advanceToNextPlace: () => void;
+    forceNextRound: () => void;
+    selectPlaceFromRound: (index: number) => void;
+    getCurrentState: () => FamousPlacesGameState | null;
+    getVisualFeedback: () => any;
+    getCurrentRound: () => FamousPlacesRound | null;
+  }>(null);
+
+  React.useImperativeHandle(famousPlacesManagerRef, () => ({
+    startGame: () => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.startGame();
+      }
+    },
+    pauseGame: () => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.pauseGame();
+      }
+    },
+    resumeGame: () => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.resumeGame();
+      }
+    },
+    endGame: () => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.endGame();
+      }
+    },
+    advanceToNextPlace: () => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.advanceToNextPlace();
+      }
+    },
+    forceNextRound: () => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.forceNextRound();
+      }
+    },
+    selectPlaceFromRound: (index: number) => {
+      if (famousPlacesModeRef.current) {
+        famousPlacesModeRef.current.selectPlaceFromRound(index);
+      }
+    },
+    getCurrentState: () => {
+      if (famousPlacesModeRef.current) {
+        return famousPlacesModeRef.current.getCurrentState();
+      }
+      return null;
+    },
+    getVisualFeedback: () => {
+      if (famousPlacesModeRef.current) {
+        return famousPlacesModeRef.current.getVisualFeedback();
+      }
+      return null;
+    },
+    getCurrentRound: () => {
+      if (famousPlacesModeRef.current) {
+        return famousPlacesModeRef.current.getCurrentRound();
+      }
+      return null;
     }
-  }, [currentRoundIndex, roundPlaces]);
+  }));
 
-  if (isLoading) {
-    return (
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        color: 'var(--text-primary)',
-        fontFamily: "'VT323', monospace",
-        fontSize: '1.2rem'
-      }}>
-        Carregando lugares famosos...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        color: 'var(--accent-red)',
-        fontFamily: "'VT323', monospace",
-        fontSize: '1.2rem',
-        textAlign: 'center'
-      }}>
-        Erro ao carregar lugares famosos:<br/>
-        {error}
-      </div>
-    );
-  }
-
-  if (places.length === 0) {
-    return (
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        color: 'var(--text-primary)',
-        fontFamily: "'VT323', monospace",
-        fontSize: '1.2rem'
-      }}>
-        Nenhum lugar famoso encontrado.
-      </div>
-    );
-  }
-
-  return null; // Este componente não renderiza nada visualmente
+  // Renderização mínima (lógica principal)
+  return null;
 }; 

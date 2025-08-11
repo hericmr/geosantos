@@ -8,7 +8,7 @@ import {
   NeighborhoodVisualFeedback 
 } from '../../../../types/modes/neighborhood';
 import { validateNeighborhoodClick } from '../../../../utils/modes/neighborhood/validation';
-import { calculateNeighborhoodScore } from '../../../../utils/modes/neighborhood/scoring';
+import { calculateNeighborhoodScore } from '../../../../utils/shared';
 
 interface NeighborhoodModeProps {
   geoJsonData: any;

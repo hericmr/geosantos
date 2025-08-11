@@ -1,225 +1,296 @@
 import * as L from 'leaflet';
 import { NeighborhoodValidation, PolygonValidation, NeighborhoodFeature } from '../../../types/modes/neighborhood';
+import {
+  isPointInsidePolygon,
+  calculateDistanceToBorder,
+  calculateDirection,
+  getDirectionText,
+  findNearestElement
+} from '../../shared';
 
-// Função para verificar se um ponto está dentro de um polígono
-export const isPointInsidePolygon = (point: L.LatLng, polygon: L.LatLng[]): boolean => {
-  const x = point.lng;
-  const y = point.lat;
-  
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].lng;
-    const yi = polygon[i].lat;
-    const xj = polygon[j].lng;
-    const yj = polygon[j].lat;
-    
-    const intersect = ((yi > y) !== (yj > y)) &&
-        (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
-  }
-  
-  return inside;
-};
+/**
+ * Validação de cliques para o modo de bairros usando utilitários compartilhados
+ * 
+ * Este arquivo foi refatorado para usar os utilitários compartilhados
+ * em vez de duplicar código entre modos.
+ */
 
-// Função para calcular a distância até a borda mais próxima do polígono
-export const calculateDistanceToBorder = (point: L.LatLng, polygon: L.LatLng[]): { distance: number; closestPoint: L.LatLng } => {
-  let minDistance = Infinity;
-  let closestPoint = polygon[0];
-  
-  // Verificar distância até cada segmento do polígono
-  for (let i = 0; i < polygon.length; i++) {
-    const start = polygon[i];
-    const end = polygon[(i + 1) % polygon.length];
-    
-    const distance = pointToSegmentDistance(point, start, end);
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestPoint = getClosestPointOnSegment(point, start, end);
-    }
-  }
-  
-  return {
-    distance: minDistance,
-    closestPoint
-  };
-};
+// ============================================================================
+// FUNÇÕES DE VALIDAÇÃO ESPECÍFICAS DO MODO BAIRROS
+// ============================================================================
 
-// Função para calcular distância de um ponto até um segmento de linha
-const pointToSegmentDistance = (point: L.LatLng, start: L.LatLng, end: L.LatLng): number => {
-  const A = point.lng - start.lng;
-  const B = point.lat - start.lat;
-  const C = end.lng - start.lng;
-  const D = end.lat - start.lat;
-  
-  const dot = A * C + B * D;
-  const lenSq = C * C + D * D;
-  
-  if (lenSq === 0) {
-    // start e end são o mesmo ponto
-    return Math.sqrt(A * A + B * B);
-  }
-  
-  let param = dot / lenSq;
-  
-  if (param < 0) {
-    // Ponto mais próximo é start
-    return Math.sqrt(A * A + B * B);
-  } else if (param > 1) {
-    // Ponto mais próximo é end
-    const E = point.lng - end.lng;
-    const F = point.lat - end.lat;
-    return Math.sqrt(E * E + F * F);
-  } else {
-    // Ponto mais próximo está no segmento
-    const G = start.lng + param * C;
-    const H = start.lat + param * D;
-    const I = point.lng - G;
-    const J = point.lat - H;
-    return Math.sqrt(I * I + J * J);
-  }
-};
-
-// Função para obter o ponto mais próximo em um segmento de linha
-const getClosestPointOnSegment = (point: L.LatLng, start: L.LatLng, end: L.LatLng): L.LatLng => {
-  const A = point.lng - start.lng;
-  const B = point.lat - start.lat;
-  const C = end.lng - start.lng;
-  const D = end.lat - start.lat;
-  
-  const dot = A * C + B * D;
-  const lenSq = C * C + D * D;
-  
-  if (lenSq === 0) {
-    return start;
-  }
-  
-  let param = dot / lenSq;
-  param = Math.max(0, Math.min(1, param));
-  
-  return L.latLng(
-    start.lat + param * D,
-    start.lng + param * C
-  );
-};
-
-// Função para validar clique em um bairro específico
+/**
+ * Valida clique em um bairro específico
+ */
 export const validateNeighborhoodClick = (
   clickedPoint: L.LatLng,
   targetNeighborhood: string,
   geoJsonData: any,
   timeLeft: number
 ): NeighborhoodValidation => {
-  // Encontrar o feature do bairro alvo
-  const targetFeature = geoJsonData.features.find((feature: NeighborhoodFeature) => 
-    feature.properties.NOME === targetNeighborhood
+  // Encontrar o bairro alvo no GeoJSON
+  const targetFeature = geoJsonData.features.find((feature: any) => 
+    feature.properties.name === targetNeighborhood
   );
   
   if (!targetFeature) {
     return {
       isValid: false,
-      distance: 0,
+      distance: Infinity,
       message: 'Bairro não encontrado',
       score: 0,
       isPerfect: false,
       isCorrectNeighborhood: false,
-      neighborhoodName: targetNeighborhood,
-      isNearBorder: false
+      isNearBorder: false,
+      neighborhoodName: targetNeighborhood
     };
   }
   
-  // Converter coordenadas para LatLng
-  const coordinates = targetFeature.geometry.coordinates;
-  let polygon: L.LatLng[] = [];
+  // Verificar se o clique está dentro do polígono do bairro
+  const coordinates = targetFeature.geometry.coordinates[0].map((coord: number[]) => 
+    L.latLng(coord[1], coord[0])
+  );
   
-  if (targetFeature.geometry.type === 'Polygon') {
-    polygon = (coordinates[0] as number[][]).map((coord: number[]) => L.latLng(coord[1], coord[0]));
-  } else if (targetFeature.geometry.type === 'MultiPolygon') {
-    // Para MultiPolygon, usar o primeiro polígono
-    polygon = (coordinates[0][0] as number[][]).map((coord: number[]) => L.latLng(coord[1], coord[0]));
-  }
-  
-  // Verificar se o clique está dentro do polígono
-  const isInside = isPointInsidePolygon(clickedPoint, polygon);
+  const isInside = isPointInsidePolygon(clickedPoint, coordinates);
   
   if (isInside) {
-    // Clique dentro do bairro correto
+    // Clique dentro do bairro - acerto perfeito
     return {
       isValid: true,
       distance: 0,
       message: `Perfeito! Você acertou o bairro ${targetNeighborhood}!`,
-      score: 3000, // Pontuação base para acerto
+      score: 0, // Será calculado pelo sistema de pontuação
       isPerfect: true,
       isCorrectNeighborhood: true,
-      neighborhoodName: targetNeighborhood,
-      isNearBorder: false
+      isNearBorder: false,
+      neighborhoodName: targetNeighborhood
     };
   } else {
     // Clique fora do bairro - calcular distância até a borda
-    const borderInfo = calculateDistanceToBorder(clickedPoint, polygon);
-    const distance = borderInfo.distance;
-    const isNearBorder = distance <= 500; // Considerar "próximo" se estiver a 500m ou menos
+    const borderDistance = calculateDistanceToBorder(clickedPoint, coordinates);
     
-    // Calcular pontuação baseada na distância
-    const distanceKm = distance / 1000;
-    const distanceScore = Math.max(0, 1000 * (1 - (distanceKm / 10)));
+    // Determinar direção aproximada
+    const center = calculatePolygonCenter(coordinates);
+    const direction = calculateDirection(clickedPoint, center);
     
-    // Bônus de tempo se estiver próximo da borda
-    const timeBonus = isNearBorder && timeLeft <= 2 ? Math.round((timeLeft / 2) * 500) : 0;
-    const totalScore = Math.round(distanceScore + timeBonus);
+    // Verificar se está próximo da borda (para bônus)
+    const isNearBorder = borderDistance.distance <= 500;
     
     // Gerar mensagem baseada na distância
     let message = '';
-    if (distance < 100) {
-      message = 'Quase lá! Você está muito perto do bairro!';
-    } else if (distance < 500) {
-      message = 'Continue tentando! Você está no caminho certo!';
-    } else if (distance < 1000) {
-      message = 'Ainda longe, mas continue tentando!';
+    if (borderDistance.distance < 100) {
+      message = `Quase lá! Você está a ${Math.round(borderDistance.distance)}m do bairro ${targetNeighborhood}`;
+    } else if (borderDistance.distance < 500) {
+      message = `Está próximo! Continue tentando!`;
+    } else if (borderDistance.distance < 1000) {
+      message = `Ainda longe, mas no caminho certo!`;
     } else {
-      message = 'Muito longe! Tente novamente!';
+      message = `Muito longe! Tente novamente!`;
     }
     
     return {
       isValid: true,
-      distance: distance,
-      message: message,
-      score: totalScore,
+      distance: borderDistance.distance,
+      message,
+      score: 0, // Será calculado pelo sistema de pontuação
       isPerfect: false,
       isCorrectNeighborhood: false,
-      neighborhoodName: targetNeighborhood,
-      distanceToBorder: distance,
-      isNearBorder: isNearBorder,
-      additionalData: {
-        closestPoint: borderInfo.closestPoint
-      }
+      isNearBorder,
+      neighborhoodName: targetNeighborhood
     };
   }
 };
 
-// Função para encontrar o bairro mais próximo de um ponto
-export const findNearestNeighborhood = (point: L.LatLng, geoJsonData: any): { name: string; distance: number } => {
-  let nearestName = '';
+/**
+ * Encontra o bairro mais próximo de um ponto
+ */
+export const findNearestNeighborhood = (
+  point: L.LatLng, 
+  geoJsonData: any
+): { name: string; distance: number } | null => {
+  if (!geoJsonData || !geoJsonData.features || geoJsonData.features.length === 0) {
+    return null;
+  }
+  
+  let nearestNeighborhood = geoJsonData.features[0];
   let nearestDistance = Infinity;
   
-  geoJsonData.features.forEach((feature: NeighborhoodFeature) => {
-    const coordinates = feature.geometry.coordinates;
-    let polygon: L.LatLng[] = [];
-    
+  for (const feature of geoJsonData.features) {
     if (feature.geometry.type === 'Polygon') {
-      polygon = (coordinates[0] as number[][]).map((coord: number[]) => L.latLng(coord[1], coord[0]));
-    } else if (feature.geometry.type === 'MultiPolygon') {
-      polygon = (coordinates[0][0] as number[][]).map((coord: number[]) => L.latLng(coord[1], coord[0]));
+      const coordinates = feature.geometry.coordinates[0].map((coord: number[]) => 
+        L.latLng(coord[1], coord[0])
+      );
+      
+      // Verificar se o ponto está dentro do polígono
+      if (isPointInsidePolygon(point, coordinates)) {
+        return {
+          name: feature.properties.name,
+          distance: 0
+        };
+      }
+      
+      // Calcular distância até a borda
+      const borderDistance = calculateDistanceToBorder(point, coordinates);
+      if (borderDistance.distance < nearestDistance) {
+        nearestDistance = borderDistance.distance;
+        nearestNeighborhood = feature;
+      }
     }
-    
-    const borderInfo = calculateDistanceToBorder(point, polygon);
-    if (borderInfo.distance < nearestDistance) {
-      nearestDistance = borderInfo.distance;
-      nearestName = feature.properties.NOME;
-    }
-  });
+  }
   
   return {
-    name: nearestName,
+    name: nearestNeighborhood.properties.name,
     distance: nearestDistance
   };
+};
+
+/**
+ * Valida se um ponto está dentro de um polígono específico
+ */
+export const validatePolygonClick = (
+  point: L.LatLng,
+  polygon: L.LatLng[],
+  polygonName: string
+): PolygonValidation => {
+  const isInside = isPointInsidePolygon(point, polygon);
+  
+  if (isInside) {
+    return {
+      isInside: true,
+      distanceToBorder: 0,
+      closestPoint: point,
+      neighborhoodName: polygonName
+    };
+  } else {
+    const borderDistance = calculateDistanceToBorder(point, polygon);
+    return {
+      isInside: false,
+      distanceToBorder: borderDistance.distance,
+      closestPoint: borderDistance.closestPoint,
+      neighborhoodName: polygonName
+    };
+  }
+};
+
+/**
+ * Calcula estatísticas de precisão para um conjunto de cliques
+ */
+export const calculateNeighborhoodAccuracy = (
+  clicks: Array<{ latlng: L.LatLng; timestamp: number; isCorrect: boolean }>
+): {
+  totalClicks: number;
+  correctClicks: number;
+  accuracy: number;
+  averageTime: number;
+  consecutiveCorrect: number;
+} => {
+  if (clicks.length === 0) {
+    return {
+      totalClicks: 0,
+      correctClicks: 0,
+      accuracy: 0,
+      averageTime: 0,
+      consecutiveCorrect: 0
+    };
+  }
+  
+  const correctClicks = clicks.filter(click => click.isCorrect).length;
+  const accuracy = correctClicks / clicks.length;
+  
+  // Calcular tempo médio entre cliques
+  let totalTime = 0;
+  for (let i = 1; i < clicks.length; i++) {
+    totalTime += clicks[i].timestamp - clicks[i - 1].timestamp;
+  }
+  const averageTime = clicks.length > 1 ? totalTime / (clicks.length - 1) : 0;
+  
+  // Calcular acertos consecutivos
+  let consecutiveCorrect = 0;
+  let maxConsecutive = 0;
+  for (const click of clicks) {
+    if (click.isCorrect) {
+      consecutiveCorrect++;
+      maxConsecutive = Math.max(maxConsecutive, consecutiveCorrect);
+    } else {
+      consecutiveCorrect = 0;
+    }
+  }
+  
+  return {
+    totalClicks: clicks.length,
+    correctClicks,
+    accuracy,
+    averageTime,
+    consecutiveCorrect: maxConsecutive
+  };
+};
+
+// ============================================================================
+// FUNÇÕES AUXILIARES ESPECÍFICAS DO MODO BAIRROS
+// ============================================================================
+
+/**
+ * Calcula o centro de um polígono
+ */
+function calculatePolygonCenter(polygon: L.LatLng[]): L.LatLng {
+  let sumLat = 0;
+  let sumLng = 0;
+  
+  for (const point of polygon) {
+    sumLat += point.lat;
+    sumLng += point.lng;
+  }
+  
+  return L.latLng(sumLat / polygon.length, sumLng / polygon.length);
+}
+
+/**
+ * Gera dicas baseadas na distância e direção para bairros
+ */
+export const getNeighborhoodHints = (
+  distance: number,
+  direction: string,
+  neighborhoodName: string
+): string[] => {
+  const hints: string[] = [];
+  
+  if (distance < 100) {
+    hints.push(`Você está muito próximo do bairro ${neighborhoodName}!`);
+    hints.push(`Continue procurando na área!`);
+  } else if (distance < 500) {
+    hints.push(`Você está próximo do bairro ${neighborhoodName}`);
+    hints.push(`Procure na direção ${getDirectionText(direction)}`);
+  } else if (distance < 1000) {
+    hints.push(`Você está a uma distância média do bairro ${neighborhoodName}`);
+    hints.push(`Mova-se na direção ${getDirectionText(direction)}`);
+  } else {
+    hints.push(`Você está longe do bairro ${neighborhoodName}`);
+    hints.push(`Comece se movendo na direção ${getDirectionText(direction)}`);
+  }
+  
+  return hints;
+};
+
+/**
+ * Valida se um conjunto de coordenadas forma um polígono válido
+ */
+export const validatePolygonCoordinates = (
+  coordinates: number[][]
+): boolean => {
+  if (coordinates.length < 3) {
+    return false; // Polígono precisa de pelo menos 3 pontos
+  }
+  
+  // Verificar se as coordenadas são válidas
+  for (const coord of coordinates) {
+    if (coord.length !== 2 || 
+        typeof coord[0] !== 'number' || 
+        typeof coord[1] !== 'number' ||
+        isNaN(coord[0]) || 
+        isNaN(coord[1])) {
+      return false;
+    }
+  }
+  
+  return true;
 }; 
