@@ -14,7 +14,7 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
       top: 'clamp(10px, 2vw, 20px)',
       left: 'clamp(10px, 2vw, 20px)',
       background: 'var(--bg-secondary)',
-      border: '2px solid var(--text-primary)',
+      border: 'none',
       color: 'var(--text-primary)',
       padding: 'clamp(8px, 1.5vw, 12px)',
       borderRadius: '2px',

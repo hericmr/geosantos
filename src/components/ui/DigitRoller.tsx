@@ -25,7 +25,7 @@ export const DigitRoller: React.FC<DigitRollerProps> = ({ targetDigit, delay }) 
       height: `${digitHeight}px`,
       overflow: 'hidden',
       position: 'relative' as const,
-      border: '2px solid var(--text-primary)',
+      border: 'none',
       boxShadow: 'var(--shadow-sm)'
     },
     digitContainer: {

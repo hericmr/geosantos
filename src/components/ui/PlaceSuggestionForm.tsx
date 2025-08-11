@@ -174,7 +174,7 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
                 gap: '8px',
                 padding: '8px 12px',
                 background: 'var(--bg-accent)',
-                border: '2px solid var(--text-primary)',
+                border: 'none',
                 borderRadius: '4px',
                 color: 'var(--text-primary)',
                 cursor: 'pointer',

@@ -25,7 +25,7 @@ export const GameStats: React.FC<GameStatsProps> = ({
       top: '20px',
       right: '20px',
       background: 'rgba(0, 0, 0, 0.8)',
-      border: '2px solid var(--text-primary)',
+      border: 'none',
       borderRadius: '8px',
       padding: '12px',
       zIndex: 1000,

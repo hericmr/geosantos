@@ -136,7 +136,7 @@ export const styles: FeedbackPanelStyles = {
     fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
     background: variant === 'pause' ? 'var(--accent-orange)' : variant === 'next' ? 'var(--accent-green)' : 'var(--accent-red)',
     color: variant === 'pause' ? '#000000' : '#ffffff',
-    border: '2px solid var(--text-primary)',
+    border: 'none',
     borderRadius: '2px',
     cursor: 'pointer',
     transition: 'all 0.1s steps(1)',

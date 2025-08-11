@@ -52,7 +52,7 @@ h1 {
 
 button {
   border-radius: 2px;
-  border: 2px solid var(--text-primary);
+  border: none;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 400;

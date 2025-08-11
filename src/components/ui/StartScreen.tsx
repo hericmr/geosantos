@@ -534,7 +534,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           maxWidth: '600px',
           padding: '20px',
           background: 'var(--bg-secondary)',
-          border: '2px solid var(--text-primary)',
+          border: 'none',
           borderRadius: '4px',
           boxShadow: 'var(--shadow-md)',
           marginTop: '40px'

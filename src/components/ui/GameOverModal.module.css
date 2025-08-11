@@ -157,7 +157,7 @@
 .saveButton {
   padding: 12px 20px;
   background: var(--accent-green);
-  border: 2px solid var(--text-primary);
+  border: none;
   border-radius: 4px;
   color: var(--text-primary);
   cursor: pointer;
@@ -300,7 +300,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  border: 3px solid var(--text-primary);
+  border: none;
   border-radius: 4px;
   color: var(--text-primary);
   cursor: pointer;

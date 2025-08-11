@@ -142,7 +142,7 @@ html, body {
   font-weight: 400;
   font-size: 12px;
   line-height: 1;
-  border: 2px solid var(--text-primary);
+  border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -185,31 +185,26 @@ html, body {
 
 .pixel-btn--primary {
   background: var(--accent-blue);
-  border-color: #ffffff;
   color: #ffffff;
 }
 
 .pixel-btn--success {
   background: var(--accent-green);
-  border-color: #ffffff;
   color: #000000;
 }
 
 .pixel-btn--warning {
   background: var(--accent-orange);
-  border-color: #ffffff;
   color: #ffffff;
 }
 
 .pixel-btn--danger {
   background: var(--accent-red);
-  border-color: #ffffff;
   color: #ffffff;
 }
 
 .pixel-btn--secondary {
   background: var(--bg-accent);
-  border-color: var(--text-secondary);
   color: var(--text-secondary);
 }
 

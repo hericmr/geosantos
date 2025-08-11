@@ -43,7 +43,7 @@ export const GameControls: React.FC<GameControlsProps> = ({
       left: 0,
       width: '100%',
       background: 'var(--bg-secondary)',
-      border: '2px solid var(--text-primary)',
+      border: 'none',
       borderBottom: 'none',
       color: 'var(--text-primary)',
       padding: gameStarted ? '0' : 'clamp(10px, 2vw, 15px)',
