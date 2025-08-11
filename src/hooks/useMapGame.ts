@@ -225,15 +225,19 @@ export const useMapGame = (
         }
         
         // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA AUTOMÁTICA
-        // CORREÇÃO: Implementar barra de progresso de 5 segundos com avanço automático
+        // CORREÇÃO: Implementar barra de progresso de 3 segundos com avanço automático
         let progress = 0;
+        console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (modo lugares famosos)');
         const progressInterval = setInterval(() => {
-          progress += 2; // 2% a cada 100ms = 100% em 5 segundos
+          progress += 3.33; // 3.33% a cada 100ms = 100% em 3 segundos
+          console.log('[useMapGame] DEBUG - Progresso atual:', progress, '%');
+          
           if (progress >= 100) {
             progress = 100;
             clearInterval(progressInterval);
+            console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 100%');
             
-            // CORREÇÃO: Avançar automaticamente para próxima rodada após 5 segundos
+            // CORREÇÃO: Avançar automaticamente para próxima rodada após 3 segundos
             console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo lugares famosos)');
             console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData, 'isAutoAdvancing:', isAutoAdvancingRef.current);
             
@@ -467,15 +471,19 @@ export const useMapGame = (
           }
           
           // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA AUTOMÁTICA
-          // CORREÇÃO: Implementar barra de progresso de 5 segundos com avanço automático
+          // CORREÇÃO: Implementar barra de progresso de 3 segundos com avanço automático
           let progress = 0;
+          console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (modo bairros)');
           const progressInterval = setInterval(() => {
-            progress += 2; // 2% a cada 100ms = 100% em 5 segundos
+            progress += 3.33; // 3.33% a cada 100ms = 100% em 3 segundos
+            console.log('[useMapGame] DEBUG - Progresso atual:', progress, '%');
+            
             if (progress >= 100) {
               progress = 100;
               clearInterval(progressInterval);
+              console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 100%');
               
-              // CORREÇÃO: Avançar automaticamente para próxima rodada após 5 segundos
+              // CORREÇÃO: Avançar automaticamente para próxima rodada após 3 segundos
               console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo bairros)');
               console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData, 'isAutoAdvancing:', isAutoAdvancingRef.current);
               
