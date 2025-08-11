@@ -196,4 +196,4 @@ A lógica desse jogo também pode ser usada em jogos de outras naturezas como ap
 - LinkedIn: [Héric Moura](https://www.linkedin.com/in/heric-moura/)
 
 
-**🎮 Espero que vcs se divirtam jogando como eu me diverti!** 🗺️
+**🎮 Espero que vcs se divirtam jogando como eu me diverti fazendo!** 🗺️
