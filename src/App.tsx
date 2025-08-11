@@ -7,6 +7,7 @@ import { FamousPlacesWiki } from './components/ui/FamousPlacesWiki';
 import SpriteTestPage from './components/ui/SpriteTestPage';
 import SpriteDebug from './components/ui/SpriteDebug';
 import { GameModeLoaderTest } from './components/ui/GameModeLoaderTest';
+import { UnifiedGameModeTest } from './components/ui/UnifiedGameModeTest';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/teste-sprites" element={<SpriteTestPage />} />
         <Route path="/debug-sprites" element={<SpriteDebug />} />
         <Route path="/teste-carregamento" element={<GameModeLoaderTest />} />
+        <Route path="/teste-unificado" element={<UnifiedGameModeTest />} />
         <Route path="/" element={
           <div style={{
             margin: 0,
