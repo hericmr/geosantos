@@ -86,11 +86,26 @@ export const useMapGame = (
       isPaused: gameState.isPaused
     });
     
+    // DEBUG: Log adicional para verificar o estado exato
+    console.log('[useMapGame] DEBUG - Estado exato:', {
+      gameStarted: !!gameState.gameStarted,
+      isCountingDown: !!gameState.isCountingDown,
+      showFeedback: !!gameState.showFeedback,
+      isPaused: !!gameState.isPaused
+    });
+    
     if (!gameState.gameStarted || !gameState.isCountingDown) {
       console.log('[useMapGame] Clique ignorado - jogo não iniciado ou não contando');
+      console.log('[useMapGame] DEBUG - Condições não atendidas:', {
+        gameStarted: gameState.gameStarted,
+        isCountingDown: gameState.isCountingDown,
+        showFeedback: gameState.showFeedback
+      });
       return;
     }
 
+    console.log('[useMapGame] ✅ Clique processado - condições atendidas, iniciando processamento');
+    
     // Marcar como processando
     isProcessingClickRef.current = true;
     
@@ -98,9 +113,14 @@ export const useMapGame = (
     clickDebounceRef.current = setTimeout(() => {
       isProcessingClickRef.current = false;
     }, 100);
-    
-    const clickDuration = gameState.roundInitialTime - gameState.roundTimeLeft;
 
+    // CORREÇÃO: Sempre resetar a flag de avanço automático no início de cada clique
+    isAutoAdvancingRef.current = false;
+    console.log('[useMapGame] DEBUG - Flag isAutoAdvancing resetada para false no início do clique');
+
+    // Calcular tempo gasto na rodada
+    const clickDuration = gameState.roundInitialTime - gameState.roundTimeLeft;
+    
     // FUNÇÃO PARA LIMPAR TODOS OS TIMERS ANTES DE INICIAR NOVOS
     const clearAllTimers = () => {
       if (progressIntervalRef.current) {
@@ -228,6 +248,8 @@ export const useMapGame = (
         // CORREÇÃO: Implementar barra de progresso de 3 segundos com avanço automático
         let progress = 0;
         console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (modo lugares famosos)');
+        
+        // CORREÇÃO: Armazenar referência do intervalo para limpeza adequada
         const progressInterval = setInterval(() => {
           progress += 3.33; // 3.33% a cada 100ms = 100% em 3 segundos
           console.log('[useMapGame] DEBUG - Progresso atual:', progress, '%');
@@ -244,15 +266,12 @@ export const useMapGame = (
             // Aguardar um pequeno delay para o usuário ver o progresso completo
             setTimeout(() => {
               console.log('[useMapGame] DEBUG - Executando setTimeout para avanço automático (modo lugares famosos)');
-              if (geoJsonData && !isAutoAdvancingRef.current) {
-                isAutoAdvancingRef.current = true; // Proteção contra chamadas duplas
+              // CORREÇÃO: Sempre verificar se geoJsonData está disponível e avançar
+              if (geoJsonData) {
                 console.log('[useMapGame] Iniciando próxima rodada automaticamente (modo lugares famosos)');
                 startNextRound(geoJsonData);
               } else {
-                console.log('[useMapGame] DEBUG - Condições não atendidas para avanço automático:', {
-                  geoJsonData: !!geoJsonData,
-                  isAutoAdvancing: isAutoAdvancingRef.current
-                });
+                console.log('[useMapGame] DEBUG - geoJsonData não disponível para avanço automático');
               }
             }, 500); // 500ms de delay para visualização
           } else {
@@ -263,11 +282,11 @@ export const useMapGame = (
         }, 100); // Atualizar a cada 100ms para animação suave
       };
       
-              // Executar sequência de feedback
-        handleFeedbackSequence();
-        
-        return;
-      }
+      // Executar sequência de feedback
+      handleFeedbackSequence();
+      
+      return;
+    }
 
     if (geoJsonRef.current) {
       let targetLayer: L.Layer | null = null;
@@ -474,6 +493,8 @@ export const useMapGame = (
           // CORREÇÃO: Implementar barra de progresso de 3 segundos com avanço automático
           let progress = 0;
           console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (modo bairros)');
+          
+          // CORREÇÃO: Armazenar referência do intervalo para limpeza adequada
           const progressInterval = setInterval(() => {
             progress += 3.33; // 3.33% a cada 100ms = 100% em 3 segundos
             console.log('[useMapGame] DEBUG - Progresso atual:', progress, '%');
@@ -485,20 +506,17 @@ export const useMapGame = (
               
               // CORREÇÃO: Avançar automaticamente para próxima rodada após 3 segundos
               console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo bairros)');
-              console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData, 'isAutoAdvancing:', isAutoAdvancingRef.current);
+              console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData);
               
               // Aguardar um pequeno delay para o usuário ver o progresso completo
               setTimeout(() => {
                 console.log('[useMapGame] DEBUG - Executando setTimeout para avanço automático (modo bairros)');
-                if (geoJsonData && !isAutoAdvancingRef.current) {
-                  isAutoAdvancingRef.current = true; // Proteção contra chamadas duplas
+                // CORREÇÃO: Sempre verificar se geoJsonData está disponível e avançar
+                if (geoJsonData) {
                   console.log('[useMapGame] Iniciando próxima rodada automaticamente (modo bairros)');
                   startNextRound(geoJsonData);
                 } else {
-                  console.log('[useMapGame] DEBUG - Condições não atendidas para avanço automático:', {
-                    geoJsonData: !!geoJsonData,
-                    isAutoAdvancing: isAutoAdvancingRef.current
-                  });
+                  console.log('[useMapGame] DEBUG - geoJsonData não disponível para avanço automático');
                 }
               }, 500); // 500ms de delay para visualização
             } else {
@@ -554,12 +572,9 @@ export const useMapGame = (
       roundNumber: gameState.roundNumber
     });
     
-    // CORREÇÃO: Resetar flag de avanço automático
+    // CORREÇÃO: Resetar flag de avanço automático (mantido para compatibilidade)
     isAutoAdvancingRef.current = false;
-    
     console.log('[handleNextRound] DEBUG - Flag isAutoAdvancing resetada para false');
-    
-
     
     setIsPaused(false);
     if (audioRef.current && gameState.gameStarted && !gameState.gameOver && !gameState.isMuted) {

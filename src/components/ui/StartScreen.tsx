@@ -47,7 +47,9 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       icon: MapPin, 
       action: () => {
         console.log('[StartScreen] Modo Bairros selecionado');
+        console.log('[StartScreen] Chamando onSelectMode com neighborhoods');
         onSelectMode?.('neighborhoods');
+        console.log('[StartScreen] Chamando onStartGame');
         onStartGame();
       },
       description: 'Clique no mapa onde você acha que está o bairro. Quanto mais próximo da localização correta, mais pontos você ganha!'
@@ -58,7 +60,9 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       icon: LandmarkIcon, 
       action: () => { 
         console.log('[StartScreen] Modo Lugares Famosos selecionado');
+        console.log('[StartScreen] Chamando onSelectMode com famous_places');
         onSelectMode?.('famous_places'); 
+        console.log('[StartScreen] Chamando onStartGame');
         onStartGame(); 
       },
       description: 'Localize pontos turísticos e lugares históricos de Santos. Teste seus conhecimentos sobre a cidade!'

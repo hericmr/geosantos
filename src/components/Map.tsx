@@ -282,6 +282,19 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     gameMode
   } = useMapGame(geoJsonData, currentMode, currentFamousPlace, isTimerPaused);
 
+  // DEBUG: Log para verificar se o handleMapClick está sendo chamado
+  const debugHandleMapClick = useCallback((latlng: L.LatLng) => {
+    console.log('🔍 [Map.tsx] handleMapClick chamado com:', latlng);
+    console.log('🔍 [Map.tsx] Estado do jogo:', {
+      gameStarted: gameState.gameStarted,
+      isCountingDown: gameState.isCountingDown,
+      showFeedback: gameState.showFeedback
+    });
+    
+    // Chamar o handler original
+    handleMapClick(latlng);
+  }, [handleMapClick, gameState.gameStarted, gameState.isCountingDown, gameState.showFeedback]);
+
   // Função para selecionar próximo lugar famoso (pode repetir, sempre aleatório)
   const selectNextFamousPlace = useCallback(() => {
     if (!famousPlaces || famousPlaces.length === 0) return;
@@ -880,7 +893,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           attributionControl={false}
           ref={mapRef}
         >
-          <MapEvents onClick={handleMapClick} />
+          <MapEvents onClick={debugHandleMapClick} />
           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
           {/* Marcador do local correto do lugar famoso (bandeira1) */}
           {currentMode === 'famous_places' && gameState.showFeedback && currentFamousPlace && (
@@ -903,7 +916,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               geoJsonData={geoJsonData}
               revealedNeighborhoods={gameState.revealedNeighborhoods}
               currentNeighborhood={gameState.currentNeighborhood}
-              onMapClick={handleMapClick}
+              onMapClick={debugHandleMapClick}
               geoJsonRef={geoJsonRef}
             />
           )}
