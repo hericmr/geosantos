@@ -3,7 +3,7 @@
  * Execute este arquivo para verificar se tudo está funcionando
  */
 
-import { GameTimerManager } from './GameTimerManager';
+import { gameTimerManager } from './GameTimerManager';
 import { GameStateMachine, GamePhase } from './GameStateMachine';
 import { GameAnimationSystem } from './GameAnimationSystem';
 
@@ -12,15 +12,14 @@ export function testAllSystems() {
   
   // Teste 1: GameTimerManager
   console.log('\n📱 Testando GameTimerManager...');
-  const timerManager = new GameTimerManager();
   
   // Testar timer
-  timerManager.scheduleTimer('test', 1000, () => {
+  gameTimerManager.scheduleTimer('test', 1000, () => {
     console.log('✅ Timer funcionando!');
   });
   
-  console.log(`Timers ativos: ${timerManager.getActiveTimersCount()}`);
-  console.log(`Configuração mobile:`, timerManager.getMobileOptimizedConfig());
+  console.log(`Timers ativos: ${gameTimerManager.getActiveTimersCount()}`);
+  console.log(`Configuração mobile:`, gameTimerManager.getMobileOptimizedConfig());
   
   // Teste 2: GameStateMachine
   console.log('\n🎮 Testando GameStateMachine...');
@@ -51,7 +50,7 @@ export function testAllSystems() {
     console.log('🧹 Sistema de animações limpo');
     
     // Limpar timer de teste
-    timerManager.clearAll();
+    gameTimerManager.clearAll();
     console.log('🧹 Timers limpos');
     
     console.log('\n✅ Todos os testes concluídos!');

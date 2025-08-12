@@ -3,7 +3,7 @@
  * Coordena todas as animações e evita conflitos de timing
  */
 
-import { GameTimerManager } from './GameTimerManager';
+import { gameTimerManager } from './GameTimerManager';
 
 export interface Animation {
   id: string;
@@ -19,12 +19,11 @@ export interface Animation {
 export class GameAnimationSystem {
   private animations: Map<string, Animation> = new Map();
   private animationQueue: Animation[] = [];
-  private isPlaying: boolean = false;
-  private timerManager: GameTimerManager;
   private currentAnimation: Animation | null = null;
+  private isPlaying: boolean = false;
+  private timerManager = gameTimerManager; // Usar instância singleton
 
   constructor() {
-    this.timerManager = new GameTimerManager();
     this.setupAnimationTypes();
   }
 

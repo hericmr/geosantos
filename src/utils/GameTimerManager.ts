@@ -247,6 +247,47 @@ export class GameTimerManager {
       states: Object.fromEntries(this.timerStates)
     };
   }
+
+  /**
+   * Método de compatibilidade: scheduleTimer (alias para createTimer)
+   */
+  scheduleTimer(id: string, interval: number, callback: () => void): void {
+    this.createTimer(id, {
+      interval,
+      callback,
+      autoStart: true
+    });
+  }
+
+  /**
+   * Método de compatibilidade: clearAll (alias para clearAllTimers)
+   */
+  clearAll(): void {
+    this.clearAllTimers();
+  }
+
+  /**
+   * Método de compatibilidade: getActiveTimersCount
+   */
+  getActiveTimersCount(): number {
+    return Array.from(this.timerStates.values()).filter(s => s.isRunning).length;
+  }
+
+  /**
+   * Método de compatibilidade: getMobileOptimizedConfig
+   */
+  getMobileOptimizedConfig(): any {
+    return {
+      interval: 16, // 60fps para mobile
+      maxDuration: 30000, // 30 segundos máximo
+      autoStart: false,
+      // Propriedades para animações
+      spriteFrames: 16,
+      frameDelay: 100,
+      distanceCircleDelay: 500,
+      feedbackDelay: 200
+    };
+  }
 }
 
 // Exportar instância singleton
