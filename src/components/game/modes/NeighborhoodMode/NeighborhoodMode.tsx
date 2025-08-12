@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as L from 'leaflet';
 import { BaseGameMode } from '../../common/BaseGameMode';
 import { 
@@ -7,8 +7,10 @@ import {
   NeighborhoodConfig,
   NeighborhoodVisualFeedback 
 } from '../../../../types/modes/neighborhood';
-import { validateNeighborhoodClick } from '../../../../utils/modes/neighborhood/validation';
+// CORREÇÃO: Usar validação específica para modo Neighborhood
+import { validateNeighborhoodClickForMode } from '../../../../utils/shared/validation';
 import { calculateNeighborhoodScore } from '../../../../utils/shared';
+import { FEEDBACK_BAR_DURATION } from '../../../../constants/game';
 
 interface NeighborhoodModeProps {
   geoJsonData: any;
@@ -37,14 +39,15 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
     feedback: null
   });
 
+  // Estado para feedback visual
   const [visualFeedback, setVisualFeedback] = useState<NeighborhoodVisualFeedback>({
+    highlightNeighborhood: false,
+    neighborhoodColor: '#00ff00',
     showDistanceCircle: false,
     showArrow: false,
     arrowPath: null,
     distanceCircleCenter: null,
-    distanceCircleRadius: 0,
-    highlightNeighborhood: false,
-    neighborhoodColor: '#00ff00'
+    distanceCircleRadius: 0
   });
 
   // Configuração padrão do modo bairros
@@ -64,7 +67,17 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
   // Inicializar bairros disponíveis
   useEffect(() => {
     if (geoJsonData && geoJsonData.features) {
-      const neighborhoods = geoJsonData.features.map((feature: any) => feature.properties.NOME);
+      // CORREÇÃO: Usar normalização para extrair nomes consistentemente
+      const neighborhoods = geoJsonData.features
+        .map((feature: any) => {
+          // Usar função de normalização compartilhada
+          if (feature.properties?.NOME) return feature.properties.NOME;
+          if (feature.properties?.name) return feature.properties.name;
+          if (feature.properties?.NOME_BAIRRO) return feature.properties.NOME_BAIRRO;
+          return null;
+        })
+        .filter((name: string | null): name is string => name !== null);
+      
       setGameState(prev => ({
         ...prev,
         availableNeighborhoods: neighborhoods,
@@ -75,7 +88,12 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
 
   // Selecionar bairro aleatório para a rodada
   const selectRandomNeighborhood = useCallback(() => {
-    if (gameState.availableNeighborhoods.length === 0) return;
+    console.log('[NeighborhoodMode] selectRandomNeighborhood chamado - Stack trace:', new Error().stack);
+    
+    if (gameState.availableNeighborhoods.length === 0) {
+      console.log('[NeighborhoodMode] Nenhum bairro disponível');
+      return;
+    }
 
     const availableNeighborhoods = gameState.availableNeighborhoods.filter(
       name => !gameState.revealedNeighborhoods.has(name)
@@ -83,6 +101,7 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
 
     if (availableNeighborhoods.length === 0) {
       // Todos os bairros foram revelados, resetar
+      console.log('[NeighborhoodMode] Todos os bairros revelados - resetando');
       setGameState(prev => ({
         ...prev,
         revealedNeighborhoods: new Set(),
@@ -93,6 +112,8 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
 
     const randomIndex = Math.floor(Math.random() * availableNeighborhoods.length);
     const selectedNeighborhood = availableNeighborhoods[randomIndex];
+
+    console.log('[NeighborhoodMode] Selecionando bairro:', selectedNeighborhood);
 
     setGameState(prev => ({
       ...prev,
@@ -105,43 +126,58 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
       currentNeighborhood: selectedNeighborhood,
       roundNumber: gameState.roundNumber
     });
+    
+    console.log('[NeighborhoodMode] Bairro selecionado com sucesso:', selectedNeighborhood);
   }, [gameState.availableNeighborhoods, gameState.revealedNeighborhoods, gameState.roundNumber, onStateChange, defaultConfig.roundTime]);
 
   // Iniciar nova rodada
   const startNewRound = useCallback(() => {
+    console.log('[NeighborhoodMode] startNewRound chamado');
+    
     if (gameState.roundNumber >= gameState.totalRounds) {
       // Jogo terminou
+      console.log('[NeighborhoodMode] Jogo terminou - todas as rodadas completas');
       setGameState(prev => ({ ...prev, isActive: false }));
       onRoundComplete();
       return;
     }
 
+    console.log('[NeighborhoodMode] Iniciando nova rodada:', gameState.roundNumber + 1);
+    
     setGameState(prev => ({
       ...prev,
       roundNumber: prev.roundNumber + 1,
       feedback: null
     }));
 
-    // Limpar feedback visual
-    setVisualFeedback(prev => ({
-      ...prev,
-      showDistanceCircle: false,
-      showArrow: false,
-      arrowPath: null,
-      distanceCircleCenter: null,
-      distanceCircleRadius: 0,
-      highlightNeighborhood: false
-    }));
+    // CORREÇÃO: Limpar feedback visual MAS preservar destaque do bairro se ainda estiver em delay
+    setVisualFeedback(prev => {
+      // NOVA ABORDAGEM: Sempre limpar o destaque no início de uma nova rodada
+      console.log('[NeighborhoodMode] Limpando destaque do bairro para nova rodada');
+      
+      return {
+        ...prev,
+        highlightNeighborhood: false,
+        neighborhoodColor: '#00ff00',
+        showDistanceCircle: false,
+        showArrow: false,
+        arrowPath: null,
+        distanceCircleCenter: null,
+        distanceCircleRadius: 0
+      };
+    });
 
     // Selecionar novo bairro
     selectRandomNeighborhood();
+    
+    console.log('[NeighborhoodMode] Nova rodada iniciada com sucesso');
   }, [gameState.roundNumber, gameState.totalRounds, onRoundComplete, selectRandomNeighborhood]);
 
   // Validar clique do jogador
   const handleMapClick = useCallback((latlng: L.LatLng) => {
     if (!gameState.isActive || !gameState.currentNeighborhood) return;
 
-    const validation = validateNeighborhoodClick(
+    const validation = validateNeighborhoodClickForMode(
       latlng,
       gameState.currentNeighborhood,
       geoJsonData,
@@ -185,19 +221,35 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
     // Configurar feedback visual
     if (validation.isCorrectNeighborhood) {
       // Acerto: destacar bairro e aguardar avanço automático
+      // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
+      console.log('[NeighborhoodMode] Acerto detectado - destacando bairro em 1s');
+      
+      // Primeiro, limpar feedback visual imediatamente (SEM destaque)
       setVisualFeedback(prev => ({
         ...prev,
-        highlightNeighborhood: true,
+        highlightNeighborhood: false, // Inicialmente false
         neighborhoodColor: '#00ff00',
         showDistanceCircle: false,
         showArrow: false
       }));
+      
+      // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
+      setTimeout(() => {
+        console.log('[NeighborhoodMode] Ativando destaque do bairro após 1s do clique');
+        setVisualFeedback(prev => ({
+          ...prev,
+          highlightNeighborhood: true, // Agora ativa o destaque
+          neighborhoodColor: '#00ff00'
+        }));
+      }, 3000); // 1000ms = 1 segundo após o clique
 
       // Avançar automaticamente após delay
       if (defaultConfig.autoAdvance) {
+        // CORREÇÃO: Executar startNewRound automaticamente após 2 segundos
+        console.log('[NeighborhoodMode] Executando startNewRound automaticamente após 2 segundos');
         setTimeout(() => {
           startNewRound();
-        }, 3000); // 3 segundos para visualizar o acerto
+        }, FEEDBACK_BAR_DURATION);
       }
     } else {
       // Erro: mostrar círculo de distância e seta
@@ -245,9 +297,9 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
 
       // Avançar automaticamente após delay
       if (defaultConfig.autoAdvance) {
-        setTimeout(() => {
-          startNewRound();
-        }, 2000);
+        // CORREÇÃO: Avançar imediatamente quando tempo esgota
+        console.log('[NeighborhoodMode] Tempo esgotado - avançando automaticamente');
+        startNewRound();
       }
     }
   }, [gameState.currentNeighborhood, onStateChange, onFeedback, defaultConfig.autoAdvance, startNewRound]);
@@ -296,13 +348,13 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
   useEffect(() => {
     return () => {
       setVisualFeedback({
+        highlightNeighborhood: false,
+        neighborhoodColor: '#00ff00',
         showDistanceCircle: false,
         showArrow: false,
         arrowPath: null,
         distanceCircleCenter: null,
-        distanceCircleRadius: 0,
-        highlightNeighborhood: false,
-        neighborhoodColor: '#00ff00'
+        distanceCircleRadius: 0
       });
     };
   }, []);

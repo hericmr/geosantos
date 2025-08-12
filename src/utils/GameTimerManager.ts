@@ -1,136 +1,253 @@
 /**
- * Sistema de timers unificado para o jogo GeoSantos
- * Resolve problemas de timers sobrepostos e vazamentos de memória
+ * Gerenciador de timers para o jogo
+ * CORREÇÃO: Sistema de timer unificado para evitar conflitos
  */
+
+export interface TimerConfig {
+  interval: number;
+  callback: () => void;
+  autoStart?: boolean;
+  maxDuration?: number;
+}
+
+export interface TimerState {
+  isRunning: boolean;
+  isPaused: boolean;
+  startTime: number;
+  pauseTime: number;
+  totalPausedTime: number;
+  duration: number;
+}
 
 export class GameTimerManager {
   private timers: Map<string, NodeJS.Timeout> = new Map();
-  private intervals: Map<string, NodeJS.Timeout> = new Map();
-  private isMobile: boolean;
-
-  constructor() {
-    this.isMobile = this.detectMobileDevice();
-  }
-
-  private detectMobileDevice(): boolean {
-    // Verificar se estamos no browser
-    if (typeof window === 'undefined') {
-      return false; // Não é mobile se não estamos no browser
-    }
-    
-    return (
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      window.innerWidth <= 768 ||
-      'ontouchstart' in window
-    );
-  }
+  private timerStates: Map<string, TimerState> = new Map();
+  private configs: Map<string, TimerConfig> = new Map();
 
   /**
-   * Agenda um timer único
+   * Criar um timer com configuração específica
+   * CORREÇÃO: Sistema de timer mais robusto
    */
-  scheduleTimer(id: string, delay: number, callback: () => void): void {
+  createTimer(
+    id: string, 
+    config: TimerConfig
+  ): void {
+    // Limpar timer existente se houver
     this.clearTimer(id);
     
-    // Otimizações para mobile
-    const optimizedDelay = this.isMobile ? Math.min(delay, 2000) : delay;
+    // Armazenar configuração
+    this.configs.set(id, config);
     
-    const timer = setTimeout(() => {
-      callback();
-      this.timers.delete(id);
-    }, optimizedDelay);
+    // Inicializar estado
+    this.timerStates.set(id, {
+      isRunning: false,
+      isPaused: false,
+      startTime: 0,
+      pauseTime: 0,
+      totalPausedTime: 0,
+      duration: 0
+    });
     
-    this.timers.set(id, timer);
+    // Iniciar automaticamente se configurado
+    if (config.autoStart) {
+      this.startTimer(id);
+    }
   }
 
   /**
-   * Agenda um intervalo
+   * Iniciar um timer específico
+   * CORREÇÃO: Controle de estado mais preciso
    */
-  scheduleInterval(id: string, interval: number, callback: () => void): void {
-    console.log(`[GameTimerManager] 📅 Agendando intervalo: ${id} a cada ${interval}ms`);
+  startTimer(id: string): boolean {
+    const config = this.configs.get(id);
+    const state = this.timerStates.get(id);
     
-    this.clearInterval(id);
+    if (!config || !state) {
+      console.warn(`[GameTimerManager] Timer ${id} não encontrado`);
+      return false;
+    }
     
-    // Otimizações para mobile
-    const optimizedInterval = this.isMobile ? Math.max(interval, 50) : interval;
-    console.log(`[GameTimerManager] 📱 Intervalo otimizado: ${optimizedInterval}ms (mobile: ${this.isMobile})`);
+    if (state.isRunning) {
+      console.warn(`[GameTimerManager] Timer ${id} já está rodando`);
+      return false;
+    }
     
-    const intervalTimer = setInterval(callback, optimizedInterval);
-    this.intervals.set(id, intervalTimer);
+    // Atualizar estado
+    state.isRunning = true;
+    state.isPaused = false;
+    state.startTime = Date.now();
+    state.totalPausedTime = 0;
     
-    console.log(`[GameTimerManager] ✅ Intervalo ${id} agendado com sucesso. Total ativos: ${this.intervals.size}`);
+    // Criar intervalo
+    const interval = setInterval(() => {
+      try {
+        config.callback();
+      } catch (error) {
+        console.error(`[GameTimerManager] Erro no callback do timer ${id}:`, error);
+        this.clearTimer(id);
+      }
+    }, config.interval);
+    
+    // Armazenar referência
+    this.timers.set(id, interval);
+    
+    console.log(`[GameTimerManager] Timer ${id} iniciado`);
+    return true;
   }
 
   /**
-   * Limpa um timer específico
+   * Pausar um timer específico
+   * CORREÇÃO: Pausa precisa com tracking de tempo
    */
-  clearTimer(id: string): void {
+  pauseTimer(id: string): boolean {
+    const state = this.timerStates.get(id);
+    const timer = this.timers.get(id);
+    
+    if (!state || !timer) {
+      return false;
+    }
+    
+    if (!state.isRunning || state.isPaused) {
+      return false;
+    }
+    
+    // Pausar
+    clearInterval(timer);
+    this.timers.delete(id);
+    
+    // Atualizar estado
+    state.isPaused = true;
+    state.pauseTime = Date.now();
+    state.isRunning = false;
+    
+    console.log(`[GameTimerManager] Timer ${id} pausado`);
+    return true;
+  }
+
+  /**
+   * Retomar um timer pausado
+   * CORREÇÃO: Retomada com compensação de tempo pausado
+   */
+  resumeTimer(id: string): boolean {
+    const config = this.configs.get(id);
+    const state = this.timerStates.get(id);
+    
+    if (!config || !state) {
+      return false;
+    }
+    
+    if (!state.isPaused) {
+      return false;
+    }
+    
+    // Calcular tempo pausado
+    const pauseDuration = Date.now() - state.pauseTime;
+    state.totalPausedTime += pauseDuration;
+    
+    // Retomar
+    state.isPaused = false;
+    state.isRunning = true;
+    
+    // Criar novo intervalo
+    const interval = setInterval(() => {
+      try {
+        config.callback();
+      } catch (error) {
+        console.error(`[GameTimerManager] Erro no callback do timer ${id}:`, error);
+        this.clearTimer(id);
+      }
+    }, config.interval);
+    
+    this.timers.set(id, interval);
+    
+    console.log(`[GameTimerManager] Timer ${id} retomado`);
+    return true;
+  }
+
+  /**
+   * Parar e limpar um timer
+   * CORREÇÃO: Limpeza completa de recursos
+   */
+  clearTimer(id: string): boolean {
     const timer = this.timers.get(id);
     if (timer) {
-      clearTimeout(timer);
+      clearInterval(timer);
       this.timers.delete(id);
     }
+    
+    this.timerStates.delete(id);
+    this.configs.delete(id);
+    
+    console.log(`[GameTimerManager] Timer ${id} limpo`);
+    return true;
   }
 
   /**
-   * Limpa um intervalo específico
+   * Verificar se um timer está rodando
+   * CORREÇÃO: Verificação de estado mais precisa
    */
-  clearInterval(id: string): void {
-    const interval = this.intervals.get(id);
-    if (interval) {
-      console.log(`[GameTimerManager] 🧹 Limpando intervalo: ${id}`);
-      clearInterval(interval);
-      this.intervals.delete(id);
-      console.log(`[GameTimerManager] ✅ Intervalo ${id} limpo. Total restantes: ${this.intervals.size}`);
-    } else {
-      console.log(`[GameTimerManager] ℹ️ Intervalo ${id} não encontrado para limpeza`);
+  isTimerRunning(id: string): boolean {
+    const state = this.timerStates.get(id);
+    return state ? state.isRunning && !state.isPaused : false;
+  }
+
+  /**
+   * Obter estado de um timer
+   * CORREÇÃO: Estado completo do timer
+   */
+  getTimerState(id: string): TimerState | null {
+    return this.timerStates.get(id) || null;
+  }
+
+  /**
+   * Obter tempo total rodando de um timer
+   * CORREÇÃO: Cálculo preciso considerando pausas
+   */
+  getTimerElapsedTime(id: string): number {
+    const state = this.timerStates.get(id);
+    if (!state) return 0;
+    
+    if (state.isRunning) {
+      return Date.now() - state.startTime - state.totalPausedTime;
+    } else if (state.isPaused) {
+      return state.pauseTime - state.startTime - state.totalPausedTime;
     }
+    
+    return 0;
   }
 
   /**
-   * Limpa todos os timers e intervalos
+   * Limpar todos os timers
+   * CORREÇÃO: Limpeza completa de todos os recursos
    */
-  clearAll(): void {
-    console.log(`[GameTimerManager] 🧹 Limpando todos os timers e intervalos (${this.timers.size} timers, ${this.intervals.size} intervalos)`);
+  clearAllTimers(): void {
+    console.log('[GameTimerManager] Limpando todos os timers...');
     
-    this.timers.forEach(timer => clearTimeout(timer));
-    this.intervals.forEach(interval => clearInterval(interval));
+    for (const [id, timer] of this.timers) {
+      clearInterval(timer);
+    }
+    
     this.timers.clear();
-    this.intervals.clear();
+    this.timerStates.clear();
+    this.configs.clear();
     
-    console.log(`[GameTimerManager] ✅ Todos os timers e intervalos limpos`);
+    console.log('[GameTimerManager] Todos os timers limpos');
   }
 
   /**
-   * Verifica se um timer está ativo
+   * Obter estatísticas dos timers
+   * CORREÇÃO: Informações de debug completas
    */
-  hasTimer(id: string): boolean {
-    return this.timers.has(id);
-  }
-
-  /**
-   * Verifica se um intervalo está ativo
-   */
-  hasInterval(id: string): boolean {
-    return this.intervals.has(id);
-  }
-
-  /**
-   * Retorna o número de timers ativos
-   */
-  getActiveTimersCount(): number {
-    return this.timers.size + this.intervals.size;
-  }
-
-  /**
-   * Configurações otimizadas para mobile
-   */
-  getMobileOptimizedConfig() {
+  getStats(): any {
     return {
-      spriteFrames: this.isMobile ? 8 : 16,
-      frameDelay: this.isMobile ? 80 : 45,
-      distanceCircleDelay: this.isMobile ? 200 : 400,
-      feedbackDelay: this.isMobile ? 400 : 800,
-      progressInterval: this.isMobile ? 50 : 100
+      totalTimers: this.timers.size,
+      runningTimers: Array.from(this.timerStates.values()).filter(s => s.isRunning).length,
+      pausedTimers: Array.from(this.timerStates.values()).filter(s => s.isPaused).length,
+      timerIds: Array.from(this.timers.keys()),
+      states: Object.fromEntries(this.timerStates)
     };
   }
-} 
+}
+
+// Exportar instância singleton
+export const gameTimerManager = new GameTimerManager(); 

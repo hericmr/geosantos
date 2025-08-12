@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
 
-interface FeedbackPanelStyles {
+export interface FeedbackPanelStyles {
   container: (gameOver: boolean, isMobile: boolean, popupPosition: { top: string; left: string }) => CSSProperties;
   contentContainer: CSSProperties;
   scoreDisplay: CSSProperties;
@@ -9,7 +9,7 @@ interface FeedbackPanelStyles {
   timeBonus: CSSProperties;
   feedbackMessage: (isExcellent: boolean) => CSSProperties;
   buttonContainer: CSSProperties;
-  button: (variant: 'pause' | 'next' | 'retry') => CSSProperties;
+  button: (variant: 'pause' | 'resume' | 'next' | 'retry') => CSSProperties;
   progressBar: (progress: number, color: string) => CSSProperties;
 }
 
@@ -134,7 +134,9 @@ export const styles: FeedbackPanelStyles = {
   button: (variant) => ({
     padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
     fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-    background: variant === 'pause' ? 'var(--accent-orange)' : variant === 'next' ? 'var(--accent-green)' : 'var(--accent-red)',
+    background: variant === 'pause' ? 'var(--accent-orange)' : 
+                variant === 'resume' ? 'var(--accent-green)' :
+                variant === 'next' ? 'var(--accent-green)' : 'var(--accent-red)',
     color: variant === 'pause' ? '#000000' : '#ffffff',
     border: 'none',
     borderRadius: '2px',
@@ -143,13 +145,13 @@ export const styles: FeedbackPanelStyles = {
     fontWeight: 400,
     fontFamily: "'Press Start 2P', monospace",
     boxShadow: 'var(--shadow-md)',
-    flex: variant === 'pause' ? '0.4' : '0.6',
+    flex: variant === 'pause' || variant === 'resume' ? '0.4' : '0.6',
     maxWidth: variant === 'retry' ? '100%' : 'none',
     position: 'relative',
     overflow: 'hidden',
     textTransform: 'uppercase',
     letterSpacing: '1px',
-    minWidth: variant === 'pause' ? '100px' : '120px',
+    minWidth: variant === 'pause' || variant === 'resume' ? '100px' : '120px',
     zIndex: 1,
     '&:hover': {
       transform: 'translate(-1px, -1px)',

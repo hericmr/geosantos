@@ -44,10 +44,15 @@ export {
   formatTime,
   formatDistance,
   
-  // Funções de validação únicas
+  // Funções de validação
+  validateDistance,
+  calculateClickPrecision,
   validateClickSequence,
   validateFamousPlaceClick,
   validateNeighborhoodClick,
+  validateNeighborhoodClickForMode,
+  normalizeNeighborhoodName,
+  findNeighborhoodByName,
   findNearestFamousPlace,
   findNearestNeighborhood,
   getPlaceHints,

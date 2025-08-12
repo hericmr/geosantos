@@ -16,8 +16,6 @@ export {
   getClosestPointOnSegment,
   calculateDirection,
   getDirectionText,
-  validateDistance,
-  calculateClickPrecision,
   findNearestElement,
   calculateSearchArea,
   isPointInSearchArea,
@@ -58,25 +56,16 @@ export type {
 } from './validation';
 
 export {
-  validateDistance as validateDistanceValidation,
-  calculateClickPrecision as calculateClickPrecisionValidation,
+  validateDistance,
+  calculateClickPrecision,
   validateClickSequence,
   validateFamousPlaceClick,
   validateNeighborhoodClick,
+  validateNeighborhoodClickForMode,
+  normalizeNeighborhoodName,
+  findNeighborhoodByName,
   findNearestFamousPlace,
   findNearestNeighborhood,
   getPlaceHints,
   generatePrecisionFeedback
-} from './validation';
-
-// ============================================================================
-// RE-EXPORTS PARA COMPATIBILIDADE
-// ============================================================================
-
-// Re-exportar funções comuns com nomes diferentes para evitar conflitos
-export {
-  calculateDistance as calculateDistanceShared,
-  calculateDirection as calculateDirectionShared,
-  getDirectionText as getDirectionTextShared,
-  formatScore as formatScoreShared
-} from './geometry'; 
+} from './validation'; 

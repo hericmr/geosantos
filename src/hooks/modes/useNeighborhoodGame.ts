@@ -1,20 +1,17 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import * as L from 'leaflet';
 import { 
   NeighborhoodGameState, 
-  NeighborhoodValidation, 
-  NeighborhoodConfig,
+  NeighborhoodValidation,
   NeighborhoodVisualFeedback 
 } from '../../types/modes/neighborhood';
-import { validateNeighborhoodClick } from '../../utils/modes/neighborhood/validation';
 import { calculateNeighborhoodScore } from '../../utils/shared';
+// CORREÇÃO: Usar validação compartilhada
+import { validateNeighborhoodClickForMode } from '../../utils/shared/validation';
 
-export const useNeighborhoodGame = (
-  geoJsonData: any,
-  config: Partial<NeighborhoodConfig> = {}
-) => {
+export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {}) => {
   // Configuração padrão
-  const defaultConfig: NeighborhoodConfig = {
+  const defaultConfig: any = {
     roundTime: 10,
     maxRounds: 10,
     autoAdvance: true,
@@ -39,14 +36,15 @@ export const useNeighborhoodGame = (
     feedback: null
   });
 
+  // Estado para feedback visual
   const [visualFeedback, setVisualFeedback] = useState<NeighborhoodVisualFeedback>({
+    highlightNeighborhood: false,
+    neighborhoodColor: '#00ff00',
     showDistanceCircle: false,
     showArrow: false,
     arrowPath: null,
     distanceCircleCenter: null,
-    distanceCircleRadius: 0,
-    highlightNeighborhood: false,
-    neighborhoodColor: '#00ff00'
+    distanceCircleRadius: 0
   });
 
   // Inicializar bairros disponíveis
@@ -63,7 +61,12 @@ export const useNeighborhoodGame = (
 
   // Selecionar bairro aleatório para a rodada
   const selectRandomNeighborhood = useCallback(() => {
-    if (gameState.availableNeighborhoods.length === 0) return;
+    console.log('[useNeighborhoodGame] selectRandomNeighborhood chamado - Stack trace:', new Error().stack);
+    
+    if (gameState.availableNeighborhoods.length === 0) {
+      console.log('[useNeighborhoodGame] Nenhum bairro disponível');
+      return;
+    }
 
     const availableNeighborhoods = gameState.availableNeighborhoods.filter(
       name => !gameState.revealedNeighborhoods.has(name)
@@ -71,6 +74,7 @@ export const useNeighborhoodGame = (
 
     if (availableNeighborhoods.length === 0) {
       // Todos os bairros foram revelados, resetar
+      console.log('[useNeighborhoodGame] Todos os bairros revelados - resetando');
       setGameState(prev => ({
         ...prev,
         revealedNeighborhoods: new Set(),
@@ -81,6 +85,8 @@ export const useNeighborhoodGame = (
 
     const randomIndex = Math.floor(Math.random() * availableNeighborhoods.length);
     const selectedNeighborhood = availableNeighborhoods[randomIndex];
+
+    console.log('[useNeighborhoodGame] Selecionando bairro:', selectedNeighborhood);
 
     setGameState(prev => ({
       ...prev,
@@ -131,7 +137,7 @@ export const useNeighborhoodGame = (
 
     try {
       // Validar o clique
-      const validation = validateNeighborhoodClick(
+      const validation = validateNeighborhoodClickForMode(
         latlng,
         gameState.currentNeighborhood,
         geoJsonData,
@@ -165,16 +171,37 @@ export const useNeighborhoodGame = (
         distanceCircleRadius: validation.distance,
         showArrow: defaultConfig.showArrow && !validation.isCorrectNeighborhood,
         arrowPath: validation.isCorrectNeighborhood ? null : [latlng, latlng] as [L.LatLng, L.LatLng],
-        highlightNeighborhood: validation.isCorrectNeighborhood,
+        highlightNeighborhood: false, // CORREÇÃO: Inicialmente false para delay
         neighborhoodColor: validation.isCorrectNeighborhood ? '#00ff00' : '#ff0000'
       }));
 
-      // Se acertou, marcar como revelado
+      // Se acertou, marcar como revelado e ativar destaque com delay
       if (validation.isCorrectNeighborhood) {
         setGameState(prev => ({
           ...prev,
           revealedNeighborhoods: new Set([...prev.revealedNeighborhoods, gameState.currentNeighborhood])
         }));
+
+        // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
+        console.log('[useNeighborhoodGame] Acerto detectado - destacando bairro em 1s');
+        
+        // Primeiro, limpar feedback visual imediatamente (SEM destaque)
+        setVisualFeedback(prev => ({
+          ...prev,
+          highlightNeighborhood: false, // Inicialmente false
+          neighborhoodColor: '#00ff00',
+          showDistanceCircle: false,
+          showArrow: false
+        }));
+        
+        // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
+        setTimeout(() => {
+          console.log('[useNeighborhoodGame] Ativando destaque do bairro após 1s do clique');
+          setVisualFeedback(prev => ({
+            ...prev,
+            highlightNeighborhood: true // Agora ativa o destaque
+          }));
+        }, 1000); // 1000ms = 1 segundo após o clique
 
         // Avançar para próxima rodada se configurado
         if (defaultConfig.autoAdvance) {

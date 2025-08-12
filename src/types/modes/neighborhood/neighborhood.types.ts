@@ -95,6 +95,8 @@ export interface NeighborhoodVisualFeedback {
   distanceCircleRadius: number;
   highlightNeighborhood: boolean;
   neighborhoodColor: string;
+  // CORREÇÃO: Timestamp para controlar quando o destaque foi ativado
+  highlightStartTime?: number;
 }
 
 // Interface para o hook do modo neighborhood

@@ -32,6 +32,7 @@ export interface FeedbackPanelProps {
   geoJsonData: any;
   gameOver: boolean;
   onPauseGame: () => void;
+  onResumeGame?: () => void;
   score: number;
   currentNeighborhood: string;
   currentMode?: GameMode;
@@ -40,6 +41,7 @@ export interface FeedbackPanelProps {
   roundNumber?: number;
   consecutiveCorrect?: number;
   bestStreak?: number;
+  isPaused?: boolean;
 }
 
 
@@ -59,6 +61,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   geoJsonData,
   gameOver,
   onPauseGame,
+  onResumeGame,
   score,
   currentNeighborhood,
   currentMode = 'neighborhoods',
@@ -67,6 +70,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   roundNumber = 1,
   consecutiveCorrect = 0,
   bestStreak = 0,
+  isPaused,
 }) => {
   const [displayedDistance, setDisplayedDistance] = useState(0);
   const [displayedTime, setDisplayedTime] = useState(0);
@@ -174,6 +178,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         }}
         feedbackProgress={feedbackProgress}
         currentMode={currentMode}
+        onResumeGame={onResumeGame}
+        isPaused={isPaused}
       />
 
       {/* Dica contextual melhorada */}

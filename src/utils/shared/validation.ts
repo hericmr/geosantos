@@ -9,6 +9,96 @@ import { calculateDistance, calculateDirection, getDirectionText } from './geome
  */
 
 // ============================================================================
+// SISTEMA DE LOGGING PARA DEBUG
+// ============================================================================
+
+/**
+ * Sistema de logging estruturado para debug
+ * CORREÇÃO: Adicionado para rastrear problemas de validação
+ */
+export const gameLogger = {
+  info: (message: string, data?: any) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[GAME-VALIDATION] ${message}`, data);
+    }
+  },
+  error: (message: string, error?: any) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`[GAME-VALIDATION] ERROR: ${message}`, error);
+    }
+  },
+  performance: (operation: string, duration: number) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[GAME-VALIDATION] ${operation}: ${duration}ms`);
+    }
+  },
+  validation: (operation: string, result: any) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[GAME-VALIDATION] ${operation}:`, result);
+    }
+  }
+};
+
+// ============================================================================
+// FUNÇÕES DE NORMALIZAÇÃO
+// ============================================================================
+
+/**
+ * Normaliza o nome de um bairro para busca consistente no GeoJSON
+ * CORREÇÃO: Padroniza diferentes formatos de propriedades
+ */
+export const normalizeNeighborhoodName = (feature: any): string | null => {
+  if (!feature || !feature.properties) return null;
+  
+  // Prioridade: NOME (padrão do GeoJSON de Santos)
+  if (feature.properties.NOME && typeof feature.properties.NOME === 'string') {
+    return feature.properties.NOME.trim();
+  }
+  
+  // Fallback: name (formato alternativo)
+  if (feature.properties.name && typeof feature.properties.name === 'string') {
+    return feature.properties.name.trim();
+  }
+  
+  // Fallback: NOME_BAIRRO (formato alternativo)
+  if (feature.properties.NOME_BAIRRO && typeof feature.properties.NOME_BAIRRO === 'string') {
+    return feature.properties.NOME_BAIRRO.trim();
+  }
+  
+  return null;
+};
+
+/**
+ * Encontra um bairro no GeoJSON usando nome normalizado
+ * CORREÇÃO: Busca consistente independente do formato da propriedade
+ */
+export const findNeighborhoodByName = (
+  geoJsonData: any, 
+  targetName: string
+): any | null => {
+  const startTime = performance.now();
+  
+  if (!geoJsonData || !geoJsonData.features || !Array.isArray(geoJsonData.features)) {
+    gameLogger.error('findNeighborhoodByName: Dados GeoJSON inválidos', { geoJsonData, targetName });
+    return null;
+  }
+  
+  const normalizedTargetName = targetName.trim().toLowerCase();
+  gameLogger.info('findNeighborhoodByName: Buscando bairro', { targetName, normalizedTargetName });
+  
+  const result = geoJsonData.features.find((feature: any) => {
+    const normalizedFeatureName = normalizeNeighborhoodName(feature);
+    return normalizedFeatureName && normalizedFeatureName.toLowerCase() === normalizedTargetName;
+  }) || null;
+  
+  const duration = performance.now() - startTime;
+  gameLogger.performance('findNeighborhoodByName', duration);
+  gameLogger.validation('findNeighborhoodByName', { targetName, found: !!result, duration });
+  
+  return result;
+};
+
+// ============================================================================
 // TIPOS DE VALIDAÇÃO COMPARTILHADOS
 // ============================================================================
 
@@ -159,10 +249,8 @@ export const validateNeighborhoodClick = (
   geoJsonData: any,
   timeLeft: number
 ): ClickValidation => {
-  // Encontrar o bairro alvo no GeoJSON
-  const targetFeature = geoJsonData.features.find((feature: any) => 
-    feature.properties.name === targetNeighborhood
-  );
+  // CORREÇÃO: Usar função de busca normalizada
+  const targetFeature = findNeighborhoodByName(geoJsonData, targetNeighborhood);
   
   if (!targetFeature) {
     return {
@@ -226,6 +314,118 @@ export const validateNeighborhoodClick = (
       precision: 0,
       direction
     };
+  }
+};
+
+/**
+ * Valida clique em um bairro específico - Versão para modo Neighborhood
+ * CORREÇÃO: Retorna o tipo correto NeighborhoodClickValidation
+ */
+export const validateNeighborhoodClickForMode = (
+  clickedPoint: L.LatLng,
+  targetNeighborhood: string,
+  geoJsonData: any,
+  timeLeft: number
+): any => {
+  const startTime = performance.now();
+  gameLogger.info('validateNeighborhoodClickForMode: Iniciando validação', { 
+    targetNeighborhood, 
+    clickedPoint: { lat: clickedPoint.lat, lng: clickedPoint.lng },
+    timeLeft 
+  });
+  
+  // CORREÇÃO: Usar função de busca normalizada
+  const targetFeature = findNeighborhoodByName(geoJsonData, targetNeighborhood);
+  
+  if (!targetFeature) {
+    gameLogger.error('validateNeighborhoodClickForMode: Bairro não encontrado', { targetNeighborhood });
+    return {
+      isValid: false,
+      distance: Infinity,
+      message: 'Bairro não encontrado',
+      score: 0,
+      isPerfect: false,
+      isCorrectNeighborhood: false,
+      isNearBorder: false,
+      neighborhoodName: targetNeighborhood
+    };
+  }
+  
+  // Verificar se o clique está dentro do polígono do bairro
+  const coordinates = targetFeature.geometry.coordinates[0].map((coord: number[]) => 
+    L.latLng(coord[1], coord[0])
+  );
+  
+  const isInside = isPointInsidePolygon(clickedPoint, coordinates);
+  gameLogger.info('validateNeighborhoodClickForMode: Verificação de polígono', { 
+    isInside, 
+    coordinatesCount: coordinates.length 
+  });
+  
+  if (isInside) {
+    // Clique dentro do bairro - acerto perfeito
+    const result = {
+      isValid: true,
+      distance: 0,
+      message: `Perfeito! Você acertou o bairro ${targetNeighborhood}!`,
+      score: 0, // Será calculado pelo sistema de pontuação
+      isPerfect: true,
+      isCorrectNeighborhood: true,
+      isNearBorder: false,
+      neighborhoodName: targetNeighborhood
+    };
+    
+    const duration = performance.now() - startTime;
+    gameLogger.performance('validateNeighborhoodClickForMode', duration);
+    gameLogger.validation('validateNeighborhoodClickForMode - ACERTO', result);
+    
+    return result;
+  } else {
+    // Clique fora do bairro - calcular distância até a borda
+    const borderDistance = calculateDistanceToBorder(clickedPoint, coordinates);
+    
+    // Determinar direção aproximada
+    const center = calculatePolygonCenter(coordinates);
+    const direction = calculateDirection(clickedPoint, center);
+    
+    // Verificar se está próximo da borda (para bônus)
+    const isNearBorder = borderDistance.distance <= 500;
+    
+    // Gerar mensagem baseada na distância
+    let message = '';
+    if (borderDistance.distance < 100) {
+      message = `Quase lá! Você está a ${Math.round(borderDistance.distance)}m do bairro ${targetNeighborhood}`;
+    } else if (borderDistance.distance < 500) {
+      message = `Está próximo! Continue tentando!`;
+    } else if (borderDistance.distance < 1000) {
+      message = `Ainda longe, mas no caminho certo!`;
+    } else {
+      message = `Muito longe! Tente novamente!`;
+    }
+    
+    const result = {
+      isValid: true,
+      distance: borderDistance.distance,
+      message,
+      score: 0, // Será calculado pelo sistema de pontuação
+      isPerfect: false,
+      isCorrectNeighborhood: false,
+      isNearBorder,
+      neighborhoodName: targetNeighborhood,
+      additionalData: {
+        closestPoint: borderDistance.closestPoint
+      }
+    };
+    
+    const duration = performance.now() - startTime;
+    gameLogger.performance('validateNeighborhoodClickForMode', duration);
+    gameLogger.validation('validateNeighborhoodClickForMode - ERRO', { 
+      ...result, 
+      borderDistance: borderDistance.distance,
+      direction 
+    });
+    
+    return result;
   }
 };
 
@@ -411,8 +611,9 @@ export const findNearestNeighborhood = (
       
       // Verificar se o ponto está dentro do polígono
       if (isPointInsidePolygon(point, coordinates)) {
+        const neighborhoodName = normalizeNeighborhoodName(feature);
         return {
-          name: feature.properties.name,
+          name: neighborhoodName || 'Bairro Desconhecido',
           distance: 0
         };
       }
@@ -426,8 +627,9 @@ export const findNearestNeighborhood = (
     }
   }
   
+  const neighborhoodName = normalizeNeighborhoodName(nearestNeighborhood);
   return {
-    name: nearestNeighborhood.properties.name,
+    name: neighborhoodName || 'Bairro Desconhecido',
     distance: nearestDistance
   };
 };

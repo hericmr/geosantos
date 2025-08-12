@@ -42,4 +42,26 @@ export const GAME_CONSTANTS = {
             fontFamily: 'Figtree'
         }
     }
-}; 
+};
+
+// ============================================================================
+// CONSTANTES DE TIMING
+// ============================================================================
+
+/**
+ * Duração fixa da barra de feedback (em milissegundos)
+ * CORREÇÃO: Valor fixo de 2 segundos para consistência
+ */
+export const FEEDBACK_BAR_DURATION = 2000; // 2 segundos
+
+/**
+ * Intervalo de atualização da barra de feedback (em milissegundos)
+ * CORREÇÃO: 100ms para animação suave
+ */
+export const FEEDBACK_BAR_UPDATE_INTERVAL = 100; // 100ms
+
+/**
+ * Incremento da barra de progresso por atualização
+ * CORREÇÃO: 5% a cada 100ms = 100% em 2 segundos
+ */
+export const FEEDBACK_BAR_PROGRESS_INCREMENT = 5; // 5% 

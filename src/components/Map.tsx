@@ -280,6 +280,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     handleVolumeChange,
     handleToggleMute,
     handlePauseGame,
+    handleResumeGame,
     handleNextRound,
     handleStartGame,
     setDistanceCircle,
@@ -931,6 +932,59 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               geoJsonData={geoJsonData}
               geoJsonRef={geoJsonRef}
               updateGameState={updateGameState}
+              externalCurrentNeighborhood={gameState.currentNeighborhood}
+              onNeighborhoodChanged={(neighborhood) => {
+                console.log('[Map] Bairro alterado no NeighborhoodManager:', neighborhood);
+                // O estado já está sincronizado, apenas log para debug
+              }}
+              onStateChange={(state) => {
+                // Atualizar estado local quando NeighborhoodManager mudar
+                if (state.currentNeighborhood) {
+                  updateGameState({
+                    currentNeighborhood: state.currentNeighborhood
+                  });
+                }
+                if (state.roundNumber) {
+                  updateGameState({
+                    roundNumber: state.roundNumber
+                  });
+                }
+                if (state.score !== undefined) {
+                  updateGameState({
+                    score: state.score
+                  });
+                }
+                if (state.revealedNeighborhoods) {
+                  updateGameState({
+                    revealedNeighborhoods: state.revealedNeighborhoods
+                  });
+                }
+                // gameOver é gerenciado pelo próprio NeighborhoodManager
+              }}
+              onFeedback={(feedback) => {
+                // Processar feedback do NeighborhoodManager
+                console.log('[Map] Feedback recebido do NeighborhoodManager:', feedback);
+              }}
+              onRoundComplete={() => {
+                // Rodada completada - verificar se deve mostrar game over
+                console.log('[Map] Rodada completada no modo bairros');
+                if (gameState.gameOver) {
+                  console.log('[Map] Game over detectado - mostrando modal');
+                  const startTime = Date.now();
+                  const playTime = Math.floor((startTime - (gameState.lastClickTime || startTime)) / 1000);
+                  
+                  // Calcular precisão baseada na distância total
+                  const accuracy = Math.max(0, Math.min(1, 1 - (gameState.totalDistance / 6000)));
+                  
+                  setGameStats({
+                    playTime: Math.max(1, playTime),
+                    roundsPlayed: gameState.roundNumber,
+                    accuracy
+                  });
+                  
+                  setShowGameOver(true);
+                }
+              }}
             />
           ) : (
             <FamousPlacesManager
@@ -1020,10 +1074,12 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           geoJsonData={geoJsonData}
           gameOver={gameState.gameOver}
           onPauseGame={handlePauseGame}
+          onResumeGame={handleResumeGame}
           score={gameState.score}
           currentNeighborhood={gameState.currentNeighborhood}
           currentMode={currentMode}
           currentFamousPlace={currentFamousPlace || undefined}
+          isPaused={isPaused}
         />
       )}
 
