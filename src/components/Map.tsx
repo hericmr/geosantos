@@ -314,10 +314,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       }
     }
     console.log('[selectNextFamousPlace] currentFamousPlace antes:', currentFamousPlace);
+    console.log('[selectNextFamousPlace] novo lugar selecionado:', famousPlaces[idx]);
     setCurrentFamousPlace(famousPlaces[idx]);
-    setTimeout(() => {
-      console.log('[selectNextFamousPlace] currentFamousPlace depois:', famousPlaces[idx]);
-    }, 0);
   }, [famousPlaces, currentFamousPlace]);
 
   // Atualiza a ref sempre que currentFamousPlace mudar
@@ -660,14 +658,34 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   // Função para avançar rodada e trocar lugar famoso
   const handleNextRoundWithFamousPlaceReset = useCallback((geoJsonData: any) => {
     console.log('[handleNextRoundWithFamousPlaceReset] chamada. currentFamousPlace:', currentFamousPlace);
-    handleNextRound(geoJsonData);
     if (currentMode === 'famous_places') {
-      setTimeout(() => {
-        console.log('[handleNextRoundWithFamousPlaceReset] chamando selectNextFamousPlace');
-        selectNextFamousPlace();
-      }, 0);
+      // Para lugares famosos, marcar como pendente e trocar o lugar
+      console.log('[handleNextRoundWithFamousPlaceReset] marcando próxima rodada como pendente');
+      setPendingNextRound(true);
+      setPendingGeoJsonData(geoJsonData);
+      selectNextFamousPlace();
+    } else {
+      // Para bairros, manter a lógica original
+      handleNextRound(geoJsonData);
     }
   }, [currentMode, handleNextRound, selectNextFamousPlace, currentFamousPlace]);
+
+  // Efeito para reagir à mudança do lugar famoso e avançar a rodada
+  const [pendingNextRound, setPendingNextRound] = useState<boolean>(false);
+  const [pendingGeoJsonData, setPendingGeoJsonData] = useState<any>(null);
+
+  useEffect(() => {
+    if (pendingNextRound && pendingGeoJsonData && currentFamousPlace) {
+      console.log('[useEffect] Lugar famoso mudou, executando próxima rodada');
+      setPendingNextRound(false);
+      setPendingGeoJsonData(null);
+      // Aguardar um frame para garantir que o estado foi atualizado
+      requestAnimationFrame(() => {
+        console.log('[useEffect] Executando handleNextRound após frame');
+        handleNextRound(pendingGeoJsonData);
+      });
+    }
+  }, [currentFamousPlace, pendingNextRound, pendingGeoJsonData, handleNextRound]);
 
   return (
     <div style={{
@@ -1170,6 +1188,17 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         famousPlace={currentFamousPlace}
         isCentered={isModalCentered}
         timeProgress={modalTimeProgress}
+        onPauseGame={handlePauseGame}
+        onResumeGame={handleResumeGame}
+        onNextRound={() => {
+          if (currentMode === 'famous_places' && geoJsonData) {
+            handleNextRoundWithFamousPlaceReset(geoJsonData);
+          }
+        }}
+        isPaused={isPaused}
+        gameOver={gameState.gameOver}
+        feedbackProgress={gameState.feedbackProgress}
+        geoJsonData={geoJsonData}
       />
     </div>
   );

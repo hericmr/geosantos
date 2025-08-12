@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FamousPlace } from '../../types/famousPlaces';
 import { HelpCircleIcon } from './GameIcons';
+import { ActionButtons } from './ActionButtons';
 
 interface FamousPlaceModalProps {
   open: boolean;
@@ -9,6 +10,14 @@ interface FamousPlaceModalProps {
   isCentered?: boolean;
   onTransitionComplete?: () => void;
   timeProgress?: number;
+  // Novas props para controle do jogo
+  onPauseGame?: () => void;
+  onResumeGame?: () => void;
+  onNextRound?: () => void;
+  isPaused?: boolean;
+  gameOver?: boolean;
+  feedbackProgress?: number;
+  geoJsonData?: any;
 }
 
 export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({ 
@@ -17,7 +26,14 @@ export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({
   famousPlace,
   isCentered = true,
   onTransitionComplete,
-  timeProgress = 0
+  timeProgress = 0,
+  onPauseGame,
+  onResumeGame,
+  onNextRound,
+  isPaused = false,
+  gameOver = false,
+  feedbackProgress = 0,
+  geoJsonData
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -144,8 +160,8 @@ export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({
           gap: isCentered ? '12px' : '8px'
         }}>
           
-   {/* Imagem simplificada */}
-   <div style={{
+          {/* Imagem simplificada */}
+          <div style={{
             position: 'relative',
             border: 'none',
             borderRadius: '2px',
@@ -227,7 +243,81 @@ export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({
               </span>
             </div>
           )}
+
+          {/* Descrição do lugar famoso */}
+          {isCentered && famousPlace.description && (
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.85)',
+              borderRadius: '12px',
+              padding: '16px',
+              margin: '12px 0 0 0',
+              border: '2px solid rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              animation: '0.5s ease-out fadeInUp'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '12px',
+                paddingBottom: '8px',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 18v-7"></path>
+                  <path d="M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z"></path>
+                  <path d="M14 18v-7"></path>
+                  <path d="M18 18v-7"></path>
+                  <path d="M3 22h18"></path>
+                  <path d="M6 18v-7"></path>
+                </svg>
+                <div style={{
+                  fontSize: 'clamp(0.8rem, 2vw, 1rem)',
+                  color: '#FFD700',
+                  fontFamily: "'LaCartoonerie', sans-serif",
+                  fontWeight: 400,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  {famousPlace.name.toUpperCase()}
+                </div>
+              </div>
+              <div style={{
+                fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
+                color: '#ffffff',
+                fontFamily: "'LaCartoonerie', sans-serif",
+                lineHeight: 1.4,
+                marginBottom: '12px',
+                textAlign: 'left'
+              }}>
+                {famousPlace.description}
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Botões de ação - apenas quando centralizado */}
+        {isCentered && onPauseGame && onNextRound && (
+          <div style={{
+            padding: '16px',
+            borderTop: '2px solid var(--text-primary)',
+            background: 'var(--bg-primary)'
+          }}>
+            <ActionButtons
+              gameOver={gameOver}
+              onPauseGame={onPauseGame}
+              onResumeGame={onResumeGame}
+              onNextRound={() => {
+                if (onNextRound) {
+                  onNextRound();
+                }
+              }}
+              feedbackProgress={feedbackProgress}
+              currentMode="famous_places"
+              isPaused={isPaused}
+            />
+          </div>
+        )}
 
         {/* Estilos CSS simplificados */}
         <style>{`
@@ -260,6 +350,17 @@ export const FamousPlaceModal: React.FC<FamousPlaceModalProps> = ({
             100% { 
               opacity: 0;
               transform: ${isCentered ? 'translate(-50%, -50%) scale(0.9)' : 'translateX(100%)'};
+            }
+          }
+
+          @keyframes fadeInUp {
+            0% {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
             }
           }
           

@@ -59,10 +59,28 @@ export const GameIcon: React.FC<GameIconProps> = ({
 
   switch (name.toLowerCase()) {
     case 'target':
-      return <Target {...iconProps} />;
+      return (
+        <img 
+          src={`${import.meta.env.BASE_URL || ''}/assets/images/16.svg`}
+          alt="Target"
+          width={size}
+          height={size}
+          className={iconProps.className}
+          style={iconProps.style}
+        />
+      );
     case 'clock':
     case 'time':
-      return <Clock {...iconProps} />;
+      return (
+        <img 
+          src={`${import.meta.env.BASE_URL || ''}/assets/images/time.png`}
+          alt="Clock"
+          width={size}
+          height={size}
+          className={iconProps.className}
+          style={iconProps.style}
+        />
+      );
     case 'zap':
     case 'lightning':
     case 'bonus':

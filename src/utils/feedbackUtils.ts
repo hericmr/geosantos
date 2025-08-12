@@ -43,7 +43,7 @@ export const getAchievementData = (
   } else if (distanceKm < 0.5) {
     return {
       title: "INCRÍVEL!",
-      subtitle: "",
+      subtitle: "Você arrebentou no teste de mapas! Habilidade pura!",
       icon: "sparkles",
       color: "#FFA500",
       achievement: "NEAR_PERFECT",
@@ -52,7 +52,7 @@ export const getAchievementData = (
   } else if (distanceKm < 1) {
     return {
       title: "EXCELENTE!",
-      subtitle: "",
+      subtitle: "Seu talento para mapas é fora de série! Que jogada!",
       icon: "sparkles",
       color: "#32CD32",
       achievement: "EXCELLENT",
@@ -61,7 +61,7 @@ export const getAchievementData = (
   } else if (distanceKm < 2) {
     return {
       title: "MUITO BOM!",
-      subtitle: "",
+      subtitle: "Você é um mestre dos mapas! Isso é que é saber jogar!",
       icon: "thumbsup",
       color: "#00CED1",
       achievement: "GOOD",
@@ -70,7 +70,7 @@ export const getAchievementData = (
   } else if (distanceKm < 5) {
     return {
       title: "QUASE LÁ!",
-      subtitle: "",
+      subtitle: "Continue assim, você está no caminho certo!",
       icon: "helpcircle",
       color: "#FFD700",
       achievement: "CLOSE",

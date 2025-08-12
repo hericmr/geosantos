@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { GeoJSON } from 'react-leaflet';
 import * as L from 'leaflet';
 import { GeoJSONLayerProps } from '../../types/game';
@@ -11,6 +11,9 @@ export const GeoJSONLayer: React.FC<GeoJSONLayerProps> = ({
   onMapClick,
   geoJsonRef
 }) => {
+  // Ref para armazenar os timers de cada camada
+  const hoverTimeouts = useRef<Map<L.Layer, NodeJS.Timeout>>(new Map());
+
   return (
     <GeoJSON
       data={geoJsonData}
@@ -23,16 +26,36 @@ export const GeoJSONLayer: React.FC<GeoJSONLayerProps> = ({
         mouseover: (e: L.LeafletEvent) => {
           const layer = e.target as L.Path;
           const feature = (layer as any).feature;
+
+          // cancela qualquer timeout anterior para este layer
+          if (hoverTimeouts.current.has(layer)) {
+            clearTimeout(hoverTimeouts.current.get(layer));
+            hoverTimeouts.current.delete(layer);
+          }
+
           if (feature && revealedNeighborhoods.has(feature.properties?.NOME)) {
-            layer.setStyle({
-              ...getNeighborhoodStyle(feature, revealedNeighborhoods, currentNeighborhood),
-              fillOpacity: 0.7
-            });
+            // cria um timeout para aplicar o estilo ap�s 1 segundo
+            const timeoutId = setTimeout(() => {
+              layer.setStyle({
+                ...getNeighborhoodStyle(feature, revealedNeighborhoods, currentNeighborhood),
+                fillOpacity: 0.7
+              });
+              hoverTimeouts.current.delete(layer);
+            }, 1000);
+
+            hoverTimeouts.current.set(layer, timeoutId);
           }
         },
         mouseout: (e: L.LeafletEvent) => {
           const layer = e.target as L.Path;
           const feature = (layer as any).feature;
+
+          // cancela o timeout se o mouse sair antes de 1 segundo
+          if (hoverTimeouts.current.has(layer)) {
+            clearTimeout(hoverTimeouts.current.get(layer));
+            hoverTimeouts.current.delete(layer);
+          }
+
           if (feature) {
             layer.setStyle(getNeighborhoodStyle(feature, revealedNeighborhoods, currentNeighborhood));
           }
@@ -41,4 +64,4 @@ export const GeoJSONLayer: React.FC<GeoJSONLayerProps> = ({
       ref={geoJsonRef}
     />
   );
-}; 
+};

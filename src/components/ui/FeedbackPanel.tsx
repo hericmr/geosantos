@@ -3,6 +3,7 @@ import { ActionButtons } from './ActionButtons';
 import { styles } from './FeedbackPanel.styles';
 import { GameMode } from '../../types/famousPlaces';
 import { ContextualTip } from './ContextualTip';
+import { GameIcon } from './GameIcons'; // CORREÇÃO: Adicionar import do GameIcon
 import { 
   AchievementHeader, 
   PlaceDescription, 
@@ -137,165 +138,159 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       className="feedback-panel-container"
       style={{
         ...styles.container(false, isMobile, popupPosition),
-        zIndex: 10020
+        zIndex: 10020,
+        maxWidth: isMobile ? '95%' : '360px', // smaller width
+        padding: '12px',
+        borderRadius: '8px'
       }}
     >
       {clickedPosition && (
         <div style={styles.contentContainer}>
-          <AchievementHeader 
-            achievementData={achievementData}
-            showStreakAnimation={showStreakAnimation}
-          />
-          
-          <PlaceDescription
+          {/* Subtitle (no green outline) */}
+          <div
+            style={{
+              textAlign: 'center',
+              marginBottom: '10px',
+              padding: '8px',
+              background: 'transparent',
+              borderRadius: '6px'
+            }}
+          >
+            <div
+              style={{
+                fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                fontFamily: "'LaCartoonerie', sans-serif",
+                color: '#32CD32',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}
+            >
+              {achievementData?.subtitle || "Mandou bem demais! E foi super rápido também!"}
+            </div>
+          </div>
+
+          {/* Place description */}
+          <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+            <PlaceDescription
+              currentMode={currentMode}
+              currentNeighborhood={currentNeighborhood}
+              currentFamousPlace={currentFamousPlace}
+              displayedDistance={displayedDistance}
+              clickTime={clickTime}
+              isCorrectNeighborhood={isCorrectNeighborhood}
+            />
+          </div>
+
+              {/* Score grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '8px',
+                  marginBottom: '10px',
+                  width: '100%'
+                }}
+              >
+                {/* Target points */}
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '10px',
+                    background: 'var(--bg-primary)',
+                    borderRadius: '6px',
+                    lineHeight: '1.1'
+                  }}
+                >
+                  <GameIcon name="target" size={22} color="var(--accent-green)" />
+                  <div
+                    style={{
+                      marginTop: '2px',
+                      fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+                      fontFamily: "'VT323', monospace",
+                      color: 'var(--text-primary)',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {Math.round(score * 0.9)} pts
+                  </div>
+                </div>
+
+                {/* Time points */}
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '10px',
+                    background: 'var(--bg-primary)',
+                    borderRadius: '6px',
+                    lineHeight: '1.1'
+                  }}
+                >
+                  <GameIcon name="clock" size={22} color="var(--accent-orange)" />
+                  <div
+                    style={{
+                      marginTop: '2px',
+                      fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+                      fontFamily: "'VT323', monospace",
+                      color: 'var(--text-primary)',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {Math.round(score * 0.1)} pts
+                  </div>
+                </div>
+              </div>
+
+              {/* Total score */}
+              <div
+                style={{
+                  textAlign: 'center',
+                  marginBottom: '14px',
+                  padding: '14px',
+                  background: 'linear-gradient(135deg, #064d2e, #0a7b4b)',
+                  borderRadius: '8px',
+                  boxShadow: '0 3px 10px rgba(0,0,0,0.25)',
+                  width: '100%',
+                  lineHeight: '1.1'
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 'clamp(2rem, 5vw, 2.8rem)',
+                    fontFamily: "'VT323', monospace",
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    letterSpacing: '1px',
+                    textShadow: '1px 1px 4px rgba(0,0,0,0.5)'
+                  }}
+                >
+                  {score} PTS
+                </div>
+              </div>
+
+
+          {/* Action buttons */}
+          <ActionButtons
+            gameOver={gameOver}
+            onPauseGame={onPauseGame}
+            onNextRound={() => {
+              if (geoJsonData) onNextRound(geoJsonData);
+            }}
+            feedbackProgress={feedbackProgress}
             currentMode={currentMode}
-            currentNeighborhood={currentNeighborhood}
-            currentFamousPlace={currentFamousPlace}
-            displayedDistance={displayedDistance}
-            clickTime={clickTime}
-            isCorrectNeighborhood={isCorrectNeighborhood}
+            onResumeGame={onResumeGame}
+            isPaused={isPaused}
           />
-          
-          <StatsDisplay
-            score={score}
-            timeBonus={timeBonus}
-            clickTime={clickTime}
-          />
-
-
         </div>
       )}
 
-
-
-      <ActionButtons
-        gameOver={gameOver}
-        onPauseGame={onPauseGame}
-        onNextRound={() => {
-          if (geoJsonData) {
-            onNextRound(geoJsonData);
-          }
-        }}
-        feedbackProgress={feedbackProgress}
-        currentMode={currentMode}
-        onResumeGame={onResumeGame}
-        isPaused={isPaused}
-      />
-
-      {/* Dica contextual melhorada */}
+      {/* Contextual tip */}
       <ContextualTip
         currentMode={currentMode}
         currentNeighborhood={currentNeighborhood}
         currentFamousPlace={currentFamousPlace}
         isVisible={true}
       />
-
-      <style>
-        {`
-          @keyframes rollDigits {
-            0% {
-              transform: translateY(-400px);
-            }
-            100% {
-              transform: translateY(0);
-            }
-          }
-          @keyframes pulseText {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-          }
-          @keyframes fadeInScale {
-            0% { 
-              opacity: 0;
-              transform: translate(-50%, -50%) scale(0.95);
-            }
-            100% { 
-              opacity: 1;
-              transform: translate(-50%, -50%) scale(1);
-            }
-          }
-          @keyframes pulseScore {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-          }
-          @keyframes slideIn {
-            0% {
-              opacity: 0;
-              transform: translate(-50%, -20px);
-            }
-            100% {
-              opacity: 1;
-              transform: translate(-50%, 0);
-            }
-          }
-          @keyframes slideInLeft {
-            0% {
-              opacity: 0;
-              transform: translateX(-100%);
-            }
-            100% {
-              opacity: 1;
-              transform: translateX(0);
-            }
-          }
-          @keyframes slideUp {
-            0% {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            100% {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          @keyframes streakGlow {
-            0% { 
-              box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-            }
-            50% { 
-              box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-            }
-            100% { 
-              box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-            }
-          }
-
-          /* Estilos responsivos para o modal */
-          @media (max-width: 1200px) {
-            .feedback-panel-container {
-              width: clamp(300px, 30vw, 400px) !important;
-              max-width: 400px !important;
-            }
-          }
-          
-          @media (max-width: 768px) {
-            .feedback-panel-container {
-              width: 100% !important;
-              max-width: 100% !important;
-              left: 0 !important;
-              right: 0 !important;
-            }
-          }
-          
-          @media (max-width: 480px) {
-            .feedback-panel-container {
-              padding: 12px !important;
-              gap: 8px !important;
-            }
-          }
-
-          button {
-            -webkit-tap-highlight-color: transparent;
-          }
-          
-          button:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-          }
-        `}
-      </style>
     </div>
   );
 }; 

@@ -71,36 +71,24 @@ export const useMapGame = (
   } = useGameState(externalPause);
 
   const handleMapClick = (latlng: L.LatLng) => {
-    // DEBOUNCE: Evitar múltiplos cliques simultâneos
-    if (clickDebounceRef.current) {
-      clearTimeout(clickDebounceRef.current);
-    }
+    console.log('[useMapGame]  CLIQUE NO MAPA DETECTADO - Iniciando processamento...');
+    console.log('[useMapGame] 📍 Coordenadas do clique:', latlng.lat, latlng.lng);
+    console.log('[useMapGame] 🎮 Estado atual do jogo:', {
+      gameStarted: gameState.gameStarted,
+      isCountingDown: gameState.isCountingDown,
+      showFeedback: gameState.showFeedback,
+      gameMode,
+      currentFamousPlace: !!currentFamousPlace
+    });
     
+    // NOVA PROTEÇÃO: Evitar múltiplos cliques simultâneos
     if (isProcessingClickRef.current) {
-      console.log('[useMapGame] Clique ignorado - ainda processando clique anterior');
+      console.log('[useMapGame] ⚠️ Clique ignorado - já processando clique anterior');
       return;
     }
     
-    // DEBUG: Log do estado atual para facilitar debug
-    console.log('[useMapGame] Clique recebido:', {
-      gameStarted: gameState.gameStarted,
-      isCountingDown: gameState.isCountingDown,
-      roundNumber: gameState.roundNumber,
-      gameMode: gameState.gameMode,
-      showFeedback: gameState.showFeedback,
-      isPaused: gameState.isPaused
-    });
-    
-    // DEBUG: Log adicional para verificar o estado exato
-    console.log('[useMapGame] DEBUG - Estado exato:', {
-      gameStarted: !!gameState.gameStarted,
-      isCountingDown: !!gameState.isCountingDown,
-      showFeedback: !!gameState.showFeedback,
-      isPaused: !!gameState.isPaused
-    });
-    
     if (!gameState.gameStarted || !gameState.isCountingDown) {
-      console.log('[useMapGame] Clique ignorado - jogo não iniciado ou não contando');
+      console.log('[useMapGame] ❌ Clique ignorado - jogo não iniciado ou não contando');
       console.log('[useMapGame] DEBUG - Condições não atendidas:', {
         gameStarted: gameState.gameStarted,
         isCountingDown: gameState.isCountingDown,
@@ -124,7 +112,7 @@ export const useMapGame = (
     console.log('[useMapGame] DEBUG - Flag isAutoAdvancing resetada para false no início do clique');
 
     // Calcular tempo gasto na rodada
-    const clickDuration = gameState.roundInitialTime - gameState.roundTimeLeft;
+    const clickDuration = Math.max(0, gameState.roundInitialTime - gameState.roundTimeLeft);
     
     // FUNÇÃO PARA LIMPAR TODOS OS TIMERS ANTES DE INICIAR NOVOS
     const clearAllTimers = () => {
@@ -153,7 +141,14 @@ export const useMapGame = (
     // setTargetIconPosition(latlng); // REMOVIDO
 
     // NOVA LÓGICA PARA MODO LUGARES FAMOSOS
+    console.log('[useMapGame] 🔍 VERIFICANDO MODO DE JOGO:', {
+      gameMode,
+      currentFamousPlace: !!currentFamousPlace,
+      condition: gameMode === 'famous_places' && currentFamousPlace
+    });
+    
     if (gameMode === 'famous_places' && currentFamousPlace) {
+      console.log('[useMapGame] 🏛️ MODO LUGARES FAMOSOS - Executando handleFeedbackSequence');
       const targetLatLng = L.latLng(currentFamousPlace.latitude, currentFamousPlace.longitude);
       const distance = calculateDistance(latlng, targetLatLng);
       
@@ -250,67 +245,96 @@ export const useMapGame = (
         }
         
         // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA AUTOMÁTICA
-        // CORREÇÃO: Implementar barra de progresso de 3 segundos com avanço automático
-        let progress = 0;
-        console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (modo lugares famosos)');
+        // CORREÇÃO: Implementar barra de progresso regressiva de 100% a 0%
+        let progress = 100; // CORREÇÃO: Começar em 100%
+        console.log('[useMapGame]  INICIANDO BARRA DE PROGRESSO - Progresso inicial:', progress, '%');
+        
+        // CORREÇÃO: Garantir que o feedbackProgress comece em 100
+        updateGameState({
+          feedbackProgress: 100
+        });
+        console.log('[useMapGame] ✅ Estado inicial definido - feedbackProgress: 100%');
         
         // CORREÇÃO: Armazenar referência do intervalo para limpeza adequada
         feedbackProgressIntervalRef.current = setInterval(() => {
+          console.log('[useMapGame] 🔄 INTERVALO EXECUTANDO - Estado atual:', {
+            progress,
+            isPaused: gameState.isPaused,
+            showFeedback: gameState.showFeedback,
+            feedbackProgress: gameState.feedbackProgress
+          });
+          
           // NOVA FUNCIONALIDADE: Verificar se o jogo está pausado
           if (gameState.isPaused) {
-            console.log('[useMapGame] DEBUG - Barra de progresso pausada (jogo pausado)');
+            console.log('[useMapGame] ⏸️ BARRA PAUSADA - Jogo está pausado, retornando...');
             return;
           }
           
-          progress += 3.33; // 3.33% a cada 100ms = 100% em 3 segundos
-          console.log('[useMapGame] DEBUG - Progresso atual:', progress, '%');
+          progress -= 3.33; // CORREÇÃO: Decrementar 3.33% a cada 100ms = 0% em 3 segundos
+          console.log('[useMapGame] 📉 PROGRESSO DECREMENTADO - Novo valor:', progress.toFixed(2), '%');
           
-          if (progress >= 100) {
-            progress = 100;
+          if (progress <= 0) {
+            progress = 0;
+            console.log('[useMapGame]  PROGRESSO CHEGOU A 0% - Iniciando sequência de avanço automático');
+            
+            // CORREÇÃO: Atualizar o estado para 0% antes de limpar o intervalo
+            updateGameState({
+              feedbackProgress: 0
+            });
+            console.log('[useMapGame] ✅ Estado atualizado para 0%');
+            
             if (feedbackProgressIntervalRef.current) {
               clearInterval(feedbackProgressIntervalRef.current);
               feedbackProgressIntervalRef.current = null;
+              console.log('[useMapGame] 🧹 INTERVALO LIMPO - setInterval removido');
             }
-            console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 100%');
+            console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 0%');
             
             // CORREÇÃO: Avançar automaticamente para próxima rodada após 3 segundos
-            console.log('[useMapGame] Barra de progresso completa - avançando automaticamente (modo lugares famosos)');
+            console.log('[useMapGame] 🚀 BARRA COMPLETA - Executando startNextRound automaticamente');
             console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData, 'isAutoAdvancing:', isAutoAdvancingRef.current);
             
             // NOVA PROTEÇÃO: Verificar se já não está avançando automaticamente
             if (isAutoAdvancingRef.current) {
-              console.log('[useMapGame] Já está avançando automaticamente, ignorando chamada');
+              console.log('[useMapGame] ⚠️ JÁ ESTÁ AVANÇANDO - Flag isAutoAdvancing ativa, ignorando chamada');
               return;
             }
             
             // NOVA PROTEÇÃO: Verificar se o estado visual ainda está ativo
-            if (!gameState.showFeedback && gameState.feedbackProgress === 0) {
-              console.log('[useMapGame] Estado visual já foi limpo, ignorando avanço automático');
-              return;
-            }
+            // CORREÇÃO: A verificação estava incorreta, bloqueando o avanço automático
+            // if (!gameState.showFeedback && gameState.feedbackProgress === 0) {
+            //   console.log('[useMapGame] ⚠️ ESTADO VISUAL LIMPO - showFeedback false e feedbackProgress 0, ignorando avanço');
+            //   return;
+            // }
+            
+            console.log('[useMapGame] ✅ Estado visual ativo - permitindo avanço automático');
             
             // Marcar como avançando automaticamente
             isAutoAdvancingRef.current = true;
+            console.log('[useMapGame] 🚩 FLAG ATIVADA - isAutoAdvancing definido como true');
             
-            // Aguardar um pequeno delay para o usuário ver o progresso completo
-            setTimeout(() => {
-              console.log('[useMapGame] DEBUG - Executando setTimeout para avanço automático (modo lugares famosos)');
-              // CORREÇÃO: Sempre verificar se geoJsonData está disponível e avançar
-              if (geoJsonData) {
-                console.log('[useMapGame] Iniciando próxima rodada automaticamente (modo lugares famosos)');
-                startNextRound(geoJsonData);
-              } else {
-                console.log('[useMapGame] DEBUG - geoJsonData não disponível para avanço automático');
-                // Resetar flag se não conseguir avançar
-                isAutoAdvancingRef.current = false;
-              }
-            }, 500); // 500ms de delay para visualização
+            // CORREÇÃO: Remover delay de 500ms para avançar em exatamente 3 segundos
+            // Avançar imediatamente quando a barra chegar a 0%
+            console.log('[useMapGame] 🚀 EXECUTANDO AVANÇO IMEDIATO - Chamando startNextRound...');
+            // CORREÇÃO: Sempre verificar se geoJsonData está disponível e avançar
+            if (geoJsonData) {
+              console.log('[useMapGame] ✅ geoJsonData DISPONÍVEL - Iniciando próxima rodada automaticamente');
+              startNextRound(geoJsonData);
+            } else {
+              console.log('[useMapGame] ❌ geoJsonData NÃO DISPONÍVEL - Resetando flag isAutoAdvancing');
+              // Resetar flag se não conseguir avançar
+              isAutoAdvancingRef.current = false;
+            }
           } else {
+            console.log('[useMapGame]  ATUALIZANDO ESTADO - Progresso:', progress.toFixed(2), '%');
             updateGameState({
               feedbackProgress: progress
             });
+            console.log('[useMapGame] ✅ Estado atualizado com sucesso');
           }
         }, 100); // Atualizar a cada 100ms para animação suave
+        
+        console.log('[useMapGame]  INTERVALO CRIADO - setInterval configurado para executar a cada 100ms');
       };
       
       // Executar sequência de feedback
@@ -406,60 +430,84 @@ export const useMapGame = (
           });
           
           // CORREÇÃO: Implementar barra de progresso para quando acerta o bairro
-          let progress = 0;
-          console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (acertou bairro)');
+          let progress = 100; // CORREÇÃO: Começar em 100% para contagem regressiva
+          console.log('[useMapGame] 🏘️ INICIANDO BARRA DE PROGRESSO (BAIRROS) - Progresso inicial:', progress, '%');
+          
+          // CORREÇÃO: Garantir que o feedbackProgress comece em 100
+          updateGameState({
+            feedbackProgress: 100
+          });
+          console.log('[useMapGame] ✅ Estado inicial definido (BAIRROS) - feedbackProgress: 100%');
           
           feedbackProgressIntervalRef.current = setInterval(() => {
+            console.log('[useMapGame] 🔄 INTERVALO EXECUTANDO (BAIRROS) - Estado atual:', {
+              progress,
+              isPaused: gameState.isPaused,
+              showFeedback: gameState.showFeedback,
+              feedbackProgress: gameState.feedbackProgress
+            });
+            
             // NOVA FUNCIONALIDADE: Verificar se o jogo está pausado
             if (gameState.isPaused) {
-              console.log('[useMapGame] DEBUG - Barra de progresso pausada (jogo pausado)');
+              console.log('[useMapGame] ⏸️ BARRA PAUSADA (BAIRROS) - Jogo está pausado, retornando...');
               return;
             }
             
-            progress += FEEDBACK_BAR_PROGRESS_INCREMENT; // Usar constante para incremento
-            console.log('[useMapGame] DEBUG - Progresso atual (acertou):', progress, '%');
+            progress -= 3.33; // CORREÇÃO: Decrementar 3.33% a cada 100ms = 0% em 3 segundos
+            console.log('[useMapGame] 📉 PROGRESSO DECREMENTADO (BAIRROS) - Novo valor:', progress.toFixed(2), '%');
             
-            if (progress >= 100) {
-              progress = 100;
+            if (progress <= 0) {
+              progress = 0;
+              console.log('[useMapGame]  PROGRESSO CHEGOU A 0% (BAIRROS) - Iniciando sequência de avanço automático');
+              
+              // CORREÇÃO: Atualizar o estado para 0% antes de limpar o intervalo
+              updateGameState({
+                feedbackProgress: 0
+              });
+              console.log('[useMapGame] ✅ Estado atualizado para 0% (BAIRROS)');
+              
               if (feedbackProgressIntervalRef.current) {
                 clearInterval(feedbackProgressIntervalRef.current);
                 feedbackProgressIntervalRef.current = null;
+                console.log('[useMapGame] 🧹 INTERVALO LIMPO (BAIRROS) - setInterval removido');
               }
-              console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 100% (acertou)');
+              console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 0% (acertou bairro)');
               
               // CORREÇÃO: Executar startNextRound automaticamente quando barra chega ao fim
-              console.log('[useMapGame] Barra de progresso completa - executando startNextRound automaticamente (acertou bairro)');
+              console.log('[useMapGame]  BARRA COMPLETA (BAIRROS) - Executando startNextRound automaticamente');
               
               // NOVA PROTEÇÃO: Verificar se já não está avançando automaticamente
               if (isAutoAdvancingRef.current) {
-                console.log('[useMapGame] Já está avançando automaticamente, ignorando chamada');
+                console.log('[useMapGame] ⚠️ JÁ ESTÁ AVANÇANDO (BAIRROS) - Flag isAutoAdvancing ativa, ignorando chamada');
                 return;
               }
               
-              // NOVA PROTEÇÃO: Verificar se o estado visual ainda está ativo
-              if (!gameState.showFeedback && gameState.feedbackProgress === 0) {
-                console.log('[useMapGame] Estado visual já foi limpo, ignorando avanço automático');
-                return;
-              }
+              // CORREÇÃO: Remover verificação problemática que estava bloqueando o avanço
+              console.log('[useMapGame] ✅ Estado visual ativo - permitindo avanço automático');
               
               // Marcar como avançando automaticamente
               isAutoAdvancingRef.current = true;
+              console.log('[useMapGame]  FLAG ATIVADA (BAIRROS) - isAutoAdvancing definido como true');
               
-              // CORREÇÃO: Executar startNextRound imediatamente quando barra chega a 100%
+              // CORREÇÃO: Executar startNextRound imediatamente quando barra chega a 0%
               if (geoJsonData) {
-                console.log('[useMapGame] Executando startNextRound automaticamente (acertou bairro)');
+                console.log('[useMapGame] ✅ geoJsonData DISPONÍVEL (BAIRROS) - Iniciando próxima rodada automaticamente');
                 startNextRound(geoJsonData);
               } else {
-                console.log('[useMapGame] DEBUG - geoJsonData não disponível para startNextRound');
+                console.log('[useMapGame] ❌ geoJsonData NÃO DISPONÍVEL (BAIRROS) - Resetando flag isAutoAdvancing');
                 // Resetar flag se não conseguir avançar
                 isAutoAdvancingRef.current = false;
               }
             } else {
+              console.log('[useMapGame]  ATUALIZANDO ESTADO (BAIRROS) - Progresso:', progress.toFixed(2), '%');
               updateGameState({
                 feedbackProgress: progress
               });
+              console.log('[useMapGame] ✅ Estado atualizado com sucesso (BAIRROS)');
             }
-          }, FEEDBACK_BAR_UPDATE_INTERVAL); // Usar constante para intervalo
+          }, 100); // CORREÇÃO: Usar 100ms ao invés de FEEDBACK_BAR_UPDATE_INTERVAL para consistência
+          
+          console.log('[useMapGame]  INTERVALO CRIADO (BAIRROS) - setInterval configurado para executar a cada 100ms');
         }, 0);
         
         return;
@@ -534,8 +582,10 @@ export const useMapGame = (
         const isGameOverByScore = newNegativeSum > 60 || newTotalDistance > 6000;
         const isGameOver = isGameOverByTime || isGameOverByScore;
         
-        // NOVA LÓGICA SIMPLIFICADA PARA MODO BAIRROS
+        // NOVA LÓGICA UNIFICADA PARA MODO BAIRROS (acertos e erros)
         const handleNeighborhoodFeedback = () => {
+          console.log('[useMapGame] 🏘️ INICIANDO FEEDBACK UNIFICADO (BAIRROS) - Acerto:', isCorrectNeighborhood);
+          
           // 1. ÁUDIO + ESTADO (imediato)
           if (isGameOver && errorSoundRef.current) {
             errorSoundRef.current.currentTime = 0;
@@ -554,7 +604,7 @@ export const useMapGame = (
             timeBonus: timeBonus,
             showFeedback: true,
             feedbackOpacity: 1,
-            feedbackProgress: 0, // CORREÇÃO: Iniciar em 0 para animação progressiva
+            feedbackProgress: 100, // CORREÇÃO: Sempre começar em 100% para contagem regressiva
             feedbackMessage: feedbackMessage,
             gameOver: isGameOver,
             revealedNeighborhoods: new Set([...gameState.revealedNeighborhoods, gameState.currentNeighborhood]),
@@ -573,64 +623,81 @@ export const useMapGame = (
             }, 400); // CORREÇÃO: Reduzido de 727ms para 400ms
           }
           
-          // 3. BARRA DE PROGRESSO + PRÓXIMA RODADA AUTOMÁTICA
-          // CORREÇÃO: Barra de progresso de 2 segundos (valor fixo) com avanço automático
-          let progress = 0;
-          console.log('[useMapGame] DEBUG - Iniciando setInterval para barra de progresso (modo bairros)');
+          // 3. BARRA DE PROGRESSO UNIFICADA + PRÓXIMA RODADA AUTOMÁTICA
+          // CORREÇÃO: Barra de progresso regressiva de 100% a 0% em 3 segundos
+          let progress = 100; // CORREÇÃO: Sempre começar em 100%
+          console.log('[useMapGame] 🏘️ INICIANDO BARRA DE PROGRESSO UNIFICADA (BAIRROS) - Progresso inicial:', progress, '%');
           
           // CORREÇÃO: Armazenar referência do intervalo para limpeza adequada
           feedbackProgressIntervalRef.current = setInterval(() => {
+            console.log('[useMapGame] 🔄 INTERVALO EXECUTANDO (BAIRROS) - Estado atual:', {
+              progress,
+              isPaused: gameState.isPaused,
+              showFeedback: gameState.showFeedback,
+              feedbackProgress: gameState.feedbackProgress
+            });
+            
             // NOVA FUNCIONALIDADE: Verificar se o jogo está pausado
             if (gameState.isPaused) {
-              console.log('[useMapGame] DEBUG - Barra de progresso pausada (jogo pausado)');
+              console.log('[useMapGame] ⏸️ BARRA PAUSADA (BAIRROS) - Jogo está pausado, retornando...');
               return;
             }
             
-            progress += FEEDBACK_BAR_PROGRESS_INCREMENT; // Usar constante para incremento
-            console.log('[useMapGame] DEBUG - Progresso atual:', progress, '%');
+            progress -= 3.33; // CORREÇÃO: Decrementar 3.33% a cada 100ms = 0% em 3 segundos
+            console.log('[useMapGame] 📉 PROGRESSO DECREMENTADO (BAIRROS) - Novo valor:', progress.toFixed(2), '%');
             
-            if (progress >= 100) {
-              progress = 100;
+            if (progress <= 0) {
+              progress = 0;
+              console.log('[useMapGame] PROGRESSO CHEGOU A 0% (BAIRROS) - Iniciando sequência de avanço automático');
+              
+              // CORREÇÃO: Atualizar o estado para 0% antes de limpar o intervalo
+              updateGameState({
+                feedbackProgress: 0
+              });
+              console.log('[useMapGame] ✅ Estado atualizado para 0% (BAIRROS)');
+              
               if (feedbackProgressIntervalRef.current) {
                 clearInterval(feedbackProgressIntervalRef.current);
                 feedbackProgressIntervalRef.current = null;
+                console.log('[useMapGame] 🧹 INTERVALO LIMPO (BAIRROS) - setInterval removido');
               }
-              console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 100%');
+              console.log('[useMapGame] DEBUG - setInterval limpo, progresso chegou a 0% (modo bairros)');
               
               // CORREÇÃO: Executar startNextRound automaticamente quando barra chega ao fim
-              console.log('[useMapGame] Barra de progresso completa - executando startNextRound automaticamente (modo bairros)');
-              console.log('[useMapGame] DEBUG - geoJsonData:', !!geoJsonData);
+              console.log('[useMapGame] BARRA COMPLETA (BAIRROS) - Executando startNextRound automaticamente');
               
               // NOVA PROTEÇÃO: Verificar se já não está avançando automaticamente
               if (isAutoAdvancingRef.current) {
-                console.log('[useMapGame] Já está avançando automaticamente, ignorando chamada');
+                console.log('[useMapGame] ⚠️ JÁ ESTÁ AVANÇANDO (BAIRROS) - Flag isAutoAdvancing ativa, ignorando chamada');
                 return;
               }
               
-              // NOVA PROTEÇÃO: Verificar se o estado visual ainda está ativo
-              if (!gameState.showFeedback && gameState.feedbackProgress === 0) {
-                console.log('[useMapGame] Estado visual já foi limpo, ignorando avanço automático');
-                return;
-              }
+              // CORREÇÃO: Remover verificação problemática que estava bloqueando o avanço
+              console.log('[useMapGame] ✅ Estado visual ativo - permitindo avanço automático');
               
               // Marcar como avançando automaticamente
               isAutoAdvancingRef.current = true;
+              console.log('[useMapGame] FLAG ATIVADA (BAIRROS) - isAutoAdvancing definido como true');
               
-              // CORREÇÃO: Executar startNextRound imediatamente quando barra chega a 100%
+              // CORREÇÃO: Executar startNextRound imediatamente quando barra chega a 0%
               if (geoJsonData) {
-                console.log('[useMapGame] Executando startNextRound automaticamente (modo bairros)');
+                console.log('[useMapGame] ✅ geoJsonData DISPONÍVEL (BAIRROS) - Iniciando próxima rodada automaticamente');
                 startNextRound(geoJsonData);
               } else {
-                console.log('[useMapGame] DEBUG - geoJsonData não disponível para startNextRound');
+                console.log('[useMapGame] ❌ geoJsonData NÃO DISPONÍVEL (BAIRROS) - Resetando flag isAutoAdvancing');
                 // Resetar flag se não conseguir avançar
                 isAutoAdvancingRef.current = false;
               }
             } else {
+              console.log('[useMapGame] ATUALIZANDO ESTADO (BAIRROS) - Progresso:', progress.toFixed(2), '%');
               updateGameState({
                 feedbackProgress: progress
               });
+              console.log('[useMapGame] ✅ Estado atualizado com sucesso (BAIRROS)');
             }
-          }, FEEDBACK_BAR_UPDATE_INTERVAL); // Usar constante para intervalo
+          }, 100); // CORREÇÃO: Usar 100ms para consistência
+          
+          console.log('[useMapGame] INTERVALO CRIADO (BAIRROS) - setInterval configurado para executar a cada 100ms');
         };
         
         // Executar sequência de feedback para modo bairros
@@ -699,7 +766,7 @@ export const useMapGame = (
 
   // NOVA FUNÇÃO: Retomar a barra de progresso do feedback
   const resumeFeedbackProgress = () => {
-    if (!gameState.showFeedback || gameState.feedbackProgress >= 100) return;
+    if (!gameState.showFeedback || gameState.feedbackProgress <= 0) return; // CORREÇÃO: <= 0 ao invés de >= 100
     
     // NOVA PROTEÇÃO: Evitar múltiplas execuções simultâneas
     if (feedbackProgressIntervalRef.current) {
@@ -708,11 +775,11 @@ export const useMapGame = (
     }
     
     const currentProgress = gameState.feedbackProgress;
-    const remainingProgress = 100 - currentProgress;
+    const remainingProgress = currentProgress; // CORREÇÃO: Não subtrair de 100
     const timePerIncrement = FEEDBACK_BAR_UPDATE_INTERVAL;
     const increment = FEEDBACK_BAR_PROGRESS_INCREMENT;
     
-    console.log('[resumeFeedbackProgress] Retomando barra de progresso:', {
+    console.log('[resumeFeedbackProgress] Retomando barra de progresso regressiva:', {
       currentProgress,
       remainingProgress,
       increment
@@ -729,16 +796,16 @@ export const useMapGame = (
         return;
       }
       
-      const newProgress = Math.min(gameState.feedbackProgress + increment, 100);
+      const newProgress = Math.max(gameState.feedbackProgress - increment, 0); // CORREÇÃO: Decrementar ao invés de incrementar
       
-      if (newProgress >= 100) {
-        // Progresso completo
+      if (newProgress <= 0) { // CORREÇÃO: <= 0 ao invés de >= 100
+        // Progresso completo (chegou a 0%)
         if (feedbackProgressIntervalRef.current) {
           clearInterval(feedbackProgressIntervalRef.current);
           feedbackProgressIntervalRef.current = null;
         }
         
-        console.log('[resumeFeedbackProgress] Progresso completo - avançando para próxima rodada');
+        console.log('[resumeFeedbackProgress] Progresso completo (0%) - avançando para próxima rodada');
         
         // Avançar para próxima rodada
         if (geoJsonData) {

@@ -78,7 +78,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => {
   return (
     <div style={buttonStyles.buttonContainer}>
-      {!gameOver && currentMode !== 'famous_places' && (
+      {!gameOver && (
         <>
           {!isPaused ? (
             <button

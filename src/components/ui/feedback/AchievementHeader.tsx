@@ -1,12 +1,10 @@
 import React from 'react';
-import { GameIcon, FlameIcon } from '../GameIcons';
+import { GameIcon } from '../GameIcons';
 
 export interface AchievementData {
   title: string;
-  subtitle: string;
   icon: string;
   color: string;
-  achievement: string;
   streakBonus: string | null;
 }
 
