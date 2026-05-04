@@ -1,3 +1,5 @@
+import { GameMode } from '../types/famousPlaces';
+
 export const INITIAL_TIME = 15; // Tempo total inicial do jogo
 export const ROUND_TIME = 15; // 15 seconds per round
 export const PHASE_TWO_TIME = 8; // 8 seconds per round in phase 2
@@ -131,6 +133,25 @@ export const getFeedbackMessage = (distance: number, clickTime: number = 0, cons
   ];
   return messages[Math.floor(Math.random() * messages.length)];
 };
+
+export interface GamePhase {
+  id: string;
+  label: string;
+  mode: GameMode;
+  category: string | null;
+  rounds: number;
+}
+
+export const GAME_PHASES: GamePhase[] = [
+  { id: 'neighborhoods', label: 'Bairro',       mode: 'neighborhoods', category: null,                    rounds: 7 },
+  { id: 'historico',     label: 'Histórico',    mode: 'famous_places', category: 'Patrimônio Histórico', rounds: 5 },
+  { id: 'cultura',       label: 'Cultural',     mode: 'famous_places', category: 'Cultura',              rounds: 5 },
+  { id: 'saude',         label: 'Saúde',        mode: 'famous_places', category: 'Saúde',                rounds: 7 },
+  { id: 'lazer',         label: 'Lazer',        mode: 'famous_places', category: 'Lazer',                rounds: 5 },
+  { id: 'educacao',      label: 'Educação',     mode: 'famous_places', category: 'Educação',             rounds: 5 },
+  { id: 'religiao',      label: 'Religião',     mode: 'famous_places', category: 'Religião',             rounds: 5 },
+  { id: 'assistencia',   label: 'Assistência',  mode: 'famous_places', category: 'Assistência Social',   rounds: 5 },
+];
 
 export const FASE_1_BAIRROS = [
   // Orla

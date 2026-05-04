@@ -63,6 +63,9 @@ export interface GameControlsProps {
   currentMode?: GameMode;
   onModeChange?: (mode: GameMode) => void;
   currentFamousPlace?: FamousPlace;
+  selectedCategory?: string | null;
+  selectedPhaseLabel?: string | null;
+  onSelectPhase?: (mode: GameMode, category: string | null) => void;
 }
 
 export interface FeedbackPanelProps {

@@ -6,9 +6,10 @@ import {
 } from './GameIcons';
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
-import { BookOpenIcon, PlusIcon, MapPin } from 'lucide-react';
+import { BookOpenIcon, PlusIcon, MapPin, Heart, Users, Dumbbell, GraduationCap, Landmark, Church, Music, ChevronLeft } from 'lucide-react';
 import { PlaceSuggestionForm } from './PlaceSuggestionForm';
 import backgroundVideo from '../../assets/images/background.webm';
+import { GAME_PHASES, GamePhase } from '../../utils/gameConstants';
 
 
 interface StartScreenProps {
@@ -18,7 +19,30 @@ interface StartScreenProps {
   totalGames?: number;
   averageScore?: number;
   onSelectMode?: (mode: GameMode) => void;
+  onSelectPhase?: (mode: GameMode, category: string | null) => void;
 }
+
+const PHASE_ICONS: Record<string, React.FC<{ size?: number; color?: string }>> = {
+  neighborhoods: MapPin,
+  historico: Landmark,
+  cultura: Music,
+  saude: Heart,
+  lazer: Dumbbell,
+  educacao: GraduationCap,
+  religiao: Church,
+  assistencia: Users,
+};
+
+const PHASE_COLORS: Record<string, string> = {
+  neighborhoods: '#34d399',
+  historico:     '#8b5cf6',
+  cultura:       '#ec4899',
+  saude:         '#ef4444',
+  lazer:         '#3b82f6',
+  educacao:      '#eab308',
+  religiao:      '#14b8a6',
+  assistencia:   '#f97316',
+};
 
 export const StartScreen: React.FC<StartScreenProps> = ({
   onStartGame,
@@ -26,7 +50,8 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   highScore = 0,
   totalGames = 0,
   averageScore = 0,
-  onSelectMode
+  onSelectMode,
+  onSelectPhase,
 }) => {
   const [selectedOption, setSelectedOption] = useState(0);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -35,20 +60,23 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   const [showRanking, setShowRanking] = useState(true);
   const [showSuggestionForm, setShowSuggestionForm] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [showPhaseSelect, setShowPhaseSelect] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const handlePhaseSelect = useCallback((phase: GamePhase) => {
+    onSelectMode?.(phase.mode);
+    onSelectPhase?.(phase.mode, phase.category);
+    onStartGame();
+  }, [onSelectMode, onSelectPhase, onStartGame]);
 
   const mainMenuOptions = useMemo(() => [
     {
-      id: 'play_neighborhoods',
-      label: 'BAIRROS',
-      icon: MapPin,
-      action: () => {
-        onSelectMode?.('neighborhoods');
-        onStartGame();
-      },
-      description: 'Clique no mapa onde você acha que está o bairro. Quanto mais próximo da localização correta, mais pontos você ganha!',
+      id: 'play',
+      label: 'JOGAR',
+      icon: PlayIcon,
+      action: () => setShowPhaseSelect(true),
+      description: 'Escolha uma categoria e teste seu conhecimento sobre Santos!',
       color: '#34d399',
       gradient: 'linear-gradient(135deg, #34d399, #059669)'
     },
@@ -61,7 +89,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       color: '#fbbf24',
       gradient: 'linear-gradient(135deg, #fbbf24, #f59e0b)'
     }
-  ], [onStartGame, onShowLeaderboard, onSelectMode]);
+  ], [onShowLeaderboard]);
 
   const secondaryMenuOptions = useMemo(() => [
     {
@@ -197,6 +225,125 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           background: 'linear-gradient(to bottom, rgba(13,15,26,0.6) 0%, rgba(13,15,26,0.75) 100%)'
         }} />
       </div>
+
+      {/* Phase selection overlay */}
+      {showPhaseSelect && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 10,
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          padding: '20px', boxSizing: 'border-box',
+          background: 'rgba(13,15,26,0.92)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <button
+            onClick={() => setShowPhaseSelect(false)}
+            style={{
+              position: 'absolute', top: '20px', left: '20px',
+              display: 'flex', alignItems: 'center', gap: '6px',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: '20px',
+              color: 'rgba(255,255,255,0.7)',
+              cursor: 'pointer',
+              padding: '8px 14px',
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '0.82rem',
+              fontWeight: 500
+            }}
+          >
+            <ChevronLeft size={14} /> Voltar
+          </button>
+
+          <h2 style={{
+            color: '#fff',
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 700,
+            fontSize: 'clamp(1.1rem, 3vw, 1.4rem)',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            marginBottom: '6px',
+            marginTop: 0
+          }}>
+            Escolha uma Categoria
+          </h2>
+          <p style={{
+            color: 'rgba(255,255,255,0.4)',
+            fontFamily: "'Inter', sans-serif",
+            fontSize: '0.82rem',
+            marginBottom: '24px',
+            marginTop: 0
+          }}>
+            Selecione o tema e começa a jogar!
+          </p>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+            gap: '10px',
+            width: '100%',
+            maxWidth: '560px'
+          }}>
+            {GAME_PHASES.map((phase) => {
+              const color = PHASE_COLORS[phase.id] || '#34d399';
+              const IconComp = PHASE_ICONS[phase.id] || MapPin;
+              return (
+                <button
+                  key={phase.id}
+                  onClick={() => handlePhaseSelect(phase)}
+                  style={{
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    gap: '8px',
+                    padding: '16px 8px',
+                    background: `${color}18`,
+                    border: `1px solid ${color}44`,
+                    borderRadius: '14px',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: 600,
+                    fontSize: 'clamp(0.7rem, 1.6vw, 0.82rem)',
+                    textAlign: 'center',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = `${color}35`;
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = `${color}88`;
+                    (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 6px 20px ${color}30`;
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = `${color}18`;
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = `${color}44`;
+                    (e.currentTarget as HTMLButtonElement).style.transform = 'none';
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <div style={{
+                    width: '36px', height: '36px', borderRadius: '10px',
+                    background: `${color}25`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  }}>
+                    <IconComp size={18} color={color} />
+                  </div>
+                  {phase.label}
+                  <span style={{
+                    fontSize: '0.68rem',
+                    color: 'rgba(255,255,255,0.35)',
+                    fontWeight: 400
+                  }}>
+                    {phase.rounds} rodadas
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
       <div style={{

@@ -20,7 +20,10 @@ export const GameControls: React.FC<GameControlsProps> = ({
   getProgressBarColor,
   currentMode,
   onModeChange,
-  currentFamousPlace
+  currentFamousPlace,
+  selectedCategory,
+  selectedPhaseLabel,
+  onSelectPhase,
 }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { stats, resetStats } = useGameStats();
@@ -75,11 +78,11 @@ export const GameControls: React.FC<GameControlsProps> = ({
         <StartScreen
           onStartGame={onStartGame}
           onShowLeaderboard={() => setShowLeaderboard(true)}
-          
           highScore={stats.highScore}
           totalGames={stats.totalGames}
           averageScore={stats.averageScore}
           onSelectMode={onModeChange}
+          onSelectPhase={onSelectPhase}
         />
       ) : (
         <div style={{
@@ -200,8 +203,8 @@ export const GameControls: React.FC<GameControlsProps> = ({
             WebkitBackdropFilter: 'blur(8px)',
             borderTop: '1px solid rgba(52,211,153,0.2)'
           }}>
-            <p style={{ 
-              fontSize: 'clamp(0.7rem, 1.8vw, 0.9rem)', 
+            <p style={{
+              fontSize: 'clamp(0.7rem, 1.8vw, 0.9rem)',
               fontFamily: "'Inter', system-ui, sans-serif",
               fontWeight: 600,
               color: 'rgba(255,255,255,0.85)',
@@ -210,7 +213,9 @@ export const GameControls: React.FC<GameControlsProps> = ({
               textTransform: 'uppercase',
               letterSpacing: '1.5px'
             }}>
-              {currentMode === 'neighborhoods' 
+              {selectedPhaseLabel
+                ? `Fase: ${selectedPhaseLabel}`
+                : currentMode === 'neighborhoods'
                 ? 'Encontre o bairro no mapa!'
                 : currentMode === 'famous_places'
                 ? 'Encontre o lugar famoso!'

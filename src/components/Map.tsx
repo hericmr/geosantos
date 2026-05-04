@@ -11,7 +11,7 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
 import { MapProps } from '../types/game';
 import { useMapGame } from '../hooks/useMapGame';
-import { getProgressBarColor } from '../utils/gameConstants';
+import { getProgressBarColor, GAME_PHASES } from '../utils/gameConstants';
 import { calculateDistance, calculateScore } from '../utils/gameUtils';
 import { GameMode, FamousPlace } from '../types/famousPlaces';
 import { getImageUrl, getSpriteUrl, getBandeiraCorretaSpriteUrl } from '../utils/assetUtils';
@@ -238,17 +238,24 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   const backgroundMusicRef = useRef<HTMLAudioElement>(null);
 
   const [currentMode, setCurrentMode] = useState<GameMode>('neighborhoods');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedPhaseLabel, setSelectedPhaseLabel] = useState<string | null>(null);
   const [currentFamousPlace, setCurrentFamousPlace] = useState<FamousPlace | null>(null);
   const [showFamousPlaceModal, setShowFamousPlaceModal] = useState(false);
   const [isModalCentered, setIsModalCentered] = useState(true);
   const [isTimerPaused, setIsTimerPaused] = useState(false);
   const [modalTimeProgress, setModalTimeProgress] = useState(0);
   const spriteIdRef = useRef<string>('');
-  
 
-  
+  const handleSelectPhase = useCallback((mode: GameMode, category: string | null) => {
+    setCurrentMode(mode);
+    setSelectedCategory(category);
+    const phase = GAME_PHASES.find(p => p.mode === mode && p.category === category);
+    setSelectedPhaseLabel(phase?.label ?? null);
+  }, []);
+
   // Controle de lugares famosos já usados
-  const { places: famousPlaces, isLoading: famousPlacesLoading, error: famousPlacesError, getRandomPlace } = useFamousPlaces();
+  const { places: famousPlaces, isLoading: famousPlacesLoading, error: famousPlacesError, getRandomPlace } = useFamousPlaces(selectedCategory);
   const lastFamousPlaceId = useRef<string | null>(null);
 
   // Controle de zoom e movimento do mapa
@@ -435,6 +442,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Só processar se o jogo estiver ativo e o mapa estiver visível
       if (!gameState.gameStarted || !mapRef.current) return;
+
+      // Não interceptar teclas quando o foco está num input/textarea
+      const tag = (event.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
 
       // Prevenir comportamento padrão para evitar scroll da página
       event.preventDefault();
@@ -998,6 +1009,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         currentMode={currentMode}
         onModeChange={setCurrentMode}
         currentFamousPlace={currentFamousPlace || undefined}
+        selectedCategory={selectedCategory}
+        selectedPhaseLabel={selectedPhaseLabel}
+        onSelectPhase={handleSelectPhase}
       />
 
       {/* Indicador de controles do mapa */}
