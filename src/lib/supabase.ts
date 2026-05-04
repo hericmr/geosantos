@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { FamousPlace } from '../types/famousPlaces';
+import localPlaces from '../data/famous_places.json';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string | undefined;
@@ -19,30 +20,9 @@ export interface RankingEntry {
   created_at?: string;
 }
 
-// Funções para interagir com o ranking
 export const famousPlacesService = {
   async getFamousPlaces(): Promise<FamousPlace[]> {
-    if (!supabase) return [];
-
-    const { data, error } = await supabase
-      .from('famous_places')
-      .select('*');
-
-    if (error) {
-      console.error('Erro ao buscar lugares famosos:', error);
-      return [];
-    }
-
-    return data.map(place => ({
-      id: place.id,
-      name: place.name,
-      description: place.description,
-      latitude: place.latitude,
-      longitude: place.longitude,
-      category: place.category,
-      address: place.address,
-      imageUrl: (place.image_url && place.image_url !== '') ? place.image_url : 'https://via.placeholder.com/56',
-    })) || [];
+    return localPlaces as FamousPlace[];
   },
 };
 
