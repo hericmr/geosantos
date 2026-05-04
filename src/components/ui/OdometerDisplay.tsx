@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 
-const CELL_H = 60; // px — altura de cada célula de dígito
+const CELL_H = 60;
+const FONT = "'Inter', system-ui, sans-serif";
 
 const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay }) => {
   const stripRef = useRef<HTMLDivElement>(null);
@@ -14,28 +15,26 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
     el.style.transition = 'none';
 
     const tid = setTimeout(() => {
-      el.style.transition = `transform 2.6s cubic-bezier(0.22, 0.61, 0.36, 1)`;
+      el.style.transition = `transform 5s cubic-bezier(0.15, 0.5, 0.3, 1)`;
       el.style.transform = `translateY(-${n * CELL_H}px)`;
-    }, delay * 4);
+    }, delay);
 
     return () => clearTimeout(tid);
   }, [n, isNum, delay]);
 
-  // Separador decimal ou unidade ("." / "k" / "m")
   if (!isNum) {
     return (
       <div style={{
         height: `${CELL_H}px`,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'center',
-        fontSize: char === '.' ? `${CELL_H * 0.55}px` : `${CELL_H * 0.42}px`,
-        fontFamily: "'VT323', monospace",
-        color: '#e2e8f0',
-        padding: '0 2px',
-        lineHeight: 1,
-        alignSelf: 'flex-end',
-        paddingBottom: char === '.' ? '6px' : '10px',
+        fontSize: `${CELL_H * 0.38}px`,
+        fontFamily: FONT,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.6)',
+        paddingBottom: '10px',
+        paddingLeft: '3px',
       }}>
         {char}
       </div>
@@ -44,20 +43,19 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
 
   return (
     <div style={{
-      width: `${CELL_H * 0.6}px`,
+      width: `${CELL_H * 0.62}px`,
       height: `${CELL_H}px`,
       overflow: 'hidden',
-      background: 'rgba(0,0,0,0.6)',
+      background: 'rgba(0,0,0,0.55)',
       border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: '4px',
+      borderRadius: '5px',
       position: 'relative',
     }}>
-      {/* Reflexo superior */}
       <div style={{
         position: 'absolute',
         top: 0, left: 0, right: 0,
-        height: '30%',
-        background: 'linear-gradient(to bottom, rgba(255,255,255,0.04), transparent)',
+        height: '28%',
+        background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), transparent)',
         zIndex: 1,
         pointerEvents: 'none',
       }} />
@@ -68,9 +66,10 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: `${CELL_H * 0.78}px`,
-            fontFamily: "'VT323', monospace",
-            color: '#e2e8f0',
+            fontSize: `${CELL_H * 0.62}px`,
+            fontFamily: FONT,
+            fontWeight: 700,
+            color: '#f1f5f9',
             lineHeight: 1,
           }}>
             {i}
@@ -82,12 +81,12 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
 };
 
 interface OdometerDisplayProps {
-  valueKm: number;
+  valueMeters: number;
 }
 
-export const OdometerDisplay: React.FC<OdometerDisplayProps> = ({ valueKm }) => {
-  const formatted = valueKm.toFixed(1).replace('.', ''); // e.g. "32"
-  const chars = [...formatted, 'k', 'm'];
+export const OdometerDisplay: React.FC<OdometerDisplayProps> = ({ valueMeters }) => {
+  const rounded = Math.round(valueMeters);
+  const chars = [...String(rounded), 'm'];
 
   return (
     <div style={{
@@ -102,16 +101,15 @@ export const OdometerDisplay: React.FC<OdometerDisplayProps> = ({ valueKm }) => 
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Scanlines */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px)',
+        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.15) 3px, rgba(0,0,0,0.15) 4px)',
         pointerEvents: 'none',
         zIndex: 2,
       }} />
       {chars.map((c, i) => (
-        <OdometerDigit key={i} char={c} delay={i * 70} />
+        <OdometerDigit key={i} char={c} delay={i * 120} />
       ))}
     </div>
   );

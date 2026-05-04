@@ -73,7 +73,6 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   if (gameOver || !showFeedback || !clickedPosition) return null;
 
   const isCorrect = distance === 0;
-  const distanceKm = distance / 1000;
   const targetName = currentMode === 'famous_places'
     ? (currentFamousPlace?.name ?? '')
     : capitalizeWords(currentNeighborhood);
@@ -109,10 +108,10 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       {/* ── Linha 1: tempo ───────────────────────── */}
       <div style={{
         fontSize: '0.85rem',
-        fontFamily: "'LaCartoonerie', sans-serif",
-        color: 'rgba(255,255,255,0.55)',
+        fontFamily: "'Inter', system-ui, sans-serif",
+        color: 'rgba(255,255,255,0.5)',
         marginBottom: '12px',
-        fontWeight: 600,
+        fontWeight: 500,
       }}>
         {isCorrect
           ? `Em ${clickTime.toFixed(2)} seg você acertou`
@@ -122,8 +121,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       {/* ── Linha 2: odômetro ou acerto ──────────── */}
       {isCorrect ? (
         <div style={{
-          fontSize: 'clamp(2rem, 6vw, 2.8rem)',
-          fontFamily: "'LaCartoonerie', sans-serif",
+          fontSize: 'clamp(1.8rem, 5vw, 2.4rem)',
+          fontFamily: "'Inter', system-ui, sans-serif",
           color: '#4ade80',
           fontWeight: 800,
           marginBottom: '10px',
@@ -133,14 +132,14 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         </div>
       ) : (
         <div style={{ marginBottom: '12px' }}>
-          <OdometerDisplay valueKm={distanceKm} />
+          <OdometerDisplay valueMeters={distance} />
         </div>
       )}
 
       {/* ── Linha 3: "De [lugar]" ─────────────────── */}
       <div style={{
-        fontSize: 'clamp(1rem, 2.8vw, 1.2rem)',
-        fontFamily: "'LaCartoonerie', sans-serif",
+        fontSize: 'clamp(1rem, 2.8vw, 1.15rem)',
+        fontFamily: "'Inter', system-ui, sans-serif",
         color: '#ffffff',
         fontWeight: 700,
         marginBottom: '14px',
@@ -152,9 +151,9 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       {/* ── Streak ───────────────────────────────── */}
       {consecutiveCorrect >= 2 && (
         <div style={{
-          fontSize: '0.95rem',
+          fontSize: '0.9rem',
           color: '#ffa500',
-          fontFamily: "'LaCartoonerie', sans-serif",
+          fontFamily: "'Inter', system-ui, sans-serif",
           fontWeight: 600,
           marginBottom: '10px',
         }}>
@@ -235,7 +234,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             border: '1px solid rgba(255,255,255,0.12)',
             borderRadius: '8px',
             color: 'rgba(255,255,255,0.6)',
-            fontFamily: "'LaCartoonerie', sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: '0.85rem',
             padding: '9px 14px',
             cursor: 'pointer',
@@ -258,8 +257,8 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             border: 'none',
             borderRadius: '8px',
             color: '#fff',
-            fontFamily: "'LaCartoonerie', sans-serif",
-            fontSize: '1.05rem',
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontSize: '1rem',
             fontWeight: 700,
             padding: '11px 20px',
             cursor: 'pointer',
