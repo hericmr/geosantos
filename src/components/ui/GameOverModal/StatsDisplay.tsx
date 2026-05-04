@@ -26,24 +26,21 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
   return (
     <div className={styles.statsGrid}>
       <div className={`${styles.statItem} ${styles.blue}`} data-testid="play-time-stat">
-        <ClockIcon size={20} color="var(--accent-blue)" />
-        <div className={styles.statValue}>
-          {formatTime(playTime)}
-        </div>
+        <ClockIcon size={18} color="var(--accent-blue)" />
+        <div className={styles.statValue}>{formatTime(playTime)}</div>
+        <div className={styles.statLabel}>Tempo</div>
       </div>
-      
+
       <div className={`${styles.statItem} ${styles.green}`} data-testid="rounds-stat">
-        <TargetIcon size={20} color="var(--accent-green)" />
-        <div className={styles.statValue}>
-          {roundsPlayed} rodadas
-        </div>
+        <TargetIcon size={18} color="var(--accent-green)" />
+        <div className={styles.statValue}>{roundsPlayed}</div>
+        <div className={styles.statLabel}>Rodadas</div>
       </div>
-      
+
       <div className={`${styles.statItem} ${styles.orange}`} data-testid="accuracy-stat">
-        <ZapIcon size={20} color="var(--accent-orange)" />
-        <div className={styles.statValue}>
-          {formatAccuracy(accuracy)}
-        </div>
+        <ZapIcon size={18} color="var(--accent-orange)" />
+        <div className={styles.statValue}>{formatAccuracy(accuracy)}</div>
+        <div className={styles.statLabel}>Precisão</div>
       </div>
     </div>
   );
