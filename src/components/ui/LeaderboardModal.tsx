@@ -8,7 +8,7 @@ import {
   TargetIcon,
   UserIcon
 } from './GameIcons';
-import { rankingService, RankingEntry } from '../../lib/supabase';
+import { rankingService, RankingEntry, supabase } from '../../lib/supabase';
 
 interface LeaderboardModalProps {
   isOpen: boolean;
@@ -27,16 +27,17 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [playerPosition, setPlayerPosition] = useState<number | null>(null);
+  const [minimized, setMinimized] = useState(!supabase);
 
   const loadRanking = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const topPlayers = await rankingService.getTopPlayers(20);
       setRanking(topPlayers);
-      
-      // Buscar posição do jogador atual se tiver pontuação
+      if (topPlayers.length === 0) setMinimized(true);
+
       if (currentPlayerName && currentPlayerScore) {
         const position = await rankingService.getPlayerPosition(currentPlayerName, currentPlayerScore);
         setPlayerPosition(position);
@@ -44,6 +45,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
     } catch (err) {
       setError('Erro ao carregar ranking');
       console.error('Erro ao carregar ranking:', err);
+      setMinimized(true);
     } finally {
       setLoading(false);
     }
@@ -51,6 +53,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      setMinimized(!supabase);
       loadRanking();
     }
   }, [isOpen]);
@@ -79,6 +82,70 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   };
 
   if (!isOpen) return null;
+
+  if (minimized) {
+    return (
+      <div style={{
+        position: 'fixed',
+        bottom: '80px',
+        right: '16px',
+        zIndex: 10001,
+        animation: 'modalSlideIn 0.3s ease-out'
+      }}>
+        <style>{`
+          @keyframes modalSlideIn {
+            0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+          }
+        `}</style>
+        <button
+          onClick={() => setMinimized(false)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(13,15,26,0.92)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '8px',
+            padding: '10px 16px',
+            cursor: 'pointer',
+            color: 'var(--text-primary)',
+            fontFamily: "'LaCartoonerie', sans-serif",
+            fontSize: '0.95rem',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)'
+          }}
+        >
+          <TrophyIcon size={18} color="var(--accent-yellow)" />
+          Ranking Global
+          <span style={{ opacity: 0.5, fontSize: '0.8rem' }}>▲</span>
+        </button>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '-8px',
+            right: '-8px',
+            background: 'rgba(13,15,26,0.95)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '50%',
+            width: '22px',
+            height: '22px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            padding: 0
+          }}
+        >
+          <XIcon size={12} color="var(--text-primary)" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -177,6 +244,24 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               }}
             >
               <RefreshCwIcon size={20} color="var(--text-primary)" />
+            </button>
+            <button
+              onClick={() => setMinimized(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-primary)',
+                fontSize: '1rem',
+                opacity: 0.7
+              }}
+              title="Minimizar"
+            >
+              ▼
             </button>
             <button
               onClick={onClose}
