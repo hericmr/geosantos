@@ -51,7 +51,7 @@ export const useGameState = (externalPause: boolean = false) => {
     const timer = setInterval(() => {
       setGameState(prev => {
         if (prev.roundTimeLeft <= 0 || prev.globalTimeLeft <= 0)
-          return { ...prev, gameOver: true, roundTimeLeft: 0, globalTimeLeft: 0, showFeedback: true };
+          return { ...prev, gameOver: true, roundTimeLeft: 0, globalTimeLeft: 0, showFeedback: false };
 
         if (prev.showFeedback || prev.feedbackProgress > 0) return prev;
 
