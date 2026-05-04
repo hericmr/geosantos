@@ -6,7 +6,7 @@ import {
 } from './GameIcons';
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
-import { BookOpenIcon, PlusIcon, MapPin, Heart, Users, Dumbbell, GraduationCap, Landmark, Church, Music, ChevronLeft } from 'lucide-react';
+import { BookOpenIcon, PlusIcon, MapPin, Heart, Users, Dumbbell, GraduationCap, Landmark, Church, Music, ChevronLeft, type LucideIcon } from 'lucide-react';
 import { PlaceSuggestionForm } from './PlaceSuggestionForm';
 import backgroundVideo from '../../assets/images/background.webm';
 import { GAME_PHASES, GamePhase } from '../../utils/gameConstants';
@@ -22,7 +22,7 @@ interface StartScreenProps {
   onSelectPhase?: (mode: GameMode, category: string | null) => void;
 }
 
-const PHASE_ICONS: Record<string, React.FC<{ size?: number; color?: string }>> = {
+const PHASE_ICONS: Record<string, LucideIcon> = {
   neighborhoods: MapPin,
   historico: Landmark,
   cultura: Music,
