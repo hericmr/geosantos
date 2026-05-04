@@ -26,6 +26,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
 
   const fetchRanking = async () => {
     setIsLoading(true);
+    if (!supabase) { setIsLoading(false); return; }
     try {
       const { data, error } = await supabase
         .from('ranking')

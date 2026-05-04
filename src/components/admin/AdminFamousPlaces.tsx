@@ -41,6 +41,7 @@ export const AdminFamousPlaces: React.FC = () => {
   }, []);
 
   const fetchPlaces = async () => {
+    if (!supabase) { setError('Supabase não configurado.'); return; }
     setLoading(true);
     setError(null);
     try {
@@ -77,6 +78,7 @@ export const AdminFamousPlaces: React.FC = () => {
     setUploading(true);
     setError(null);
     setSuccess(null);
+    if (!supabase) { setError('Supabase não configurado.'); setUploading(false); return; }
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
@@ -111,6 +113,7 @@ export const AdminFamousPlaces: React.FC = () => {
     setLoading(true);
     setSuccess(null);
     setError(null);
+    if (!supabase) { setError('Supabase não configurado.'); setLoading(false); return; }
     try {
       if (!form.name || !form.latitude || !form.longitude) {
         setError('Preencha pelo menos nome, latitude e longitude!');

@@ -1,10 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 import { FamousPlace } from '../types/famousPlaces';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string | undefined;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = supabaseUrl && supabaseKey
+  ? createClient(supabaseUrl, supabaseKey)
+  : null;
 
 // Tipos para o ranking
 export interface RankingEntry {
@@ -20,6 +22,8 @@ export interface RankingEntry {
 // Funções para interagir com o ranking
 export const famousPlacesService = {
   async getFamousPlaces(): Promise<FamousPlace[]> {
+    if (!supabase) return [];
+
     const { data, error } = await supabase
       .from('famous_places')
       .select('*');
@@ -29,7 +33,6 @@ export const famousPlacesService = {
       return [];
     }
 
-    // Mapear os dados para o tipo FamousPlace, ajustando image_url para imageUrl
     return data.map(place => ({
       id: place.id,
       name: place.name,
@@ -38,14 +41,15 @@ export const famousPlacesService = {
       longitude: place.longitude,
       category: place.category,
       address: place.address,
-      imageUrl: (place.image_url && place.image_url !== '') ? place.image_url : 'https://via.placeholder.com/56', // Mapear image_url do Supabase para imageUrl, garantindo que seja string e não vazia
+      imageUrl: (place.image_url && place.image_url !== '') ? place.image_url : 'https://via.placeholder.com/56',
     })) || [];
   },
 };
 
 export const rankingService = {
-  // Buscar top 10 jogadores
   async getTopPlayers(limit: number = 10): Promise<RankingEntry[]> {
+    if (!supabase) return [];
+
     const { data, error } = await supabase
       .from('ranking')
       .select('*')
@@ -60,8 +64,9 @@ export const rankingService = {
     return data || [];
   },
 
-  // Adicionar nova pontuação
   async addScore(entry: Omit<RankingEntry, 'id' | 'created_at'>): Promise<boolean> {
+    if (!supabase) return false;
+
     const { error } = await supabase
       .from('ranking')
       .insert([entry]);
@@ -74,8 +79,9 @@ export const rankingService = {
     return true;
   },
 
-  // Buscar posição do jogador no ranking
   async getPlayerPosition(playerName: string, playerScore: number): Promise<number> {
+    if (!supabase) return -1;
+
     const { data, error } = await supabase
       .from('ranking')
       .select('score')
@@ -86,13 +92,13 @@ export const rankingService = {
       return -1;
     }
 
-    // Encontrar a posição baseada na pontuação
     const position = data?.findIndex(entry => entry.score <= playerScore) + 1;
     return position > 0 ? position : (data?.length || 0) + 1;
   },
 
-  // Buscar estatísticas do jogador
   async getPlayerStats(playerName: string): Promise<RankingEntry | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('ranking')
       .select('*')
