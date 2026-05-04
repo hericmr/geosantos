@@ -82,7 +82,6 @@ export const GameControls: React.FC<GameControlsProps> = ({
           totalGames={stats.totalGames}
           averageScore={stats.averageScore}
           onSelectMode={onModeChange}
-          onSelectPhase={onSelectPhase}
         />
       ) : (
         <div style={{
