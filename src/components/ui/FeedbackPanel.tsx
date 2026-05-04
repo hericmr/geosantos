@@ -3,6 +3,7 @@ import { ActionButtons } from './ActionButtons';
 import { styles } from './FeedbackPanel.styles';
 import { GameMode } from '../../types/famousPlaces';
 import { PlaceDescription } from './feedback/PlaceDescription';
+import { OdometerDisplay } from './OdometerDisplay';
 import { LatLng } from 'leaflet';
 
 export interface FeedbackPanelProps {
@@ -70,15 +71,12 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   if (gameOver || !showFeedback || !clickedPosition) return null;
 
   const isCorrect = distance === 0;
-  const distanceKm = (distance / 1000).toFixed(1);
+  const distanceKm = distance / 1000;
   const targetName = currentMode === 'famous_places'
     ? currentFamousPlace?.name ?? ''
     : currentNeighborhood;
 
-  const resultColor = isCorrect ? '#32CD32' : distance < 500 ? '#ffd700' : '#ff6b6b';
-  const resultText = isCorrect
-    ? `✓ ${targetName}!`
-    : `${distanceKm}km de ${targetName}`;
+  const resultColor = isCorrect ? '#4ade80' : distance < 500 ? '#ffd700' : '#ff6b6b';
 
   return (
     <div
@@ -86,30 +84,46 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       style={{
         ...styles.container(false, isMobile, popupPosition),
         zIndex: 10020,
-        // Posicionar acima da barra de tempo (clamp(110px, 22vw, 130px))
         bottom: isMobile ? 'clamp(118px, 24vw, 140px)' : 'auto',
         top: isMobile ? 'auto' : '50%',
         left: isMobile ? '50%' : '24px',
         transform: isMobile ? 'translateX(-50%)' : 'translateY(-50%)',
-        width: isMobile ? 'calc(100% - 24px)' : '400px',
-        maxWidth: isMobile ? '480px' : '400px',
-        padding: '20px',
-        borderRadius: '12px',
+        width: isMobile ? 'calc(100% - 24px)' : '460px',
+        maxWidth: isMobile ? '520px' : '460px',
+        padding: '22px',
+        borderRadius: '14px',
+        gap: '14px',
       }}
     >
-      {/* Result */}
+      {/* Target name */}
       <div style={{
-        fontSize: isMobile ? '1.5rem' : '1.3rem',
+        fontSize: isMobile ? '1.4rem' : '1.25rem',
         fontFamily: "'LaCartoonerie', sans-serif",
         color: resultColor,
         fontWeight: 700,
         textAlign: 'center',
         letterSpacing: '0.5px',
       }}>
-        {resultText}
+        {isCorrect ? `✓ ${targetName}!` : `${targetName}`}
       </div>
 
-      {/* Distance + time description */}
+      {/* Odometer — só aparece quando errou */}
+      {!isCorrect && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+          <div style={{
+            fontSize: '0.68rem',
+            fontFamily: "'VT323', monospace",
+            color: 'rgba(255,255,255,0.35)',
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+          }}>
+            distância
+          </div>
+          <OdometerDisplay valueKm={distanceKm} />
+        </div>
+      )}
+
+      {/* Descrição / contexto */}
       <PlaceDescription
         currentMode={currentMode}
         currentNeighborhood={currentNeighborhood}
@@ -123,7 +137,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       {consecutiveCorrect >= 2 && (
         <div style={{
           textAlign: 'center',
-          fontSize: isMobile ? '1.1rem' : '1rem',
+          fontSize: '1rem',
           color: '#ffa500',
           fontFamily: "'LaCartoonerie', sans-serif",
           fontWeight: 600,
@@ -133,53 +147,44 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
       )}
 
       {/* Stats row */}
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        justifyContent: 'center',
-        marginTop: '4px',
-      }}>
-        {/* Points earned */}
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
         <div style={{
           flex: 1,
           textAlign: 'center',
-          padding: '10px 8px',
+          padding: '12px 8px',
           background: 'var(--bg-primary)',
           borderRadius: '8px',
         }}>
           <div style={{
-            fontSize: '2rem',
+            fontSize: '2.2rem',
             fontFamily: "'VT323', monospace",
-            color: roundScore > 0 ? '#32CD32' : 'var(--text-primary)',
-            fontWeight: 'bold',
+            color: roundScore > 0 ? '#4ade80' : 'var(--text-primary)',
             lineHeight: 1,
           }}>
             +{roundScore}
           </div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '4px', letterSpacing: '1px', textTransform: 'uppercase' }}>
             pontos
           </div>
         </div>
 
-        {/* Time bonus */}
         <div style={{
           flex: 1,
           textAlign: 'center',
-          padding: '10px 8px',
-          background: timeBonus > 0 ? 'rgba(255,165,0,0.12)' : 'var(--bg-primary)',
+          padding: '12px 8px',
+          background: timeBonus > 0 ? 'rgba(255,165,0,0.1)' : 'var(--bg-primary)',
           borderRadius: '8px',
-          border: timeBonus > 0 ? '1px solid rgba(255,165,0,0.35)' : '1px solid transparent',
+          border: timeBonus > 0 ? '1px solid rgba(255,165,0,0.3)' : '1px solid transparent',
         }}>
           <div style={{
-            fontSize: '2rem',
+            fontSize: '2.2rem',
             fontFamily: "'VT323', monospace",
             color: timeBonus > 0 ? '#ffa500' : 'var(--text-secondary)',
-            fontWeight: 'bold',
             lineHeight: 1,
           }}>
             {timeBonus > 0 ? `+${timeBonus}s` : '—'}
           </div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '4px', letterSpacing: '1px', textTransform: 'uppercase' }}>
             bônus tempo
           </div>
         </div>
