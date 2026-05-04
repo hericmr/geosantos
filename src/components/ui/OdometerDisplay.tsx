@@ -86,7 +86,7 @@ interface OdometerDisplayProps {
 }
 
 export const OdometerDisplay: React.FC<OdometerDisplayProps> = ({ valueKm }) => {
-  const formatted = valueKm.toFixed(1); // e.g. "3.2"
+  const formatted = valueKm.toFixed(1).replace('.', ''); // e.g. "32"
   const chars = [...formatted, 'k', 'm'];
 
   return (
