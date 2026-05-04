@@ -148,6 +148,68 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         {isCorrect ? targetName : `De ${targetName}`}
       </div>
 
+      {/* ── Streak ───────────────────────────────── */}
+      {consecutiveCorrect >= 2 && (
+        <div style={{
+          fontSize: '0.9rem',
+          color: '#ffa500',
+          fontFamily: "'Inter', system-ui, sans-serif",
+          fontWeight: 600,
+          marginBottom: '10px',
+        }}>
+          🔥 {consecutiveCorrect} seguidos!
+        </div>
+      )}
+
+      {/* ── Stats: pontos + bônus ────────────────── */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '14px',
+        padding: '0 4px',
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontSize: '1.9rem',
+            fontFamily: "'VT323', monospace",
+            color: roundScore > 0 ? '#4ade80' : 'rgba(255,255,255,0.3)',
+            lineHeight: 1,
+          }}>
+            +{roundScore}
+          </div>
+          <div style={{
+            fontSize: '0.62rem',
+            color: 'rgba(255,255,255,0.35)',
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            marginTop: '3px',
+          }}>
+            pontos
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontSize: '1.9rem',
+            fontFamily: "'VT323', monospace",
+            color: timeBonus > 0 ? '#ffa500' : 'rgba(255,255,255,0.3)',
+            lineHeight: 1,
+          }}>
+            {timeBonus > 0 ? `+${timeBonus}s` : '—'}
+          </div>
+          <div style={{
+            fontSize: '0.62rem',
+            color: 'rgba(255,255,255,0.35)',
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            marginTop: '3px',
+          }}>
+            bônus tempo
+          </div>
+        </div>
+      </div>
+
       {/* ── Rodapé: pausar (esq) + Próximo (dir) ─── */}
       <div style={{
         display: 'flex',
