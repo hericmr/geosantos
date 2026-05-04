@@ -840,7 +840,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             display: 'flex',
             gap: '20px',
             alignItems: 'center',
-            zIndex: 1000
+            zIndex: 1000,
+            pointerEvents: 'none',
+            userSelect: 'none'
           }}>
             <ScoreDisplay
               icon="target"
@@ -852,7 +854,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
             position: 'fixed',
             top: '20px',
             right: '20px',
-            zIndex: 1000
+            zIndex: 1000,
+            pointerEvents: 'none',
+            userSelect: 'none'
           }}>
             <DistanceDisplay
               totalDistance={gameState.totalDistance}

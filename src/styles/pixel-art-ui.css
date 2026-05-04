@@ -611,9 +611,6 @@ html, body {
   image-rendering: crisp-edges;
 }
 
-.game-icon:hover {
-  transform: translate(-1px, -1px);
-}
 
 /* Estilos específicos para o mapa */
 .leaflet-container {
