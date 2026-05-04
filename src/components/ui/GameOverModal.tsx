@@ -82,7 +82,6 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
       gameOverAudioRef.current.src = getAudioUrl(audioFile);
       gameOverAudioRef.current.volume = 0.7;
       gameOverAudioRef.current.play().catch((error) => {
-        console.log('Erro ao tocar áudio de game over:', error);
       });
     }
   };

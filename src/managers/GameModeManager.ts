@@ -25,12 +25,6 @@ export class GameModeManager implements IGameModeManager {
   constructor(config: UnifiedGameConfig) {
     this.config = config;
     this.activeMode = config.mode;
-    
-    console.log('[GameModeManager] Gerenciador inicializado com configuração:', {
-      mode: this.activeMode,
-      hasNeighborhoodConfig: !!config.neighborhood,
-      hasFamousPlacesConfig: !!config.famousPlaces
-    });
   }
 
   /**
@@ -38,7 +32,6 @@ export class GameModeManager implements IGameModeManager {
    */
   async initialize(): Promise<void> {
     try {
-      console.log('[GameModeManager] Inicializando gerenciador...');
 
       // Carregar hooks para ambos os modos
       await this.loadAllHooks();
@@ -46,7 +39,6 @@ export class GameModeManager implements IGameModeManager {
       // Configurar listeners de eventos
       this.setupEventListeners();
 
-      console.log('[GameModeManager] Gerenciador inicializado com sucesso');
     } catch (error) {
       console.error('[GameModeManager] Erro na inicialização:', error);
       throw error;
@@ -61,13 +53,11 @@ export class GameModeManager implements IGameModeManager {
       // Carregar hook de bairros
       if (this.config.neighborhood) {
         this.neighborhoodHook = await GameModeFactory.createHook('neighborhoods', this.config.neighborhood);
-        console.log('[GameModeManager] Hook de bairros carregado');
       }
 
       // Carregar hook de lugares famosos
       if (this.config.famousPlaces) {
         this.famousPlacesHook = await GameModeFactory.createHook('famous_places', this.config.famousPlaces);
-        console.log('[GameModeManager] Hook de lugares famosos carregado');
       }
     } catch (error) {
       console.error('[GameModeManager] Erro ao carregar hooks:', error);
@@ -81,27 +71,22 @@ export class GameModeManager implements IGameModeManager {
   private setupEventListeners(): void {
     // Listener para eventos de início de jogo
     this.eventSystem.on('gameStart', (event) => {
-      console.log(`[GameModeManager] Jogo iniciado no modo ${event.mode}`);
     });
 
     // Listener para eventos de fim de jogo
     this.eventSystem.on('gameEnd', (event) => {
-      console.log(`[GameModeManager] Jogo finalizado no modo ${event.mode}`);
     });
 
     // Listener para eventos de conclusão de rodada
     this.eventSystem.on('roundComplete', (event) => {
-      console.log(`[GameModeManager] Rodada completada no modo ${event.mode}`);
     });
 
     // Listener para eventos de atualização de pontuação
     this.eventSystem.on('scoreUpdate', (event) => {
-      console.log(`[GameModeManager] Pontuação atualizada no modo ${event.mode}:`, event.data);
     });
 
     // Listener para eventos de feedback
     this.eventSystem.on('feedback', (event) => {
-      console.log(`[GameModeManager] Feedback recebido no modo ${event.mode}:`, event.data);
     });
   }
 
@@ -110,7 +95,6 @@ export class GameModeManager implements IGameModeManager {
    */
   async switchMode(mode: GameModeType): Promise<void> {
     try {
-      console.log(`[GameModeManager] Trocando para modo ${mode}`);
 
       // Pausar modo atual se estiver ativo
       if (this.activeMode !== mode) {
@@ -128,7 +112,6 @@ export class GameModeManager implements IGameModeManager {
         timestamp: Date.now()
       });
 
-      console.log(`[GameModeManager] Modo alterado para ${mode}`);
     } catch (error) {
       console.error(`[GameModeManager] Erro ao trocar para modo ${mode}:`, error);
       throw error;
@@ -203,7 +186,6 @@ export class GameModeManager implements IGameModeManager {
       if (activeHook) {
         activeHook.pauseGame();
         this.eventSystem.emitGamePause(this.activeMode);
-        console.log(`[GameModeManager] Modo ${this.activeMode} pausado`);
       }
     } catch (error) {
       console.error('[GameModeManager] Erro ao pausar modo atual:', error);
@@ -219,7 +201,6 @@ export class GameModeManager implements IGameModeManager {
       if (activeHook) {
         activeHook.resumeGame();
         this.eventSystem.emitGameResume(this.activeMode);
-        console.log(`[GameModeManager] Modo ${this.activeMode} retomado`);
       }
     } catch (error) {
       console.error('[GameModeManager] Erro ao retomar modo atual:', error);
@@ -235,7 +216,6 @@ export class GameModeManager implements IGameModeManager {
       if (activeHook) {
         activeHook.endGame();
         this.eventSystem.emitGameEnd(this.activeMode);
-        console.log(`[GameModeManager] Modo ${this.activeMode} finalizado`);
       }
     } catch (error) {
       console.error('[GameModeManager] Erro ao finalizar modo atual:', error);
@@ -252,7 +232,6 @@ export class GameModeManager implements IGameModeManager {
         throw new Error(`Nenhum hook ativo para executar ação ${action}`);
       }
 
-      console.log(`[GameModeManager] Executando ação ${action} no modo ${this.activeMode}`);
 
       switch (action) {
         case 'startGame':
@@ -315,7 +294,6 @@ export class GameModeManager implements IGameModeManager {
    */
   cleanup(): void {
     try {
-      console.log('[GameModeManager] Limpando recursos...');
 
       // Finalizar modo atual
       this.endCurrentMode();
@@ -327,7 +305,6 @@ export class GameModeManager implements IGameModeManager {
       this.neighborhoodHook = null;
       this.famousPlacesHook = null;
 
-      console.log('[GameModeManager] Recursos limpos');
     } catch (error) {
       console.error('[GameModeManager] Erro na limpeza:', error);
     }
@@ -339,7 +316,6 @@ export class GameModeManager implements IGameModeManager {
   destroy(): void {
     try {
       this.cleanup();
-      console.log('[GameModeManager] Gerenciador destruído');
     } catch (error) {
       console.error('[GameModeManager] Erro ao destruir gerenciador:', error);
     }
@@ -375,4 +351,3 @@ export const gameModeManager = new GameModeManager({
 });
 
 // Log inicial
-console.log('[GameModeManager] Instância singleton criada'); 

@@ -88,10 +88,8 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
 
   // Selecionar bairro aleatório para a rodada
   const selectRandomNeighborhood = useCallback(() => {
-    console.log('[NeighborhoodMode] selectRandomNeighborhood chamado - Stack trace:', new Error().stack);
     
     if (gameState.availableNeighborhoods.length === 0) {
-      console.log('[NeighborhoodMode] Nenhum bairro disponível');
       return;
     }
 
@@ -101,7 +99,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
 
     if (availableNeighborhoods.length === 0) {
       // Todos os bairros foram revelados, resetar
-      console.log('[NeighborhoodMode] Todos os bairros revelados - resetando');
       setGameState(prev => ({
         ...prev,
         revealedNeighborhoods: new Set(),
@@ -113,7 +110,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
     const randomIndex = Math.floor(Math.random() * availableNeighborhoods.length);
     const selectedNeighborhood = availableNeighborhoods[randomIndex];
 
-    console.log('[NeighborhoodMode] Selecionando bairro:', selectedNeighborhood);
 
     setGameState(prev => ({
       ...prev,
@@ -127,22 +123,18 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
       roundNumber: gameState.roundNumber
     });
     
-    console.log('[NeighborhoodMode] Bairro selecionado com sucesso:', selectedNeighborhood);
   }, [gameState.availableNeighborhoods, gameState.revealedNeighborhoods, gameState.roundNumber, onStateChange, defaultConfig.roundTime]);
 
   // Iniciar nova rodada
   const startNewRound = useCallback(() => {
-    console.log('[NeighborhoodMode] startNewRound chamado');
     
     if (gameState.roundNumber >= gameState.totalRounds) {
       // Jogo terminou
-      console.log('[NeighborhoodMode] Jogo terminou - todas as rodadas completas');
       setGameState(prev => ({ ...prev, isActive: false }));
       onRoundComplete();
       return;
     }
 
-    console.log('[NeighborhoodMode] Iniciando nova rodada:', gameState.roundNumber + 1);
     
     setGameState(prev => ({
       ...prev,
@@ -153,7 +145,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
     // CORREÇÃO: Limpar feedback visual MAS preservar destaque do bairro se ainda estiver em delay
     setVisualFeedback(prev => {
       // NOVA ABORDAGEM: Sempre limpar o destaque no início de uma nova rodada
-      console.log('[NeighborhoodMode] Limpando destaque do bairro para nova rodada');
       
       return {
         ...prev,
@@ -170,7 +161,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
     // Selecionar novo bairro
     selectRandomNeighborhood();
     
-    console.log('[NeighborhoodMode] Nova rodada iniciada com sucesso');
   }, [gameState.roundNumber, gameState.totalRounds, onRoundComplete, selectRandomNeighborhood]);
 
   // Validar clique do jogador
@@ -222,7 +212,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
     if (validation.isCorrectNeighborhood) {
       // Acerto: destacar bairro e aguardar avanço automático
       // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
-      console.log('[NeighborhoodMode] Acerto detectado - destacando bairro em 1s');
       
       // Primeiro, limpar feedback visual imediatamente (SEM destaque)
       setVisualFeedback(prev => ({
@@ -235,7 +224,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
       
       // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
       setTimeout(() => {
-        console.log('[NeighborhoodMode] Ativando destaque do bairro após 1s do clique');
         setVisualFeedback(prev => ({
           ...prev,
           highlightNeighborhood: true, // Agora ativa o destaque
@@ -246,7 +234,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
       // Avançar automaticamente após delay
       if (defaultConfig.autoAdvance) {
         // CORREÇÃO: Executar startNewRound automaticamente após 2 segundos
-        console.log('[NeighborhoodMode] Executando startNewRound automaticamente após 2 segundos');
         setTimeout(() => {
           startNewRound();
         }, FEEDBACK_BAR_DURATION);
@@ -298,7 +285,6 @@ export const NeighborhoodMode: React.FC<NeighborhoodModeProps> = ({
       // Avançar automaticamente após delay
       if (defaultConfig.autoAdvance) {
         // CORREÇÃO: Avançar imediatamente quando tempo esgota
-        console.log('[NeighborhoodMode] Tempo esgotado - avançando automaticamente');
         startNewRound();
       }
     }

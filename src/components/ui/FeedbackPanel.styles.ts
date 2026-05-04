@@ -21,34 +21,25 @@ export const styles: FeedbackPanelStyles = {
     left: gameOver ? 0 : isMobile ? 0 : popupPosition.left,
     right: isMobile ? 0 : 'auto',
     transform: gameOver ? 'none' : isMobile ? 'none' : 'none', // Removido translate para posicionamento absoluto
-    width: isMobile ? '100%' : 'clamp(320px, 25vw, 450px)', // Largura responsiva
+    width: isMobile ? '100%' : 'clamp(320px, 25vw, 450px)',
     maxWidth: gameOver ? '100%' : '450px',
-    background: 'var(--bg-secondary)',
+    background: 'rgba(13,15,26,0.88)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     color: 'var(--text-primary)',
     zIndex: 9999,
     padding: 'clamp(16px, 3vw, 24px)',
-    borderRadius: isMobile ? '4px 4px 0 0' : '8px',
-    boxShadow: 'var(--shadow-xl)',
-    border: 'none',
-    margin: isMobile ? '0' : '0',
+    borderRadius: isMobile ? '16px 16px 0 0' : '16px',
+    boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+    border: '1px solid rgba(255,255,255,0.1)',
     animation: gameOver ? 'slideUp 0.3s ease-out' : isMobile ? 'slideUp 0.3s ease-out' : 'slideInLeft 0.3s ease-out',
     maxHeight: isMobile ? '90vh' : '85vh',
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
     gap: 'clamp(12px, 2vw, 16px)',
-    fontFamily: "'VT323', monospace",
-    // Garantir que não sobreponha a área do clique
+    fontFamily: "'Inter', system-ui, sans-serif",
     pointerEvents: 'auto',
-    // Melhorar responsividade
-    '@media (max-width: 1200px)': {
-      width: 'clamp(300px, 30vw, 400px)',
-      maxWidth: '400px'
-    },
-    '@media (max-width: 768px)': {
-      width: '100%',
-      maxWidth: '100%'
-    }
   }),
 
   contentContainer: {

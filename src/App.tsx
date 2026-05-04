@@ -8,30 +8,33 @@ import SpriteTestPage from './components/ui/SpriteTestPage';
 import SpriteDebug from './components/ui/SpriteDebug';
 import { GameModeLoaderTest } from './components/ui/GameModeLoaderTest';
 import { UnifiedGameModeTest } from './components/ui/UnifiedGameModeTest';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function App() {
   return (
-    <BrowserRouter basename="/geosantos">
-      <Routes>
-        <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
-        <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
-        <Route path="/teste-sprites" element={<SpriteTestPage />} />
-        <Route path="/debug-sprites" element={<SpriteDebug />} />
-        <Route path="/teste-carregamento" element={<GameModeLoaderTest />} />
-        <Route path="/teste-unificado" element={<UnifiedGameModeTest />} />
-        <Route path="/" element={
-          <div style={{
-            margin: 0,
-            padding: 0,
-            width: '100vw',
-            height: '100vh',
-            overflow: 'hidden'
-          }}>
-            <Map center={[-23.9618, -46.3322]} zoom={13} />
-          </div>
-        } />
-      </Routes>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter basename="/geosantos">
+        <Routes>
+          <Route path="/admin/famous-places" element={<AdminFamousPlaces />} />
+          <Route path="/lugares-famosos" element={<FamousPlacesWiki />} />
+          <Route path="/teste-sprites" element={<SpriteTestPage />} />
+          <Route path="/debug-sprites" element={<SpriteDebug />} />
+          <Route path="/teste-carregamento" element={<GameModeLoaderTest />} />
+          <Route path="/teste-unificado" element={<UnifiedGameModeTest />} />
+          <Route path="/" element={
+            <div style={{
+              margin: 0,
+              padding: 0,
+              width: '100vw',
+              height: '100vh',
+              overflow: 'hidden'
+            }}>
+              <Map center={[-23.9618, -46.3322]} zoom={13} />
+            </div>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

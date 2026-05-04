@@ -91,13 +91,16 @@ export const GameControls: React.FC<GameControlsProps> = ({
           <div style={{
             width: '100vw',
             height: isMobile ? 'clamp(110px, 22vw, 130px)' : 'clamp(90px, 18vw, 110px)',
-            background: '#2A2A2A',
+            background: 'rgba(13,15,26,0.92)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
             overflow: 'hidden',
             position: 'relative',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+            boxShadow: '0 -4px 24px rgba(0,0,0,0.5)',
             marginLeft: 'calc(-50vw + 50%)',
             marginRight: 'calc(-50vw + 50%)',
-            bottom: 0
+            bottom: 0,
+            borderTop: '1px solid rgba(255,255,255,0.08)'
           }}>
             <div style={{
               width: `${(globalTimeLeft / roundInitialTime) * 100}%`,
@@ -170,10 +173,10 @@ export const GameControls: React.FC<GameControlsProps> = ({
                 <span style={{
                   color: 'white',
                   fontWeight: 800,
-                  fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)',
+                  fontSize: 'clamp(2.4rem, 6vw, 3.8rem)',
                   textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
                   letterSpacing: '1px',
-                  fontFamily: "'LaCartoonerie', sans-serif",
+                  fontFamily: "'Inter', system-ui, sans-serif",
                   lineHeight: 1.2,
                   textAlign: 'center',
                   maxWidth: '80%',
@@ -192,21 +195,20 @@ export const GameControls: React.FC<GameControlsProps> = ({
             width: '100%',
             padding: '6px 0',
             textAlign: 'center',
-            background: 'rgba(20, 83, 45, 0.85)',
+            background: 'rgba(52, 211, 153, 0.15)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
+            borderTop: '1px solid rgba(52,211,153,0.2)'
           }}>
             <p style={{ 
               fontSize: 'clamp(0.7rem, 1.8vw, 0.9rem)', 
-              fontFamily: "'LaCartoonerie', sans-serif",
-              fontWeight: 400,
-              color: '#FFFFFF',
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.85)',
               lineHeight: 1.4,
               margin: 0,
               textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
-              animation: 'glowText 2s ease-in-out infinite alternate'
+              letterSpacing: '1.5px'
             }}>
               {currentMode === 'neighborhoods' 
                 ? 'Encontre o bairro no mapa!'

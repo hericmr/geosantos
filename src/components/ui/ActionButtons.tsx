@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { PauseIcon, NextIcon, RetryIcon, PlayIcon } from './GameIcons';
 
 interface ActionButtonsProps {
@@ -20,11 +20,11 @@ const buttonStyles = {
     flexWrap: 'nowrap' as const,
     width: '100%'
   },
-  
+
   button: (variant: 'pause' | 'resume' | 'next' | 'retry') => ({
     padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)',
     fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-    background: variant === 'pause' ? 'var(--accent-orange)' : 
+    background: variant === 'pause' ? 'var(--accent-orange)' :
                 variant === 'resume' ? 'var(--accent-green)' :
                 variant === 'next' ? 'var(--accent-green)' : 'var(--accent-red)',
     color: variant === 'pause' ? '#000000' : '#ffffff',
@@ -43,28 +43,7 @@ const buttonStyles = {
     letterSpacing: '1px',
     minWidth: variant === 'pause' || variant === 'resume' ? '100px' : '120px',
     zIndex: 1,
-    '&:hover': {
-      transform: 'translate(-1px, -1px)',
-      boxShadow: 'var(--shadow-lg)'
-    },
-    '&:active': {
-      transform: 'translate(1px, 1px)',
-      boxShadow: 'var(--shadow-sm)'
-    }
   }),
-
-  progressBar: (progress: number, color: string) => ({
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    width: `${progress}%`,
-    height: '100%',
-    background: color,
-    transition: 'width 0.1s linear',
-    zIndex: 1,
-    transform: 'translateX(0)',
-    transformOrigin: 'left'
-  })
 };
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
@@ -76,6 +55,16 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   currentMode = 'neighborhoods',
   isPaused = false
 }) => {
+  const prevProgressRef = useRef(0);
+  const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => {
+    if (feedbackProgress >= 99 && prevProgressRef.current < 50) {
+      setAnimKey(k => k + 1);
+    }
+    prevProgressRef.current = feedbackProgress;
+  }, [feedbackProgress]);
+
   return (
     <div style={buttonStyles.buttonContainer}>
       {!gameOver && (
@@ -101,22 +90,32 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           )}
         </>
       )}
-      {/* Botão Próximo - sempre visível quando não é game over */}
       {!gameOver && (
         <button
           onClick={onNextRound}
           className="pixel-btn pixel-btn--success"
           style={buttonStyles.button('next')}
         >
-          <div style={buttonStyles.progressBar(feedbackProgress, 'rgba(50, 205, 50, 0.3)')} />
-          <div style={buttonStyles.progressBar(100 - feedbackProgress, 'rgba(255, 0, 0, 0.5)')} />
-          <span style={{
-            position: 'relative',
-            zIndex: 2,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
+          <style>{`
+            @keyframes drainBar {
+              from { width: 100%; }
+              to { width: 0%; }
+            }
+          `}</style>
+          <div
+            key={animKey}
+            style={{
+              position: 'absolute',
+              top: 0, left: 0, bottom: 0,
+              width: animKey > 0 ? '100%' : '0%',
+              height: '100%',
+              background: 'rgba(255, 80, 80, 0.5)',
+              animation: animKey > 0 ? 'drainBar 3s linear forwards' : 'none',
+              animationPlayState: isPaused ? 'paused' : 'running',
+              zIndex: 1,
+            }}
+          />
+          <span style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '4px' }}>
             <NextIcon size={16} color="var(--text-primary)" />
             Próximo
           </span>

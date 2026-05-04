@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  PlayIcon, 
-  TrophyIcon, 
-  LandmarkIcon
+import {
+  PlayIcon,
+  TrophyIcon,
 } from './GameIcons';
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
@@ -41,68 +40,56 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
 
   const mainMenuOptions = useMemo(() => [
-    { 
-      id: 'play_neighborhoods', 
-      label: 'BAIRROS', 
-      icon: MapPin, 
+    {
+      id: 'play_neighborhoods',
+      label: 'BAIRROS',
+      icon: MapPin,
       action: () => {
-        console.log('[StartScreen] Modo Bairros selecionado');
-        console.log('[StartScreen] Chamando onSelectMode com neighborhoods');
         onSelectMode?.('neighborhoods');
-        console.log('[StartScreen] Chamando onStartGame');
         onStartGame();
       },
-      description: 'Clique no mapa onde você acha que está o bairro. Quanto mais próximo da localização correta, mais pontos você ganha!'
+      description: 'Clique no mapa onde você acha que está o bairro. Quanto mais próximo da localização correta, mais pontos você ganha!',
+      color: '#34d399',
+      gradient: 'linear-gradient(135deg, #34d399, #059669)'
     },
-    { 
-      id: 'play_famous_places', 
-      label: 'LUGARES FAMOSOS', 
-      icon: LandmarkIcon, 
-      action: () => { 
-        console.log('[StartScreen] Modo Lugares Famosos selecionado');
-        console.log('[StartScreen] Chamando onSelectMode com famous_places');
-        onSelectMode?.('famous_places'); 
-        console.log('[StartScreen] Chamando onStartGame');
-        onStartGame(); 
-      },
-      description: 'Localize pontos turísticos e lugares históricos de Santos. Teste seus conhecimentos sobre a cidade!'
-    },
-    { 
-      id: 'leaderboard', 
-      label: 'VER RANKING', 
-      icon: TrophyIcon, 
+    {
+      id: 'leaderboard',
+      label: 'VER RANKING',
+      icon: TrophyIcon,
       action: onShowLeaderboard,
-      description: 'Veja as maiores pontuações e descubra sua posição no ranking dos melhores jogadores.'
+      description: 'Veja as maiores pontuações e descubra sua posição no ranking dos melhores jogadores.',
+      color: '#fbbf24',
+      gradient: 'linear-gradient(135deg, #fbbf24, #f59e0b)'
     }
   ], [onStartGame, onShowLeaderboard, onSelectMode]);
 
   const secondaryMenuOptions = useMemo(() => [
-    { 
-      id: 'wiki', 
-      label: 'WIKI-GEOSANTOS', 
-      icon: BookOpenIcon, 
+    {
+      id: 'wiki',
+      label: 'WIKI-GEOSANTOS',
+      icon: BookOpenIcon,
       action: () => { window.location.href = '/geosantos/lugares-famosos'; },
       description: 'Explore informações e curiosidades sobre os lugares do jogo.',
-      as: Link, // Renderiza como um componente Link
-      to: '/lugares-famosos' // O destino do Link
+      as: Link,
+      to: '/lugares-famosos'
     },
-    { 
-      id: 'suggest_place', 
-      label: 'SUGERIR NOVO LOCAL', 
-      icon: PlusIcon, 
-      action: () => { 
+    {
+      id: 'suggest_place',
+      label: 'SUGERIR NOVO LOCAL',
+      icon: PlusIcon,
+      action: () => {
         setShowSuggestionForm(true);
       },
       description: 'Sugira novos lugares para serem adicionados ao jogo.',
-      as: 'button' // Renderiza como um botão normal
+      as: 'button'
     },
-    { 
-      id: 'controls', 
-      label: 'CONTROLES', 
-      icon: () => <span style={{ fontSize: '16px' }}>🎮</span>, 
-      action: () => {}, // Ação vazia, só para hover
+    {
+      id: 'controls',
+      label: 'CONTROLES',
+      icon: () => <span style={{ fontSize: '14px' }}>🎮</span>,
+      action: () => {},
       description: 'Veja os controles do mapa.',
-      as: 'button', // Renderiza como um botão normal
+      as: 'button',
       onMouseEnter: () => setShowControls(true),
       onMouseLeave: () => setShowControls(false)
     }
@@ -110,22 +97,15 @@ export const StartScreen: React.FC<StartScreenProps> = ({
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const totalOptions = mainMenuOptions.length + secondaryMenuOptions.length;
-    
+
     if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedOption(prev => {
-        let newOption = prev > 0 ? prev - 1 : totalOptions - 1;
-        return newOption;
-      });
+      setSelectedOption(prev => prev > 0 ? prev - 1 : totalOptions - 1);
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedOption(prev => {
-        let newOption = prev < totalOptions - 1 ? prev + 1 : 0;
-        return newOption;
-      });
+      setSelectedOption(prev => prev < totalOptions - 1 ? prev + 1 : 0);
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      // Determinar se é um botão principal ou secundário
       if (selectedOption < mainMenuOptions.length) {
         mainMenuOptions[selectedOption].action?.();
       } else {
@@ -138,29 +118,24 @@ export const StartScreen: React.FC<StartScreenProps> = ({
   const captureFirstFrame = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    
     if (video && canvas && video.videoWidth > 0 && video.videoHeight > 0) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        setFirstFrameDataUrl(dataUrl);
+        setFirstFrameDataUrl(canvas.toDataURL('image/jpeg', 0.8));
       }
     }
   }, []);
 
   const handleVideoLoad = useCallback(() => {
-    // Captura o primeiro frame quando o vídeo carrega
     captureFirstFrame();
     setVideoLoaded(true);
   }, [captureFirstFrame]);
 
   const handleVideoError = useCallback(() => {
     setVideoError(true);
-    console.warn('Erro ao carregar vídeo de background');
   }, []);
 
   useEffect(() => {
@@ -174,7 +149,6 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       video.addEventListener('loadeddata', handleVideoLoad);
       video.addEventListener('error', handleVideoError);
       video.addEventListener('canplay', captureFirstFrame);
-      
       return () => {
         video.removeEventListener('loadeddata', handleVideoLoad);
         video.removeEventListener('error', handleVideoError);
@@ -183,318 +157,203 @@ export const StartScreen: React.FC<StartScreenProps> = ({
     }
   }, [handleVideoLoad, handleVideoError, captureFirstFrame]);
 
+  const selectedItem = selectedOption < mainMenuOptions.length
+    ? mainMenuOptions[selectedOption]
+    : secondaryMenuOptions[selectedOption - mainMenuOptions.length];
+
   return (
     <>
-      {/* Background Video with Fallback */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
-        zIndex: 0
-      }}>
-        {/* Hidden canvas for capturing first frame */}
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'absolute',
-            top: '-9999px',
-            left: '-9999px',
-            width: '1px',
-            height: '1px'
-          }}
-        />
-        
-        {/* First Frame Fallback - visible until video loads */}
+      {/* Background Video */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+        <canvas ref={canvasRef} style={{ position: 'absolute', top: '-9999px', left: '-9999px', width: 1, height: 1 }} />
+
         {firstFrameDataUrl && (
           <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
+            position: 'absolute', inset: 0,
             backgroundImage: `url(${firstFrameDataUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover', backgroundPosition: 'center',
             opacity: videoLoaded && !videoError ? 0 : 1,
-            transition: 'opacity 0.5s ease-in-out',
+            transition: 'opacity 0.5s ease',
             zIndex: 1
           }} />
         )}
-        
-        {/* Video - overlays the image when loaded */}
+
         <video
           ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
+          autoPlay loop muted playsInline
           style={{
-            width: '100vw',
-            height: '100vh',
-            objectFit: 'cover',
-            position: 'absolute',
-            top: 0,
-            left: 0,
+            width: '100vw', height: '100vh', objectFit: 'cover',
+            position: 'absolute', inset: 0,
             opacity: videoLoaded && !videoError ? 1 : 0,
-            transition: 'opacity 0.5s ease-in-out',
-            zIndex: 2
+            transition: 'opacity 0.5s ease', zIndex: 2
           }}
         >
           <source src={backgroundVideo} type="video/webm" />
-          Seu navegador não suporta vídeo em background.
         </video>
+
+        {/* Dark overlay gradient */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 3,
+          background: 'linear-gradient(to bottom, rgba(13,15,26,0.6) 0%, rgba(13,15,26,0.75) 100%)'
+        }} />
       </div>
 
-      {/* Container principal que engloba tudo */}
+      {/* Main content */}
       <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 4,
-        padding: '20px',
-        boxSizing: 'border-box'
+        position: 'fixed', inset: 0, zIndex: 4,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '20px', boxSizing: 'border-box',
+        gap: '24px'
       }}>
 
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '4px' }}>
           <h1 style={{
-            fontSize: 'clamp(6.5rem, 26vw, 12rem)',
+            fontSize: 'clamp(5rem, 22vw, 10rem)',
             fontFamily: "'LaCartoonerie', sans-serif",
-            margin: '0',
+            margin: 0,
             animation: 'titleFloat 5s ease-in-out infinite',
-            filter: 'drop-shadow(3px 3px 0px #fff) drop-shadow(-3px -3px 0px #fff) drop-shadow(3px -3px 0px #fff) drop-shadow(-3px 3px 0px #fff)',
-            fontWeight: 'bold',
-            lineHeight: 1.2
+            lineHeight: 1.1,
+            letterSpacing: '-2px'
           }}>
-            <span style={{ color: '#22c55e' }}>Geo</span>
-            <span style={{ color: '#3b82f6' }}>Santos</span>
+            <span style={{
+              color: '#34d399',
+              filter: 'drop-shadow(0 0 20px rgba(52,211,153,0.5))'
+            }}>Geo</span>
+            <span style={{
+              color: '#4fc3d4',
+              filter: 'drop-shadow(0 0 20px rgba(79,195,212,0.5))'
+            }}>Santos</span>
           </h1>
+          <p style={{
+            color: 'rgba(255,255,255,0.5)',
+            fontSize: 'clamp(0.75rem, 1.8vw, 0.95rem)',
+            fontFamily: "'Inter', sans-serif",
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            marginTop: '4px'
+          }}>
+            Quão bem você conhece Santos?
+          </p>
         </div>
 
-        {/* Estatísticas do jogador */}
+        {/* Stats row */}
         {(highScore > 0 || totalGames > 0) && (
-          <div style={{
-            display: 'flex',
-            gap: '20px',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            marginBottom: '-50px'
-          }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
             {highScore > 0 && (
-              <div style={{
-                background: 'var(--bg-secondary)',
-                border: '2px solid var(--accent-green)',
-                borderRadius: '4px',
-                padding: '12px 16px',
-                textAlign: 'center',
-                boxShadow: 'var(--shadow-md)'
-              }}>
-                <div style={{
-                  fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                  fontFamily: "'LaCartoonerie', sans-serif",
-                  color: 'var(--text-secondary)',
-                  marginBottom: '4px'
-                }}>
-                  MELHOR PONTUAÇÃO
-                </div>
-                <div style={{
-                  fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-                  fontFamily: "'VT323', monospace",
-                  color: 'var(--accent-green)',
-                  fontWeight: 'bold'
-                }}>
-                  {highScore.toLocaleString()}
-                </div>
+              <div style={statCardStyle('#34d399')}>
+                <div style={statLabelStyle}>Melhor</div>
+                <div style={{ ...statValueStyle, color: '#34d399' }}>{highScore.toLocaleString()}</div>
               </div>
             )}
-            
             {totalGames > 0 && (
-              <div style={{
-                background: 'var(--bg-secondary)',
-                border: '2px solid var(--accent-blue)',
-                borderRadius: '4px',
-                padding: '12px 16px',
-                textAlign: 'center',
-                boxShadow: 'var(--shadow-md)'
-              }}>
-                <div style={{
-                  fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                  fontFamily: "'LaCartoonerie', sans-serif",
-                  color: 'var(--text-secondary)',
-                  marginBottom: '4px'
-                }}>
-                  JOGOS JOGADOS
-                </div>
-                <div style={{
-                  fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-                  fontFamily: "'VT323', monospace",
-                  color: 'var(--accent-blue)',
-                  fontWeight: 'bold'
-                }}>
-                  {totalGames}
-                </div>
+              <div style={statCardStyle('#4fc3d4')}>
+                <div style={statLabelStyle}>Jogos</div>
+                <div style={{ ...statValueStyle, color: '#4fc3d4' }}>{totalGames}</div>
               </div>
             )}
-            
             {averageScore > 0 && (
-              <div style={{
-                background: 'var(--bg-secondary)',
-                border: '2px solid var(--accent-orange)',
-                borderRadius: '4px',
-                padding: '12px 16px',
-                textAlign: 'center',
-                boxShadow: 'var(--shadow-md)'
-              }}>
-                <div style={{
-                  fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                  fontFamily: "'LaCartoonerie', sans-serif",
-                  color: 'var(--text-secondary)',
-                  marginBottom: '4px'
-                }}>
-                  MÉDIA
-                </div>
-                <div style={{
-                  fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-                  fontFamily: "'VT323', monospace",
-                  color: 'var(--accent-orange)',
-                  fontWeight: 'bold'
-                }}>
-                  {Math.round(averageScore)}
-                </div>
+              <div style={statCardStyle('#fbbf24')}>
+                <div style={statLabelStyle}>Média</div>
+                <div style={{ ...statValueStyle, color: '#fbbf24' }}>{Math.round(averageScore)}</div>
               </div>
             )}
           </div>
         )}
 
-        {/* Menu principal */}
+        {/* Main menu */}
         <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          minWidth: '300px',
-          alignItems: 'center',
-          marginTop: '-20px'
+          display: 'flex', flexDirection: 'column', gap: '10px',
+          width: '100%', maxWidth: '340px'
         }}>
           {mainMenuOptions.map((option, index) => {
             const IconComponent = option.icon;
             const isSelected = index === selectedOption;
 
-            const buttonStyle = {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '16px',
-              padding: '16px 24px',
-              background: isSelected ? 'var(--accent-blue)' : 'var(--bg-secondary)',
-              border: 'none',
-              borderRadius: '4px',
-              color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              fontFamily: "'LaCartoonerie', sans-serif",
-              fontWeight: 400,
-              textTransform: 'uppercase' as const,
-              letterSpacing: '1px',
-              boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
-              transform: isSelected ? 'translate(-2px, -2px)' : 'translate(0, 0)',
-              position: 'relative' as const,
-              overflow: 'hidden',
-              opacity: 1,
-              textDecoration: 'none',
-              width: '100%'
-            };
-
             return (
               <button
                 key={option.id}
-                style={buttonStyle}
                 onClick={option.action}
                 onMouseEnter={() => setSelectedOption(index)}
                 onMouseLeave={() => setSelectedOption(0)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '14px',
+                  padding: '14px 20px',
+                  background: isSelected
+                    ? option.gradient
+                    : 'rgba(255,255,255,0.07)',
+                  border: `1px solid ${isSelected ? 'transparent' : 'rgba(255,255,255,0.1)'}`,
+                  borderRadius: '12px',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 600,
+                  fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                  letterSpacing: '0.3px',
+                  boxShadow: isSelected
+                    ? `0 8px 24px ${option.color}40`
+                    : '0 2px 8px rgba(0,0,0,0.2)',
+                  transform: isSelected ? 'translateY(-1px)' : 'none',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  textAlign: 'left',
+                  width: '100%',
+                  outline: 'none'
+                }}
               >
-                <IconComponent 
-                  size={24} 
-                  color={isSelected ? 'var(--bg-primary)' : 'var(--text-primary)'} 
-                />
-                <div style={{ 
-                  fontSize: 'clamp(0.9rem, 2.2vw, 1.1rem)',
-                  fontWeight: 'bold',
-                  lineHeight: 1.2
+                <div style={{
+                  width: '36px', height: '36px', borderRadius: '8px',
+                  background: isSelected ? 'rgba(255,255,255,0.2)' : `${option.color}22`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0
                 }}>
-                  {option.label}
+                  <IconComponent size={18} color={isSelected ? '#fff' : option.color} />
                 </div>
+                {option.label}
               </button>
             );
           })}
         </div>
 
-        {/* Menu secundário - botões menores */}
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          marginTop: '20px',
-          justifyContent: 'center'
-        }}>
+        {/* Secondary menu */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
           {secondaryMenuOptions.map((option, index) => {
             const IconComponent = option.icon;
             const Component = option.as || 'button';
             const isSelected = selectedOption === (mainMenuOptions.length + index);
 
-            const smallButtonStyle = {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '8px 16px',
-              background: isSelected ? 'var(--accent-blue)' : 'var(--bg-accent)',
-              border: 'none',
-              borderRadius: '4px',
-              color: isSelected ? 'var(--bg-primary)' : 'var(--text-primary)',
+            const style: React.CSSProperties = {
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 14px',
+              background: isSelected ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '20px',
+              color: isSelected ? '#fff' : 'rgba(255,255,255,0.6)',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              fontFamily: "'LaCartoonerie', sans-serif",
-              fontSize: 'clamp(0.7rem, 1.5vw, 0.8rem)',
-              fontWeight: 400,
-              textTransform: 'uppercase' as const,
-              letterSpacing: '1px',
-              boxShadow: isSelected ? 'var(--shadow-lg)' : 'var(--shadow-md)',
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '0.8rem',
+              fontWeight: 500,
               textDecoration: 'none',
-              transform: isSelected ? 'translateY(-2px)' : 'translateY(0)'
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              outline: 'none'
             };
 
             const children = (
               <>
-                <IconComponent size={16} color="var(--text-primary)" />
+                <IconComponent size={14} />
                 {option.label}
               </>
             );
 
             if (Component === Link) {
               return (
-                <Link
-                  key={option.id}
-                  style={smallButtonStyle}
-                  to={option.to!}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'var(--accent-blue)';
-                    e.currentTarget.style.color = 'var(--bg-primary)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'var(--bg-accent)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
+                <Link key={option.id} style={style} to={option.to!}
+                  onMouseEnter={() => setSelectedOption(mainMenuOptions.length + index)}
+                  onMouseLeave={() => setSelectedOption(0)}
                 >
                   {children}
                 </Link>
@@ -504,21 +363,14 @@ export const StartScreen: React.FC<StartScreenProps> = ({
             return (
               <button
                 key={option.id}
-                style={smallButtonStyle}
+                style={style}
                 onClick={option.action}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--accent-blue)';
-                  e.currentTarget.style.color = 'var(--bg-primary)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
+                onMouseEnter={() => {
                   setSelectedOption(mainMenuOptions.length + index);
                   option.onMouseEnter?.();
                 }}
-                onMouseLeave={(e) => {
-                  if (selectedOption !== (mainMenuOptions.length + index)) {
-                    e.currentTarget.style.background = 'var(--bg-accent)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }
+                onMouseLeave={() => {
+                  setSelectedOption(0);
                   option.onMouseLeave?.();
                 }}
               >
@@ -528,250 +380,161 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           })}
         </div>
 
-        {/* Instruções */}
-        <div style={{
-          textAlign: 'center',
-          maxWidth: '600px',
-          padding: '20px',
-          background: 'var(--bg-secondary)',
-          border: 'none',
-          borderRadius: '4px',
-          boxShadow: 'var(--shadow-md)',
-          marginTop: '40px'
+        {/* Credits */}
+        <p style={{
+          color: 'rgba(255,255,255,0.3)',
+          fontSize: '0.75rem',
+          fontFamily: "'Inter', sans-serif",
+          marginTop: '-8px'
         }}>
-          <h3 style={{
-            fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-            margin: '0 0 12px 0',
-            fontFamily: "'LaCartoonerie', sans-serif",
-            color: 'var(--accent-yellow)',
-            textTransform: 'uppercase'
-          }}>
-            COMO JOGAR
-          </h3>
-          <div style={{
-            fontSize: 'clamp(1rem, 2vw, 1.1rem)',
-            fontFamily: "'LaCartoonerie', sans-serif",
-            color: 'var(--text-primary)',
-            lineHeight: 1.4
-          }}>
-            <p style={{ margin: '15px 0' }}>
-              • Clique no mapa onde você acha que está o bairro
-            </p>
-            <p style={{ margin: '15px 0' }}>
-              • Quanto mais próximo, mais pontos você ganha
-            </p>
-            <p style={{ margin: '15px 0' }}>
-              • Quanto mais rápido, mais bônus de tempo
-            </p>
-            <p style={{ margin: '15px 0' }}>
-              • Use as setas do teclado para navegar no menu
-            </p>
-            
-            {/* Controles do mapa (aparece no hover) */}
-            {showControls && (
-              <div style={{
-                position: 'fixed',
-                bottom: '80px',
-                right: '20px',
-                padding: '15px',
-                background: 'var(--bg-secondary)',
-                borderRadius: '4px',
-                border: '2px solid var(--accent-green)',
-                boxShadow: 'var(--shadow-xl)',
-                animation: 'fadeIn 0.3s ease-in',
-                zIndex: 1000,
-                minWidth: '280px'
-              }}>
-                <h4 style={{
-                  fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-                  margin: '0 0 10px 0',
-                  fontFamily: "'LaCartoonerie', sans-serif",
-                  color: 'var(--accent-green)',
-                  textTransform: 'uppercase',
-                  fontWeight: 'bold',
-                  textAlign: 'center'
-                }}>
-                  🎮 CONTROLES DO MAPA
-                </h4>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                  gap: '6px',
-                  fontSize: 'clamp(0.75rem, 1.6vw, 0.85rem)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ 
-                      color: 'var(--accent-green)', 
-                      fontWeight: 'bold',
-                      fontSize: '1.1em'
-                    }}>Z</span>
-                    <span>Zoom In</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ 
-                      color: 'var(--accent-green)', 
-                      fontWeight: 'bold',
-                      fontSize: '1.1em'
-                    }}>X</span>
-                    <span>Zoom Out</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ 
-                      color: 'var(--accent-blue)', 
-                      fontWeight: 'bold',
-                      fontSize: '1.1em'
-                    }}>↑</span>
-                    <span>Mover ↑</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ 
-                      color: 'var(--accent-blue)', 
-                      fontWeight: 'bold',
-                      fontSize: '1.1em'
-                    }}>↓</span>
-                    <span>Mover ↓</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ 
-                      color: 'var(--accent-blue)', 
-                      fontWeight: 'bold',
-                      fontSize: '1.1em'
-                    }}>←</span>
-                    <span>Mover ←</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ 
-                      color: 'var(--accent-blue)', 
-                      fontWeight: 'bold',
-                      fontSize: '1.1em'
-                    }}>→</span>
-                    <span>Mover →</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+          Desenvolvido por{' '}
+          <a
+            href="https://hericmr.github.io/me/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#4fc3d4'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+          >
+            hericmr
+          </a>
+        </p>
 
-        {/* Créditos */}
+        {/* Bottom corners */}
         <div style={{
-          textAlign: 'center',
-          fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-          fontFamily: "'LaCartoonerie', sans-serif",
-          color: '#000000',
-          marginTop: '20px'
-        }}>
-          <p style={{ 
-            margin: '4px 0',
-            textShadow: '2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff'
-          }}>
-            Desenvolvido por{' '}
-            <a 
-              href="https://hericmr.github.io/me/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{
-                color: '#000000',
-                textDecoration: 'none',
-                textShadow: '2px 2px 0px #fff, -2px -2px 0px #fff, 2px -2px 0px #fff, -2px 2px 0px #fff',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#0066CC'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#000000'; }}
-            >
-              hericmr
-            </a>
-          </p>
-        </div>
-
-        {/* Container para elementos nos cantos inferiores */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '20px',
-          right: '20px',
-          width: 'calc(100% - 40px)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
+          position: 'absolute', bottom: '20px', left: '20px', right: '20px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
           pointerEvents: 'none'
         }}>
-          {/* Ranking no canto esquerdo */}
+          {/* Ranking */}
           <div style={{ pointerEvents: 'auto' }}>
             {showRanking && (
-              <GameRanking 
-                variant="startScreen" 
-                onClose={() => setShowRanking(false)}
-              />
+              <GameRanking variant="startScreen" onClose={() => setShowRanking(false)} />
             )}
           </div>
 
-          {/* Caixa de Descrição no canto direito */}
+          {/* Description card */}
           <div style={{
             pointerEvents: 'auto',
-            width: '320px',
-            padding: '20px',
-            background: 'var(--bg-secondary)',
-            border: 'none',
-            borderRadius: '4px',
-            boxShadow: 'var(--shadow-md)',
-            fontFamily: "'LaCartoonerie', sans-serif",
-            color: 'var(--text-primary)',
-            transition: 'opacity 0.3s ease, transform 0.3s ease',
+            width: '280px',
+            padding: '16px 20px',
+            background: 'rgba(255,255,255,0.07)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+            transition: 'opacity 0.25s ease, transform 0.25s ease',
             opacity: selectedOption >= 0 ? 1 : 0,
-            transform: selectedOption >= 0 ? 'translateY(0)' : 'translateY(20px)',
-            visibility: selectedOption >= 0 ? 'visible' : 'hidden'
+            transform: selectedOption >= 0 ? 'translateY(0)' : 'translateY(12px)',
           }}>
             <h3 style={{
-              margin: '0 0 10px 0',
-              fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
-              color: 'var(--accent-yellow)',
-              textTransform: 'uppercase'
+              margin: '0 0 8px 0',
+              fontSize: '0.8rem',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 700,
+              color: selectedItem && 'color' in selectedItem ? (selectedItem as any).color : '#4fc3d4',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
             }}>
-              {selectedOption < mainMenuOptions.length 
-                ? mainMenuOptions[selectedOption].label 
-                : secondaryMenuOptions[selectedOption - mainMenuOptions.length].label}
+              {selectedItem?.label}
             </h3>
             <p style={{
               margin: 0,
-              fontSize: 'clamp(1rem, 2vw, 1.1rem)',
-              lineHeight: 1.4
+              fontSize: '0.82rem',
+              fontFamily: "'Inter', sans-serif",
+              color: 'rgba(255,255,255,0.65)',
+              lineHeight: 1.5
             }}>
-              {selectedOption < mainMenuOptions.length 
-                ? mainMenuOptions[selectedOption].description 
-                : secondaryMenuOptions[selectedOption - mainMenuOptions.length].description}
+              {selectedItem?.description}
             </p>
           </div>
         </div>
+
+        {/* Controls tooltip */}
+        {showControls && (
+          <div style={{
+            position: 'fixed', bottom: '80px', right: '20px',
+            padding: '16px 20px',
+            background: 'rgba(13,15,26,0.9)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+            animation: 'fadeIn 0.2s ease',
+            zIndex: 1000, minWidth: '260px'
+          }}>
+            <h4 style={{
+              fontSize: '0.75rem', fontWeight: 700,
+              fontFamily: "'Inter', sans-serif",
+              color: '#34d399', textTransform: 'uppercase',
+              letterSpacing: '1px', margin: '0 0 12px 0', textAlign: 'center'
+            }}>
+              Controles do Mapa
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.8rem' }}>
+              {[
+                ['Z', 'Zoom In'], ['X', 'Zoom Out'],
+                ['↑', 'Mover ↑'], ['↓', 'Mover ↓'],
+                ['←', 'Mover ←'], ['→', 'Mover →']
+              ].map(([key, label]) => (
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{
+                    background: 'rgba(255,255,255,0.1)', borderRadius: '6px',
+                    padding: '2px 8px', fontFamily: 'monospace', fontWeight: 700,
+                    color: '#4fc3d4', fontSize: '0.85rem'
+                  }}>{key}</span>
+                  <span style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Formulário de Sugestão */}
       {showSuggestionForm && (
         <PlaceSuggestionForm onClose={() => setShowSuggestionForm(false)} />
       )}
 
-      <style>
-        {`
-          @keyframes titleFloat {
-            0%, 100% {
-              transform: translateY(0) rotate(-1deg);
-            }
-            50% {
-              transform: translateY(-8px) rotate(1deg);
-            }
-          }
-          
-          @keyframes titleGlow {
-            0%, 100% {
-              filter: drop-shadow(0 0 5px var(--accent-yellow));
-            }
-            50% {
-              filter: drop-shadow(0 0 15px var(--accent-yellow)) drop-shadow(0 0 25px var(--accent-yellow));
-            }
-          }
-        `}
-      </style>
+      <style>{`
+        @keyframes titleFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </>
   );
-}; 
+};
+
+const statCardStyle = (color: string): React.CSSProperties => ({
+  background: 'rgba(255,255,255,0.07)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: `1px solid ${color}33`,
+  borderRadius: '12px',
+  padding: '10px 18px',
+  textAlign: 'center',
+  minWidth: '80px'
+});
+
+const statLabelStyle: React.CSSProperties = {
+  fontSize: '0.65rem',
+  fontFamily: "'Inter', sans-serif",
+  fontWeight: 600,
+  color: 'rgba(255,255,255,0.45)',
+  textTransform: 'uppercase',
+  letterSpacing: '1px',
+  marginBottom: '4px'
+};
+
+const statValueStyle: React.CSSProperties = {
+  fontSize: '1.4rem',
+  fontFamily: "'Inter', sans-serif",
+  fontWeight: 800,
+  lineHeight: 1
+};

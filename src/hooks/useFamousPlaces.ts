@@ -13,7 +13,6 @@ export function useFamousPlaces() {
         setIsLoading(true);
         const fetchedPlaces = await famousPlacesService.getFamousPlaces();
         setPlaces(fetchedPlaces);
-        console.log("useFamousPlaces: Places after fetch:", fetchedPlaces);
       } catch (err) {
         console.error("Failed to fetch famous places:", err);
         setError("Failed to load famous places.");

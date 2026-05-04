@@ -61,10 +61,8 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
 
   // Selecionar bairro aleatório para a rodada
   const selectRandomNeighborhood = useCallback(() => {
-    console.log('[useNeighborhoodGame] selectRandomNeighborhood chamado - Stack trace:', new Error().stack);
     
     if (gameState.availableNeighborhoods.length === 0) {
-      console.log('[useNeighborhoodGame] Nenhum bairro disponível');
       return;
     }
 
@@ -74,7 +72,6 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
 
     if (availableNeighborhoods.length === 0) {
       // Todos os bairros foram revelados, resetar
-      console.log('[useNeighborhoodGame] Todos os bairros revelados - resetando');
       setGameState(prev => ({
         ...prev,
         revealedNeighborhoods: new Set(),
@@ -86,7 +83,6 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
     const randomIndex = Math.floor(Math.random() * availableNeighborhoods.length);
     const selectedNeighborhood = availableNeighborhoods[randomIndex];
 
-    console.log('[useNeighborhoodGame] Selecionando bairro:', selectedNeighborhood);
 
     setGameState(prev => ({
       ...prev,
@@ -94,7 +90,6 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
       roundTimeLeft: defaultConfig.roundTime
     }));
 
-    console.log(`[useNeighborhoodGame] Bairro selecionado: ${selectedNeighborhood}`);
   }, [gameState.availableNeighborhoods, gameState.revealedNeighborhoods, defaultConfig.roundTime]);
 
   // Iniciar nova rodada
@@ -128,12 +123,9 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
   // Lidar com clique no mapa
   const handleMapClick = useCallback((latlng: L.LatLng) => {
     if (!gameState.isActive || !gameState.currentNeighborhood || !geoJsonData) {
-      console.log('[useNeighborhoodGame] Clique ignorado - jogo não ativo ou sem bairro selecionado');
       return;
     }
 
-    console.log(`[useNeighborhoodGame] Clique em: ${latlng.lat}, ${latlng.lng}`);
-    console.log(`[useNeighborhoodGame] Bairro alvo: ${gameState.currentNeighborhood}`);
 
     try {
       // Validar o clique
@@ -144,7 +136,6 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
         gameState.roundTimeLeft
       );
 
-      console.log('[useNeighborhoodGame] Validação:', validation);
 
       // Calcular pontuação
       const scoreCalculation = calculateNeighborhoodScore(
@@ -154,7 +145,6 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
         validation.isNearBorder
       );
 
-      console.log('[useNeighborhoodGame] Pontuação:', scoreCalculation);
 
       // Atualizar estado do jogo
       setGameState(prev => ({
@@ -183,7 +173,6 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
         }));
 
         // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
-        console.log('[useNeighborhoodGame] Acerto detectado - destacando bairro em 1s');
         
         // Primeiro, limpar feedback visual imediatamente (SEM destaque)
         setVisualFeedback(prev => ({
@@ -196,7 +185,6 @@ export const useNeighborhoodGame = (geoJsonData: any, config: Partial<any> = {})
         
         // NOVA ABORDAGEM: Delay simples de 1 segundo após o clique
         setTimeout(() => {
-          console.log('[useNeighborhoodGame] Ativando destaque do bairro após 1s do clique');
           setVisualFeedback(prev => ({
             ...prev,
             highlightNeighborhood: true // Agora ativa o destaque

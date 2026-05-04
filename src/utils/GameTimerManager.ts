@@ -91,7 +91,6 @@ export class GameTimerManager {
     // Armazenar referência
     this.timers.set(id, interval);
     
-    console.log(`[GameTimerManager] Timer ${id} iniciado`);
     return true;
   }
 
@@ -120,7 +119,6 @@ export class GameTimerManager {
     state.pauseTime = Date.now();
     state.isRunning = false;
     
-    console.log(`[GameTimerManager] Timer ${id} pausado`);
     return true;
   }
 
@@ -160,7 +158,6 @@ export class GameTimerManager {
     
     this.timers.set(id, interval);
     
-    console.log(`[GameTimerManager] Timer ${id} retomado`);
     return true;
   }
 
@@ -178,7 +175,6 @@ export class GameTimerManager {
     this.timerStates.delete(id);
     this.configs.delete(id);
     
-    console.log(`[GameTimerManager] Timer ${id} limpo`);
     return true;
   }
 
@@ -221,7 +217,6 @@ export class GameTimerManager {
    * CORREÇÃO: Limpeza completa de todos os recursos
    */
   clearAllTimers(): void {
-    console.log('[GameTimerManager] Limpando todos os timers...');
     
     for (const [id, timer] of this.timers) {
       clearInterval(timer);
@@ -231,7 +226,6 @@ export class GameTimerManager {
     this.timerStates.clear();
     this.configs.clear();
     
-    console.log('[GameTimerManager] Todos os timers limpos');
   }
 
   /**

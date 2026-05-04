@@ -111,7 +111,6 @@ export const toggleModuleVersion = (modulePath: string): void => {
     GAME_MODE_CONFIG.gameMode.useRefactored = !GAME_MODE_CONFIG.gameMode.useRefactored;
   }
   
-  console.log(`[GameModeConfig] Alternado versão para ${modulePath}:`, shouldUseRefactored(modulePath));
 };
 
 /**
@@ -132,7 +131,6 @@ export const toggleAllModules = (): void => {
     GAME_MODE_CONFIG.gameMode.useRefactored = false;
   }
   
-  console.log(`[GameModeConfig] Todas as versões alternadas para:`, GAME_MODE_CONFIG.useRefactoredModules);
 };
 
 /**
@@ -164,4 +162,3 @@ export const validateConfig = (): boolean => {
 };
 
 // Log inicial da configuração
-console.log('[GameModeConfig] Configuração carregada:', getModuleStatus()); 

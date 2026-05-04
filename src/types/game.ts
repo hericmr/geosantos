@@ -32,6 +32,8 @@ export interface GameState {
   arrowPath: [LatLng, LatLng] | null;
   lastClickTime: number;
   totalDistance: number;
+  consecutiveCorrect: number;
+  roundScore: number;
   gameMode?: GameMode; // novo campo opcional para modo de jogo
 }
 

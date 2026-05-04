@@ -51,17 +51,14 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
 
   // CORREÇÃO: Callback para notificar quando deve selecionar novo bairro
   const onShouldSelectNewNeighborhood = useCallback(() => {
-    console.log('[NeighborhoodManager] Callback onShouldSelectNewNeighborhood disparado');
     if (!isSelectingRef.current) {
       selectRandomNeighborhood();
     } else {
-      console.log('[NeighborhoodManager] Ignorando callback - já selecionando');
     }
   }, []);
 
   // CORREÇÃO: Função para ativar game over por tempo esgotado
   const triggerGameOverByTime = useCallback(() => {
-    console.log('[NeighborhoodManager] TEMPO ESGOTADO - Ativando game over');
     
     // Parar o timer da rodada
     if (roundTimerRef.current) {
@@ -89,7 +86,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
 
   // CORREÇÃO: Função para iniciar timer da rodada
   const startRoundTimer = useCallback(() => {
-    console.log('[NeighborhoodManager] Iniciando timer da rodada - tempo restante:', roundTimeLeft);
     
     // Limpar timer anterior se existir
     if (roundTimerRef.current) {
@@ -100,7 +96,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
     roundTimerRef.current = setInterval(() => {
       setRoundTimeLeft(prev => {
         const newTime = prev - 1;
-        console.log('[NeighborhoodManager] Timer rodada:', newTime, 'segundos restantes');
         
         // Atualizar estado global com tempo restante
         updateGameState({
@@ -109,7 +104,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
         
         // Verificar se tempo esgotou
         if (newTime <= 0) {
-          console.log('[NeighborhoodManager] TEMPO ESGOTADO - Parando timer');
           if (roundTimerRef.current) {
             clearInterval(roundTimerRef.current);
             roundTimerRef.current = null;
@@ -126,7 +120,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
   // CORREÇÃO: Função para parar timer da rodada
   const stopRoundTimer = useCallback(() => {
     if (roundTimerRef.current) {
-      console.log('[NeighborhoodManager] Parando timer da rodada');
       clearInterval(roundTimerRef.current);
       roundTimerRef.current = null;
     }
@@ -142,14 +135,12 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
       
       setAvailableNeighborhoods(neighborhoods);
       setTotalRounds(Math.min(neighborhoods.length, 4)); // Máximo 4 rodadas (conforme alteração do usuário)
-      console.log('[NeighborhoodManager] Bairros disponíveis:', neighborhoods);
     }
   }, [geoJsonData]);
 
   // CORREÇÃO: Implementar lógica de fim de jogo
   const checkGameOver = useCallback(() => {
     if (roundNumber >= totalRounds) {
-      console.log('[NeighborhoodManager] JOGO TERMINOU - Todas as rodadas completas');
       
       // Parar timer da rodada
       stopRoundTimer();
@@ -177,17 +168,14 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
 
   // Selecionar bairro aleatório
   const selectRandomNeighborhood = () => {
-    console.log('[NeighborhoodManager] selectRandomNeighborhood chamado - Stack trace:', new Error().stack);
     
     // CORREÇÃO: Proteção contra múltiplas execuções simultâneas
     const now = Date.now();
     if (isSelectingRef.current) {
-      console.log('[NeighborhoodManager] selectRandomNeighborhood ignorado - já selecionando');
       return;
     }
     
     if (now - lastSelectionTimeRef.current < 100) {
-      console.log('[NeighborhoodManager] selectRandomNeighborhood ignorado - muito rápido (debounce)');
       return;
     }
     
@@ -197,7 +185,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
     
     try {
       if (availableNeighborhoods.length === 0) {
-        console.log('[NeighborhoodManager] Nenhum bairro disponível');
         return;
       }
       
@@ -208,7 +195,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
       
       // Se todos os bairros foram revelados, resetar
       if (unrevealedNeighborhoods.length === 0) {
-        console.log('[NeighborhoodManager] Todos os bairros revelados - resetando');
         setRevealedNeighborhoods(new Set());
         setRoundNumber(1);
         setRoundTimeLeft(30); // Resetar tempo da rodada
@@ -222,7 +208,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
           gameOver: false,
           roundTimeLeft: 30
         });
-        console.log('[NeighborhoodManager] Novo bairro selecionado (reset):', randomNeighborhood);
         return;
       }
       
@@ -231,7 +216,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
         Math.floor(Math.random() * unrevealedNeighborhoods.length)
       ];
       
-      console.log('[NeighborhoodManager] Selecionando bairro:', randomNeighborhood);
       setCurrentNeighborhood(randomNeighborhood);
       setRoundTimeLeft(30); // Resetar tempo da rodada
       updateGameState({ 
@@ -240,7 +224,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
         gameOver: false,
         roundTimeLeft: 30
       });
-      console.log('[NeighborhoodManager] Novo bairro selecionado:', randomNeighborhood);
     } finally {
       // Sempre liberar o flag
       setTimeout(() => {
@@ -251,7 +234,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
 
   // CORREÇÃO: Função para avançar para próxima rodada
   const startNewRound = useCallback(() => {
-    console.log('[NeighborhoodManager] startNewRound chamado - rodada atual:', roundNumber);
     
     // Verificar se o jogo terminou
     if (checkGameOver()) {
@@ -266,7 +248,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
     setRoundNumber(newRoundNumber);
     setRoundTimeLeft(30); // Resetar tempo para nova rodada
     
-    console.log('[NeighborhoodManager] Avançando para rodada:', newRoundNumber);
     
     // Selecionar novo bairro para a próxima rodada
     selectRandomNeighborhood();
@@ -281,7 +262,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
 
   // CORREÇÃO: Função para marcar bairro como encontrado
   const markNeighborhoodAsFound = useCallback((neighborhoodName: string, points: number) => {
-    console.log('[NeighborhoodManager] Marcando bairro como encontrado:', neighborhoodName, 'pontos:', points);
     
     // Parar timer da rodada atual
     stopRoundTimer();
@@ -305,32 +285,14 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
 
   // Inicializar primeiro bairro quando o jogo começar
   useEffect(() => {
-    console.log('[NeighborhoodManager] useEffect disparado:', {
-      availableNeighborhoodsLength: availableNeighborhoods.length,
-      currentNeighborhood,
-      isSelecting: isSelectingRef.current
-    });
-    
     if (availableNeighborhoods.length > 0 && !currentNeighborhood && !isSelectingRef.current) {
-      console.log('[NeighborhoodManager] Inicializando primeiro bairro');
       selectRandomNeighborhood();
-    } else {
-      console.log('[NeighborhoodManager] useEffect ignorado:', {
-        reason: availableNeighborhoods.length === 0 ? 'sem bairros disponíveis' : 
-                currentNeighborhood ? 'bairro já selecionado' : 
-                'já selecionando'
-      });
     }
   }, [availableNeighborhoods, currentNeighborhood]);
 
   // NOVA FUNCIONALIDADE: Sincronizar com bairro externo quando mudar
   useEffect(() => {
     if (externalCurrentNeighborhood && externalCurrentNeighborhood !== currentNeighborhood) {
-      console.log('[NeighborhoodManager] Bairro externo alterado:', {
-        anterior: currentNeighborhood,
-        novo: externalCurrentNeighborhood
-      });
-      
       // Sincronizar estado interno
       setCurrentNeighborhood(externalCurrentNeighborhood);
       
@@ -344,14 +306,12 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
         currentNeighborhood: externalCurrentNeighborhood
       });
       
-      console.log('[NeighborhoodManager] Bairro sincronizado com estado externo');
     }
   }, [externalCurrentNeighborhood, currentNeighborhood, onNeighborhoodChanged, updateGameState]);
 
   // CORREÇÃO: Iniciar timer quando bairro for selecionado
   useEffect(() => {
     if (currentNeighborhood && isGameActive && roundTimeLeft > 0) {
-      console.log('[NeighborhoodManager] Iniciando timer para bairro:', currentNeighborhood);
       startRoundTimer();
     }
   }, [currentNeighborhood, isGameActive, roundTimeLeft, startRoundTimer]);
@@ -388,7 +348,6 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
 
   React.useImperativeHandle(neighborhoodManagerRef, () => ({
     startGame: () => {
-      console.log('[NeighborhoodManager] Jogo iniciado');
       setIsGameActive(true);
       setRoundNumber(1);
       setScore(0);
@@ -397,25 +356,21 @@ export const NeighborhoodManager: React.FC<NeighborhoodManagerRefactoredProps> =
       selectRandomNeighborhood();
     },
     pauseGame: () => {
-      console.log('[NeighborhoodManager] Jogo pausado');
       setIsGameActive(false);
       stopRoundTimer();
     },
     resumeGame: () => {
-      console.log('[NeighborhoodManager] Jogo retomado');
       setIsGameActive(true);
       if (currentNeighborhood && roundTimeLeft > 0) {
         startRoundTimer();
       }
     },
     endGame: () => {
-      console.log('[NeighborhoodManager] Jogo terminado');
       setIsGameActive(false);
       stopRoundTimer();
       updateGameState({ gameOver: true });
     },
     startNewRound: () => {
-      console.log('[NeighborhoodManager] Nova rodada iniciada');
       startNewRound();
     },
     selectRandomNeighborhood: () => {

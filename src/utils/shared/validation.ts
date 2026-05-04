@@ -19,7 +19,6 @@ import { calculateDistance, calculateDirection, getDirectionText } from './geome
 export const gameLogger = {
   info: (message: string, data?: any) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[GAME-VALIDATION] ${message}`, data);
     }
   },
   error: (message: string, error?: any) => {
@@ -29,12 +28,10 @@ export const gameLogger = {
   },
   performance: (operation: string, duration: number) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[GAME-VALIDATION] ${operation}: ${duration}ms`);
     }
   },
   validation: (operation: string, result: any) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[GAME-VALIDATION] ${operation}:`, result);
     }
   }
 };

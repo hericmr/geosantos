@@ -86,7 +86,6 @@ export const useFamousPlacesGame = (
       placesFound: new Set<string>()
     }));
 
-    console.log(`[useFamousPlacesGame] Nova rodada gerada com ${roundPlaces.length} lugares`);
   }, [famousPlaces, defaultConfig.maxPlacesPerRound]);
 
   // Selecionar lugar da rodada atual
@@ -94,7 +93,6 @@ export const useFamousPlacesGame = (
     if (currentRound.places.length === 0) return null;
     
     const place = currentRound.places[currentRound.currentIndex];
-    console.log(`[useFamousPlacesGame] Lugar selecionado: ${place.name}`);
     return place;
   }, [currentRound.places, currentRound.currentIndex]);
 
@@ -129,18 +127,14 @@ export const useFamousPlacesGame = (
   // Lidar com clique no mapa
   const handleMapClick = useCallback((latlng: L.LatLng) => {
     if (!gameState.isActive || !currentRound.places.length) {
-      console.log('[useFamousPlacesGame] Clique ignorado - jogo não ativo ou sem lugares selecionados');
       return;
     }
 
     const currentPlace = selectPlaceFromRound();
     if (!currentPlace) {
-      console.log('[useFamousPlacesGame] Nenhum lugar selecionado para esta rodada');
       return;
     }
 
-    console.log(`[useFamousPlacesGame] Clique em: ${latlng.lat}, ${latlng.lng}`);
-    console.log(`[useFamousPlacesGame] Lugar alvo: ${currentPlace.name}`);
 
     try {
       // Validar o clique
@@ -151,7 +145,6 @@ export const useFamousPlacesGame = (
         defaultConfig.distanceThreshold
       );
 
-      console.log('[useFamousPlacesGame] Validação:', validation);
 
       // Calcular pontuação
       const scoreCalculation = calculateFamousPlacesScore(
@@ -161,7 +154,6 @@ export const useFamousPlacesGame = (
         0 // consecutiveCorrect não existe no estado atual
       );
 
-      console.log('[useFamousPlacesGame] Pontuação:', scoreCalculation);
 
       // Atualizar estado do jogo
       setGameState(prev => ({

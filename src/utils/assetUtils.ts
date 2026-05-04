@@ -13,7 +13,6 @@ export const getAssetUrl = (path: string): string => {
   // Remove barra inicial se existir para evitar duplicação
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   const finalUrl = `${baseUrl}${cleanPath}`;
-  console.log('🌐 getAssetUrl:', { path, baseUrl, cleanPath, finalUrl });
   return finalUrl;
 };
 
@@ -24,7 +23,6 @@ export const getAssetUrl = (path: string): string => {
  */
 export const getImageUrl = (filename: string): string => {
   const url = getAssetUrl(`assets/images/${filename}`);
-  console.log('🔗 getImageUrl (utils):', { filename, url });
   return url;
 };
 
@@ -62,7 +60,6 @@ export const getFontUrl = (filename: string): string => {
  */
 export const getSpriteUrl = (filename: string): string => {
   const url = getAssetUrl(`assets/markerclick/${filename}`);
-  console.log('🎭 getSpriteUrl:', { filename, url, fullPath: `assets/markerclick/${filename}` });
   return url;
 };
 
@@ -73,6 +70,5 @@ export const getSpriteUrl = (filename: string): string => {
  */
 export const getBandeiraCorretaSpriteUrl = (filename: string): string => {
   const url = getAssetUrl(`assets/marker_bandeira_lugar_correto/${filename}`);
-  console.log('🏁 getBandeiraCorretaSpriteUrl:', { filename, url, fullPath: `assets/marker_bandeira_lugar_correto/${filename}` });
   return url;
 }; 

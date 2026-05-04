@@ -13,7 +13,6 @@ export class GameEventSystem implements IGameEventSystem {
   private maxHistorySize: number = 100;
 
   constructor() {
-    console.log('[GameEventSystem] Sistema de eventos inicializado');
   }
 
   /**
@@ -41,13 +40,6 @@ export class GameEventSystem implements IGameEventSystem {
         });
       }
 
-      // Log do evento
-      console.log(`[GameEventSystem] Evento emitido:`, {
-        type: event.type,
-        mode: event.mode,
-        timestamp: new Date(event.timestamp).toISOString(),
-        data: event.data
-      });
     } catch (error) {
       console.error('[GameEventSystem] Erro ao emitir evento:', error);
     }
@@ -65,7 +57,6 @@ export class GameEventSystem implements IGameEventSystem {
       const eventListeners = this.listeners.get(eventType)!;
       eventListeners.add(callback);
 
-      console.log(`[GameEventSystem] Listener adicionado para evento ${eventType}`);
     } catch (error) {
       console.error(`[GameEventSystem] Erro ao adicionar listener para ${eventType}:`, error);
     }
@@ -85,7 +76,6 @@ export class GameEventSystem implements IGameEventSystem {
           this.listeners.delete(eventType);
         }
 
-        console.log(`[GameEventSystem] Listener removido para evento ${eventType}`);
       }
     } catch (error) {
       console.error(`[GameEventSystem] Erro ao remover listener para ${eventType}:`, error);
@@ -99,7 +89,6 @@ export class GameEventSystem implements IGameEventSystem {
     try {
       this.listeners.clear();
       this.eventHistory = [];
-      console.log('[GameEventSystem] Todos os listeners e histórico limpos');
     } catch (error) {
       console.error('[GameEventSystem] Erro ao limpar sistema:', error);
     }
@@ -264,7 +253,6 @@ export class GameEventSystem implements IGameEventSystem {
   destroy(): void {
     try {
       this.clear();
-      console.log('[GameEventSystem] Sistema destruído');
     } catch (error) {
       console.error('[GameEventSystem] Erro ao destruir sistema:', error);
     }
@@ -275,4 +263,3 @@ export class GameEventSystem implements IGameEventSystem {
 export const gameEventSystem = new GameEventSystem();
 
 // Log inicial
-console.log('[GameEventSystem] Instância singleton criada'); 

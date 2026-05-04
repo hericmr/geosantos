@@ -29,61 +29,6 @@ export const throttle = <T extends (...args: any[]) => any>(
   };
 };
 
-// Gerenciador de timers para evitar vazamentos de memória
-export class TimerManager {
-  private timers: Map<string, NodeJS.Timeout> = new Map();
-  private intervals: Map<string, NodeJS.Timeout> = new Map();
-
-  setTimeout(id: string, callback: () => void, delay: number): void {
-    this.clearTimeout(id);
-    const timer = setTimeout(() => {
-      callback();
-      this.timers.delete(id);
-    }, delay);
-    this.timers.set(id, timer);
-  }
-
-  setInterval(id: string, callback: () => void, delay: number): void {
-    this.clearInterval(id);
-    const interval = setInterval(callback, delay);
-    this.intervals.set(id, interval);
-  }
-
-  clearTimeout(id: string): void {
-    const timer = this.timers.get(id);
-    if (timer) {
-      clearTimeout(timer);
-      this.timers.delete(id);
-    }
-  }
-
-  clearInterval(id: string): void {
-    const interval = this.intervals.get(id);
-    if (interval) {
-      clearInterval(interval);
-      this.intervals.delete(id);
-    }
-  }
-
-  clearAll(): void {
-    this.timers.forEach(timer => clearTimeout(timer));
-    this.intervals.forEach(interval => clearInterval(interval));
-    this.timers.clear();
-    this.intervals.clear();
-  }
-
-  getActiveTimers(): string[] {
-    return Array.from(this.timers.keys());
-  }
-
-  getActiveIntervals(): string[] {
-    return Array.from(this.intervals.keys());
-  }
-}
-
-// Singleton para gerenciar timers globalmente
-export const globalTimerManager = new TimerManager();
-
 // Função para agendar tarefas em momentos de baixa atividade
 export const scheduleIdleTask = (task: () => void): void => {
   if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
@@ -105,7 +50,6 @@ export const measurePerformance = <T extends (...args: any[]) => any>(
     const end = performance.now();
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Performance] ${name}: ${(end - start).toFixed(2)}ms`);
     }
     
     return result;

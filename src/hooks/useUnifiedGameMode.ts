@@ -27,7 +27,6 @@ export const useUnifiedGameMode = () => {
         setIsLoading(true);
         setError(null);
 
-        console.log('[useUnifiedGameMode] Inicializando gerenciador...');
         
         await managerRef.current.initialize();
         
@@ -38,7 +37,6 @@ export const useUnifiedGameMode = () => {
         updateGameStats();
         
         setIsLoading(false);
-        console.log('[useUnifiedGameMode] Gerenciador inicializado com sucesso');
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
         setError(errorMessage);
@@ -51,7 +49,6 @@ export const useUnifiedGameMode = () => {
 
     // Cleanup na desmontagem
     return () => {
-      console.log('[useUnifiedGameMode] Cleanup do hook');
       // Não destruir o gerenciador aqui, pois é singleton
     };
   }, []);
@@ -62,39 +59,32 @@ export const useUnifiedGameMode = () => {
 
     // Listener para mudanças de estado do jogo
     eventSystem.on('gameStart', (event) => {
-      console.log('[useUnifiedGameMode] Jogo iniciado:', event);
       setIsGameActive(true);
       updateGameStats();
     });
 
     eventSystem.on('gameEnd', (event) => {
-      console.log('[useUnifiedGameMode] Jogo finalizado:', event);
       setIsGameActive(false);
       updateGameStats();
     });
 
     eventSystem.on('gamePause', (event) => {
-      console.log('[useUnifiedGameMode] Jogo pausado:', event);
       setIsGameActive(false);
     });
 
     eventSystem.on('gameResume', (event) => {
-      console.log('[useUnifiedGameMode] Jogo retomado:', event);
       setIsGameActive(true);
     });
 
     eventSystem.on('roundComplete', (event) => {
-      console.log('[useUnifiedGameMode] Rodada completada:', event);
       updateGameStats();
     });
 
     eventSystem.on('scoreUpdate', (event) => {
-      console.log('[useUnifiedGameMode] Pontuação atualizada:', event);
       updateGameStats();
     });
 
     eventSystem.on('feedback', (event) => {
-      console.log('[useUnifiedGameMode] Feedback recebido:', event);
     });
   }, []);
 
@@ -119,14 +109,12 @@ export const useUnifiedGameMode = () => {
       setIsLoading(true);
       setError(null);
 
-      console.log(`[useUnifiedGameMode] Trocando para modo ${mode}`);
       
       await managerRef.current.switchMode(mode);
       
       // Atualizar estatísticas após a troca
       updateGameStats();
       
-      console.log(`[useUnifiedGameMode] Modo alterado para ${mode}`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
@@ -139,7 +127,6 @@ export const useUnifiedGameMode = () => {
   // Executar ação no modo ativo
   const executeAction = useCallback(async (action: string, data: any = {}) => {
     try {
-      console.log(`[useUnifiedGameMode] Executando ação ${action}`);
       
       const result = await managerRef.current.executeAction(action, data);
       
@@ -197,7 +184,6 @@ export const useUnifiedGameMode = () => {
   // Limpar recursos
   const cleanup = useCallback(() => {
     try {
-      console.log('[useUnifiedGameMode] Limpando recursos...');
       managerRef.current.cleanup();
     } catch (error) {
       console.error('[useUnifiedGameMode] Erro na limpeza:', error);

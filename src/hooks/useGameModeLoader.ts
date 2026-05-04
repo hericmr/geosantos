@@ -34,7 +34,6 @@ export const useGameModeLoader = () => {
       // Atualizar status
       updateModuleStatus();
       
-      console.log('[useGameModeLoader] Todas as versões alternadas');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
       console.error('[useGameModeLoader] Erro ao alternar versões:', err);
@@ -58,7 +57,6 @@ export const useGameModeLoader = () => {
       // Atualizar status
       updateModuleStatus();
       
-      console.log(`[useGameModeLoader] Versão alternada para ${modulePath}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
       console.error('[useGameModeLoader] Erro ao alternar módulo:', err);
@@ -73,24 +71,18 @@ export const useGameModeLoader = () => {
       setIsLoading(true);
       setError(null);
       
-      console.log(`[useGameModeLoader] Testando carregamento do modo ${mode}`);
       
       // Testar criação do modo
       const gameMode = await GameModeFactory.createMode(mode);
-      console.log(`[useGameModeLoader] Modo ${mode} criado:`, gameMode.mode);
       
       // Testar criação do hook
       const gameHook = await GameModeFactory.createHook(mode);
-      console.log(`[useGameModeLoader] Hook ${mode} criado`);
       
       // Testar carregamento de utilitários
       const validationUtils = await GameModeFactory.loadValidationUtils(mode);
-      console.log(`[useGameModeLoader] Utilitários de validação ${mode} carregados`);
       
       const scoringUtils = await GameModeFactory.loadScoringUtils(mode);
-      console.log(`[useGameModeLoader] Utilitários de pontuação ${mode} carregados`);
       
-      console.log(`[useGameModeLoader] Teste do modo ${mode} concluído com sucesso`);
       
       return {
         mode: gameMode,
@@ -114,10 +106,8 @@ export const useGameModeLoader = () => {
       setIsLoading(true);
       setError(null);
       
-      console.log('[useGameModeLoader] Testando carregamento do hook principal');
       
       const gameModeHook = await GameModeFactory.createGameModeHook();
-      console.log('[useGameModeLoader] Hook principal criado com sucesso');
       
       return gameModeHook;
     } catch (err) {
@@ -134,11 +124,9 @@ export const useGameModeLoader = () => {
   const clearCache = useCallback(() => {
     try {
       GameModeFactory.clearCache();
-      console.log('[useGameModeLoader] Cache limpo');
       
       // Obter status do cache
       const cacheStatus = GameModeFactory.getCacheStatus();
-      console.log('[useGameModeLoader] Status do cache:', cacheStatus);
     } catch (err) {
       console.error('[useGameModeLoader] Erro ao limpar cache:', err);
     }

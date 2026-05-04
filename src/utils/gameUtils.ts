@@ -1,5 +1,5 @@
 import { LatLng } from 'leaflet';
-import { ROUND_TIME, MAX_DISTANCE_METERS } from './gameConstants';
+import { ROUND_TIME, MAX_DISTANCE_METERS } from './gameConstants'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { ScoreCalculation } from '../types/game';
 
 // Earth's radius in meters
@@ -48,27 +48,19 @@ export const calculateDistance = (point1: LatLng, point2: LatLng): number => {
 };
 
 export const calculateScore = (distance: number, timeLeft: number, gameMode: 'neighborhoods' | 'famous_places' = 'neighborhoods'): ScoreCalculation => {
-  if (gameMode === 'famous_places') {
-    // Pontuação baseada na distância (máx 2000 pontos para 0m, 0 pontos para >=3km)
-    const distanceKm = distance / 1000;
-    const distanceScore = Math.max(0, 2000 * (1 - (distanceKm / 3)));
-    // Bônus de tempo: até 1000 pontos se tempo < 5s
-    const timeBonus = timeLeft <= 5 ? Math.round((timeLeft / 5) * 1000) : 0;
-    return {
-      total: Math.round(distanceScore + timeBonus),
-      distancePoints: Math.round(distanceScore),
-      timePoints: timeBonus
-    };
-  }
-  // Modo bairros (lógica original)
   const distanceKm = distance / 1000;
-  const distanceScore = Math.max(0, 1000 * (1 - (distanceKm / 10)));
-  const timeBonus = timeLeft <= 2 ? Math.round((timeLeft / 2) * 500) : 0;
-  return {
-    total: Math.round(distanceScore + timeBonus),
-    distancePoints: Math.round(distanceScore),
-    timePoints: timeBonus
-  };
+
+  if (gameMode === 'famous_places') {
+    // Pontuação linear: máx 800 pela distância (até 3km), + até 200 pelo tempo
+    const distancePoints = Math.round(Math.max(0, 800 * (1 - distanceKm / 3)));
+    const timePoints = Math.round((timeLeft / ROUND_TIME) * 200);
+    return { total: distancePoints + timePoints, distancePoints, timePoints };
+  }
+
+  // Modo bairros — clique errado: máx 800 pela distância (até 10km), + até 200 pelo tempo
+  const distancePoints = Math.round(Math.max(0, 800 * (1 - distanceKm / 10)));
+  const timePoints = Math.round((timeLeft / ROUND_TIME) * 200);
+  return { total: distancePoints + timePoints, distancePoints, timePoints };
 };
 
 export const getNeighborhoodStyle = (feature: any, revealedNeighborhoods: Set<string>, currentNeighborhood: string) => {

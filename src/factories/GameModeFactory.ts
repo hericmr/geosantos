@@ -56,9 +56,7 @@ export class GameModeFactory {
       // Se deve usar versão refatorada, ajustar caminho
       if (shouldUseRefactored(originalPath)) {
         modulePath = getModulePath(originalPath);
-        console.log(`[GameModeFactory] Carregando versão refatorada: ${modulePath}`);
       } else {
-        console.log(`[GameModeFactory] Carregando versão original: ${modulePath}`);
       }
 
       // Importar módulo dinamicamente
@@ -73,7 +71,6 @@ export class GameModeFactory {
       
       // Fallback para versão original se versão refatorada falhar
       if (shouldUseRefactored(originalPath)) {
-        console.log(`[GameModeFactory] Fallback para versão original: ${originalPath}`);
         try {
           const fallbackModule = await import(originalPath);
           this.moduleCache.set(cacheKey, fallbackModule);
@@ -111,7 +108,6 @@ export class GameModeFactory {
         throw new Error(`Componente ${componentName} não encontrado no módulo`);
       }
 
-      console.log(`[GameModeFactory] Modo ${mode} criado com sucesso`);
       return new ModeComponent(config);
     } catch (error) {
       console.error(`[GameModeFactory] Erro ao criar modo ${mode}:`, error);
@@ -142,7 +138,6 @@ export class GameModeFactory {
         throw new Error(`Hook ${hookName} não encontrado no módulo`);
       }
 
-      console.log(`[GameModeFactory] Hook ${mode} criado com sucesso`);
       return HookFunction(config);
     } catch (error) {
       console.error(`[GameModeFactory] Erro ao criar hook ${mode}:`, error);
@@ -165,7 +160,6 @@ export class GameModeFactory {
         throw new Error(`Hook ${hookName} não encontrado no módulo`);
       }
 
-      console.log(`[GameModeFactory] Hook principal criado com sucesso`);
       return HookFunction(config);
     } catch (error) {
       console.error(`[GameModeFactory] Erro ao criar hook principal:`, error);
@@ -187,7 +181,6 @@ export class GameModeFactory {
       }
 
       const module = await this.loadModule(modulePath);
-      console.log(`[GameModeFactory] Utilitários de validação ${mode} carregados`);
       return module;
     } catch (error) {
       console.error(`[GameModeFactory] Erro ao carregar utilitários de validação ${mode}:`, error);
@@ -209,7 +202,6 @@ export class GameModeFactory {
       }
 
       const module = await this.loadModule(modulePath);
-      console.log(`[GameModeFactory] Utilitários de pontuação ${mode} carregados`);
       return module;
     } catch (error) {
       console.error(`[GameModeFactory] Erro ao carregar utilitários de pontuação ${mode}:`, error);
@@ -222,7 +214,6 @@ export class GameModeFactory {
    */
   static clearCache(): void {
     this.moduleCache.clear();
-    console.log('[GameModeFactory] Cache limpo');
   }
 
   /**
@@ -240,4 +231,3 @@ export class GameModeFactory {
 export const gameModeFactory = new GameModeFactory();
 
 // Log inicial
-console.log('[GameModeFactory] Factory inicializado'); 

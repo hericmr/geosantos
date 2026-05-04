@@ -1,8 +1,19 @@
 export const INITIAL_TIME = 15; // Tempo total inicial do jogo
-export const ROUND_TIME = 15; // 15 seconds per round (mais fácil)
-export const PHASE_TWO_TIME = 8; // 8 seconds per round in phase 2 (mais fácil)
+export const ROUND_TIME = 15; // 15 seconds per round
+export const PHASE_TWO_TIME = 8; // 8 seconds per round in phase 2
 export const TIME_BONUS = 1.5; // Time bonus for correct neighborhood
 export const MAX_DISTANCE_METERS = 2000; // Maximum distance considered for scoring
+
+// Scoring constants
+export const SCORE_CORRECT_BASE = 1000;       // Pontos mínimos por acertar o bairro
+export const SCORE_CORRECT_TIME_BONUS = 2000; // Bônus máximo de tempo (acerto)
+export const SCORE_NEAR_BORDER_BASE = 600;    // Pontos mínimos por clique na borda
+export const SCORE_NEAR_BORDER_TIME_BONUS = 1400; // Bônus máximo de tempo (borda)
+export const SCORE_FAMOUS_PLACE_BASE = 1000;  // Pontos mínimos por acertar lugar famoso
+export const SCORE_FAMOUS_PLACE_TIME_BONUS = 2000; // Bônus máximo de tempo (lugar famoso)
+export const FAMOUS_PLACE_HIT_RADIUS_KM = 0.3; // Raio de acerto: 300m
+export const STREAK_MULTIPLIER_PER_LEVEL = 0.1; // +10% por acerto consecutivo
+export const MAX_STREAK_LEVELS = 5;             // Máximo de 5 níveis (+50%)
 
 // Constantes para o sistema de bônus de tempo
 export const TIME_BONUS_THRESHOLDS = {
@@ -27,22 +38,11 @@ export const TIME_BONUS_AMOUNTS = {
 
 // Função para calcular o bônus de tempo baseado na pontuação
 export const calculateTimeBonus = (score: number, gameMode: 'neighborhoods' | 'famous_places' = 'neighborhoods'): number => {
-  // Pontuação máxima possível é 3000 (clique direto no bairro)
-  const maxScore = 3000;
-  
-  // Bônus máximo diferente para cada modo
-  const maxBonus = gameMode === 'famous_places' ? 6.0 : 4.0; // 6 segundos para lugares famosos, 4 para bairros
-  
-  // Calcula o bônus proporcional à pontuação
-  // Quanto maior a pontuação, maior o bônus
-  // Pontuação mínima para receber bônus é 500
-  if (score < 500) return 0;
-  
-  // Normaliza a pontuação entre 0 e 1, considerando 500 como mínimo
-  const normalizedScore = (score - 500) / (maxScore - 500);
-  
-  // Calcula o bônus proporcional
-  return Math.min(maxBonus, normalizedScore * maxBonus);
+  if (score <= 0) return 0;
+
+  const maxBonus = gameMode === 'famous_places' ? 5.0 : 4.0;
+  const normalized = Math.min(score, 3000) / 3000;
+  return parseFloat((normalized * maxBonus).toFixed(1));
 };
 
 export const getProgressBarColor = (timeLeft: number, roundInitialTime: number): string => {

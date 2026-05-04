@@ -1,23 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActionButtons } from './ActionButtons';
 import { styles } from './FeedbackPanel.styles';
 import { GameMode } from '../../types/famousPlaces';
-import { ContextualTip } from './ContextualTip';
-import { GameIcon } from './GameIcons'; // CORREÇÃO: Adicionar import do GameIcon
-import { 
-  AchievementHeader, 
-  PlaceDescription, 
-  StatsDisplay 
-} from './feedback';
-import { 
-  getAchievementData, 
-  calculateTimeBonus, 
-  calculateOptimalPosition, 
-  animateTime, 
-  shouldShowStreakAnimation,
-  generateFeedbackMessage,
-  type AchievementData
-} from '../../utils/feedbackUtils';
+import { PlaceDescription } from './feedback/PlaceDescription';
 import { LatLng } from 'leaflet';
 
 export interface FeedbackPanelProps {
@@ -35,19 +20,14 @@ export interface FeedbackPanelProps {
   onPauseGame: () => void;
   onResumeGame?: () => void;
   score: number;
+  roundScore?: number;
   currentNeighborhood: string;
   currentMode?: GameMode;
   currentFamousPlace?: { name: string; description?: string };
-  totalScore?: number;
-  roundNumber?: number;
-  consecutiveCorrect?: number;
-  bestStreak?: number;
   isPaused?: boolean;
+  timeBonus?: number;
+  consecutiveCorrect?: number;
 }
-
-
-
-
 
 export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   showFeedback,
@@ -57,240 +37,164 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   feedbackProgress,
   onNextRound,
   calculateDistance,
-  calculateScore,
-  getProgressBarColor,
   geoJsonData,
   gameOver,
   onPauseGame,
   onResumeGame,
-  score,
+  roundScore = 0,
   currentNeighborhood,
   currentMode = 'neighborhoods',
   currentFamousPlace,
-  totalScore = 0,
-  roundNumber = 1,
-  consecutiveCorrect = 0,
-  bestStreak = 0,
   isPaused,
+  timeBonus = 0,
+  consecutiveCorrect = 0,
 }) => {
-  const [displayedDistance, setDisplayedDistance] = useState(0);
-  const [displayedTime, setDisplayedTime] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [distance, setDistance] = useState(0);
   const [popupPosition, setPopupPosition] = useState({ top: '50%', left: '50%' });
-  const [timeBonus, setTimeBonus] = useState(0);
-  const [showStreakAnimation, setShowStreakAnimation] = useState(false);
   const isMobile = window.innerWidth <= 768;
 
   useEffect(() => {
     if (showFeedback && clickedPosition) {
-      const distance = arrowPath ? calculateDistance(clickedPosition, arrowPath[1]) : 0;
-      const score = calculateScore(distance, clickTime);
-      
-      setIsAnimating(true);
-      setDisplayedDistance(distance);
-      setDisplayedTime(0);
-      setFeedbackMessage(generateFeedbackMessage(distance, clickTime, consecutiveCorrect));
-
-      // Mostrar animação de streak se aplicável
-      if (shouldShowStreakAnimation(distance, consecutiveCorrect)) {
-        setShowStreakAnimation(true);
-        setTimeout(() => setShowStreakAnimation(false), 3000);
-      }
-
-      const bonus = calculateTimeBonus(score.total);
-      setTimeBonus(bonus);
-
-      // Usar requestAnimationFrame para animação mais fluida
-      const cancelAnimation = animateTime(
-        0,
-        clickTime,
-        2000,
-        (time) => setDisplayedTime(time),
-        () => setIsAnimating(false)
-      );
-
-      return () => cancelAnimation();
+      const d = arrowPath ? calculateDistance(clickedPosition, arrowPath[1]) : 0;
+      setDistance(d);
     }
-  }, [showFeedback, clickedPosition, arrowPath, clickTime, calculateScore, calculateDistance, consecutiveCorrect]);
-
-
+  }, [showFeedback, clickedPosition, arrowPath, calculateDistance]);
 
   useEffect(() => {
-    if (clickedPosition) {
-      const optimalPosition = calculateOptimalPosition(clickedPosition, arrowPath, isMobile);
-      setPopupPosition(optimalPosition);
-    }
-  }, [clickedPosition, arrowPath, isMobile]);
+    if (!clickedPosition) return;
+    if (isMobile) return;
+    // Simple position: prefer bottom-left of click
+    setPopupPosition({ top: '50%', left: '20px' });
+  }, [clickedPosition, isMobile]);
 
+  if (gameOver || !showFeedback || !clickedPosition) return null;
 
+  const isCorrect = distance === 0;
+  const distanceKm = (distance / 1000).toFixed(1);
+  const targetName = currentMode === 'famous_places'
+    ? currentFamousPlace?.name ?? ''
+    : currentNeighborhood;
 
-  const isCorrectNeighborhood = displayedDistance === 0;
-  const achievementData = getAchievementData(displayedDistance, clickTime, consecutiveCorrect);
-
-  // Não renderizar o FeedbackPanel quando gameOver é true
-  if (gameOver) {
-    return null;
-  }
+  const resultColor = isCorrect ? '#32CD32' : distance < 500 ? '#ffd700' : '#ff6b6b';
+  const resultText = isCorrect
+    ? `✓ ${targetName}!`
+    : `${distanceKm}km de ${targetName}`;
 
   return (
-    <div 
+    <div
       className="feedback-panel-container"
       style={{
         ...styles.container(false, isMobile, popupPosition),
         zIndex: 10020,
-        maxWidth: isMobile ? '95%' : '360px', // smaller width
-        padding: '12px',
-        borderRadius: '8px'
+        // Posicionar acima da barra de tempo (clamp(110px, 22vw, 130px))
+        bottom: isMobile ? 'clamp(118px, 24vw, 140px)' : 'auto',
+        top: isMobile ? 'auto' : '50%',
+        left: isMobile ? '50%' : '24px',
+        transform: isMobile ? 'translateX(-50%)' : 'translateY(-50%)',
+        width: isMobile ? 'calc(100% - 24px)' : '400px',
+        maxWidth: isMobile ? '480px' : '400px',
+        padding: '20px',
+        borderRadius: '12px',
       }}
     >
-      {clickedPosition && (
-        <div style={styles.contentContainer}>
-          {/* Subtitle (no green outline) */}
-          <div
-            style={{
-              textAlign: 'center',
-              marginBottom: '10px',
-              padding: '8px',
-              background: 'transparent',
-              borderRadius: '6px'
-            }}
-          >
-            <div
-              style={{
-                fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-                fontFamily: "'LaCartoonerie', sans-serif",
-                color: '#32CD32',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '1px'
-              }}
-            >
-              {achievementData?.subtitle || "Mandou bem demais! E foi super rápido também!"}
-            </div>
-          </div>
+      {/* Result */}
+      <div style={{
+        fontSize: isMobile ? '1.5rem' : '1.3rem',
+        fontFamily: "'LaCartoonerie', sans-serif",
+        color: resultColor,
+        fontWeight: 700,
+        textAlign: 'center',
+        letterSpacing: '0.5px',
+      }}>
+        {resultText}
+      </div>
 
-          {/* Place description */}
-          <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-            <PlaceDescription
-              currentMode={currentMode}
-              currentNeighborhood={currentNeighborhood}
-              currentFamousPlace={currentFamousPlace}
-              displayedDistance={displayedDistance}
-              clickTime={clickTime}
-              isCorrectNeighborhood={isCorrectNeighborhood}
-            />
-          </div>
-
-              {/* Score grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '8px',
-                  marginBottom: '10px',
-                  width: '100%'
-                }}
-              >
-                {/* Target points */}
-                <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '10px',
-                    background: 'var(--bg-primary)',
-                    borderRadius: '6px',
-                    lineHeight: '1.1'
-                  }}
-                >
-                  <GameIcon name="target" size={22} color="var(--accent-green)" />
-                  <div
-                    style={{
-                      marginTop: '2px',
-                      fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-                      fontFamily: "'VT323', monospace",
-                      color: 'var(--text-primary)',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {Math.round(score * 0.9)} pts
-                  </div>
-                </div>
-
-                {/* Time points */}
-                <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '10px',
-                    background: 'var(--bg-primary)',
-                    borderRadius: '6px',
-                    lineHeight: '1.1'
-                  }}
-                >
-                  <GameIcon name="clock" size={22} color="var(--accent-orange)" />
-                  <div
-                    style={{
-                      marginTop: '2px',
-                      fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-                      fontFamily: "'VT323', monospace",
-                      color: 'var(--text-primary)',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    {Math.round(score * 0.1)} pts
-                  </div>
-                </div>
-              </div>
-
-              {/* Total score */}
-              <div
-                style={{
-                  textAlign: 'center',
-                  marginBottom: '14px',
-                  padding: '14px',
-                  background: 'linear-gradient(135deg, #064d2e, #0a7b4b)',
-                  borderRadius: '8px',
-                  boxShadow: '0 3px 10px rgba(0,0,0,0.25)',
-                  width: '100%',
-                  lineHeight: '1.1'
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 'clamp(2rem, 5vw, 2.8rem)',
-                    fontFamily: "'VT323', monospace",
-                    color: '#fff',
-                    fontWeight: 'bold',
-                    letterSpacing: '1px',
-                    textShadow: '1px 1px 4px rgba(0,0,0,0.5)'
-                  }}
-                >
-                  {score} PTS
-                </div>
-              </div>
-
-
-          {/* Action buttons */}
-          <ActionButtons
-            gameOver={gameOver}
-            onPauseGame={onPauseGame}
-            onNextRound={() => {
-              if (geoJsonData) onNextRound(geoJsonData);
-            }}
-            feedbackProgress={feedbackProgress}
-            currentMode={currentMode}
-            onResumeGame={onResumeGame}
-            isPaused={isPaused}
-          />
-        </div>
-      )}
-
-      {/* Contextual tip */}
-      <ContextualTip
+      {/* Distance + time description */}
+      <PlaceDescription
         currentMode={currentMode}
         currentNeighborhood={currentNeighborhood}
         currentFamousPlace={currentFamousPlace}
-        isVisible={true}
+        displayedDistance={distance}
+        clickTime={clickTime}
+        isCorrectNeighborhood={isCorrect}
+      />
+
+      {/* Streak */}
+      {consecutiveCorrect >= 2 && (
+        <div style={{
+          textAlign: 'center',
+          fontSize: isMobile ? '1.1rem' : '1rem',
+          color: '#ffa500',
+          fontFamily: "'LaCartoonerie', sans-serif",
+          fontWeight: 600,
+        }}>
+          🔥 {consecutiveCorrect} seguidos!
+        </div>
+      )}
+
+      {/* Stats row */}
+      <div style={{
+        display: 'flex',
+        gap: '8px',
+        justifyContent: 'center',
+        marginTop: '4px',
+      }}>
+        {/* Points earned */}
+        <div style={{
+          flex: 1,
+          textAlign: 'center',
+          padding: '10px 8px',
+          background: 'var(--bg-primary)',
+          borderRadius: '8px',
+        }}>
+          <div style={{
+            fontSize: '2rem',
+            fontFamily: "'VT323', monospace",
+            color: roundScore > 0 ? '#32CD32' : 'var(--text-primary)',
+            fontWeight: 'bold',
+            lineHeight: 1,
+          }}>
+            +{roundScore}
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+            pontos
+          </div>
+        </div>
+
+        {/* Time bonus */}
+        <div style={{
+          flex: 1,
+          textAlign: 'center',
+          padding: '10px 8px',
+          background: timeBonus > 0 ? 'rgba(255,165,0,0.12)' : 'var(--bg-primary)',
+          borderRadius: '8px',
+          border: timeBonus > 0 ? '1px solid rgba(255,165,0,0.35)' : '1px solid transparent',
+        }}>
+          <div style={{
+            fontSize: '2rem',
+            fontFamily: "'VT323', monospace",
+            color: timeBonus > 0 ? '#ffa500' : 'var(--text-secondary)',
+            fontWeight: 'bold',
+            lineHeight: 1,
+          }}>
+            {timeBonus > 0 ? `+${timeBonus}s` : '—'}
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+            bônus tempo
+          </div>
+        </div>
+      </div>
+
+      {/* Buttons */}
+      <ActionButtons
+        gameOver={gameOver}
+        onPauseGame={onPauseGame}
+        onNextRound={() => { if (geoJsonData) onNextRound(geoJsonData); }}
+        feedbackProgress={feedbackProgress}
+        currentMode={currentMode}
+        onResumeGame={onResumeGame}
+        isPaused={isPaused}
       />
     </div>
   );
-}; 
+};

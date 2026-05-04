@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { FamousPlace } from '../types/famousPlaces';
 
-const supabaseUrl = 'https://qbdofilxcfnxhaimuilu.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiZG9maWx4Y2ZueGhhaW11aWx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMTEzOTEsImV4cCI6MjA2ODU4NzM5MX0.4s_8p_jMPfL-TWqPqzX26ca-GkuEFBX1KbJmKy8RieI';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 

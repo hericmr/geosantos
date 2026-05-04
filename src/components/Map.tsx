@@ -96,7 +96,6 @@ const BandeiraCorretaAnimation: React.FC<{ position: [number, number]; gameState
   // Monitorar quando showFeedback se torna false para remover o componente
   useEffect(() => {
     if (!gameState.showFeedback) {
-      console.log('🏁 showFeedback é false, removendo animação da bandeira correta');
       setShouldRender(false);
     }
   }, [gameState.showFeedback]);
@@ -104,11 +103,9 @@ const BandeiraCorretaAnimation: React.FC<{ position: [number, number]; gameState
   // Aguardar o evento da primeira animação antes de iniciar
   useEffect(() => {
     const handleMarkerClickComplete = (event: CustomEvent) => {
-      console.log('📡 Evento markerClickAnimationComplete recebido, iniciando segunda animação em 0.5s');
       
       // Aguardar 0.5 segundos antes de iniciar
       setTimeout(() => {
-        console.log('🎬 Iniciando segunda animação (bandeira correta)');
         setShouldStartAnimation(true);
         setIsAnimating(true);
       }, 200); // 0.5 segundos = 500ms
@@ -140,7 +137,6 @@ const BandeiraCorretaAnimation: React.FC<{ position: [number, number]; gameState
           setTimeout(animate, frameDelay);
         } else {
           // Animação terminou, sprite final permanece até o fim do round
-          console.log('🏁 Animação da bandeira correta terminou, último frame permanecerá até o fim do round');
           setIsAnimating(false);
         }
       }
@@ -205,7 +201,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         sprites.push(sprite);
       }
 
-      console.log('🖼️ Pré-carregamento iniciado: 2 bandeiras + 16 sprites');
 
       // Aguardar todas as imagens carregarem
       Promise.all([
@@ -224,7 +219,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           })
         )
       ]).then(() => {
-        console.log('✅ Todas as imagens foram pré-carregadas com sucesso!');
       }).catch((error) => {
         console.error('❌ Erro durante o pré-carregamento:', error);
       });
@@ -288,18 +282,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
     gameMode
   } = useMapGame(geoJsonData, currentMode, currentFamousPlace, isTimerPaused);
 
-  // DEBUG: Log para verificar se o handleMapClick está sendo chamado
   const debugHandleMapClick = useCallback((latlng: L.LatLng) => {
-    console.log('🔍 [Map.tsx] handleMapClick chamado com:', latlng);
-    console.log('🔍 [Map.tsx] Estado do jogo:', {
-      gameStarted: gameState.gameStarted,
-      isCountingDown: gameState.isCountingDown,
-      showFeedback: gameState.showFeedback
-    });
-    
-    // Chamar o handler original
     handleMapClick(latlng);
-  }, [handleMapClick, gameState.gameStarted, gameState.isCountingDown, gameState.showFeedback]);
+  }, [handleMapClick]);
 
   // Função para selecionar próximo lugar famoso (pode repetir, sempre aleatório)
   const selectNextFamousPlace = useCallback(() => {
@@ -313,8 +298,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         tentativas++;
       }
     }
-    console.log('[selectNextFamousPlace] currentFamousPlace antes:', currentFamousPlace);
-    console.log('[selectNextFamousPlace] novo lugar selecionado:', famousPlaces[idx]);
     setCurrentFamousPlace(famousPlaces[idx]);
   }, [famousPlaces, currentFamousPlace]);
 
@@ -326,7 +309,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   // Monitorar quando clickedPosition se torna null para remover o sprite
   useEffect(() => {
     if (!gameState.clickedPosition && spriteContainerRef.current && spriteContainerRef.current.parentNode) {
-      console.log('🏁 clickedPosition é null, removendo sprite do clique');
       spriteContainerRef.current.parentNode.removeChild(spriteContainerRef.current);
       spriteContainerRef.current = null;
     }
@@ -345,11 +327,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   // Animação de sprite quando clickedPosition muda
     useEffect(() => {
     if (gameState.clickedPosition) {
-      console.log('🎯 Clique detectado! Posição:', gameState.clickedPosition);
-      console.log('⚙️ Configuração do sprite:', IDEAL_SPRITE_CONFIG);
 
       spriteIdRef.current = `sprite-frame-${Date.now()}-${Math.random()}`;
-      console.log('🆔 ID do sprite gerado:', spriteIdRef.current);
 
       let currentFrame = 1;
       const totalFrames = 16;
@@ -382,9 +361,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           background: transparent;
         `;
 
-        console.log(`📍 Posição do clique: ${clickX}, ${clickY}`);
-        console.log(`🖥️ Posição na tela: ${point.x}, ${point.y}`);
-        console.log(`🎯 Posição final com ancoragem: ${point.x - IDEAL_SPRITE_CONFIG.anchorX}, ${point.y - IDEAL_SPRITE_CONFIG.anchorY}`);
       } else {
         // Fallback para posição central se o mapa não estiver disponível
         spriteContainer.style.cssText = `
@@ -416,20 +392,13 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       const mapContainer = mapRef.current?.getContainer();
       if (mapContainer) {
         mapContainer.appendChild(spriteContainer);
-        console.log('🖼️ Sprite adicionado ao container do mapa');
       } else {
         // Fallback para o body se o mapa não estiver disponível
         document.body.appendChild(spriteContainer);
-        console.log('🖼️ Sprite adicionado ao body (fallback)');
       }
 
-      console.log('🖼️ Elemento HTML do sprite criado e adicionado ao DOM');
-      console.log(`📏 Tamanho: ${IDEAL_SPRITE_CONFIG.size}px`);
-      console.log(`⏱️ Frame delay: ${IDEAL_SPRITE_CONFIG.frameDelay}ms`);
-      console.log(`🎬 FPS: ${IDEAL_SPRITE_CONFIG.fps}`);
 
       const animateSprite = () => {
-        console.log(`🖼️ Frame ${currentFrame}:`, getSpriteUrl(`${currentFrame}.png`));
 
         if (currentFrame <= totalFrames) {
           spriteImg.src = getSpriteUrl(`${currentFrame}.png`);
@@ -437,11 +406,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
           if (currentFrame <= totalFrames) {
             // Continuar animação
-            console.log(`⏰ Próximo frame em ${IDEAL_SPRITE_CONFIG.frameDelay}ms`);
             setTimeout(animateSprite, IDEAL_SPRITE_CONFIG.frameDelay);
           } else {
             // Animação terminou, sprite final permanece até o fim do round
-            console.log('🏁 Animação do clique terminou, último frame permanecerá até o fim do round');
             
             // Emitir evento customizado para sincronizar com a segunda animação
             const animationCompleteEvent = new CustomEvent('markerClickAnimationComplete', {
@@ -451,17 +418,14 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               }
             });
             window.dispatchEvent(animationCompleteEvent);
-            console.log('📡 Evento markerClickAnimationComplete disparado');
             
             // Não remover imediatamente - deixar até o round terminar
           }
         } else {
-          console.log('❌ Animação finalizada');
         }
       };
 
       // Iniciar animação após um pequeno delay para garantir que o DOM esteja pronto
-      console.log(`⏰ Iniciando animação em ${IDEAL_SPRITE_CONFIG.frameDelay}ms...`);
       setTimeout(animateSprite, IDEAL_SPRITE_CONFIG.frameDelay);
     }
   }, [gameState.clickedPosition]);
@@ -542,7 +506,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
   // Lógica de timing do modal de lugares famosos
   useEffect(() => {
     if (currentMode === 'famous_places' && currentFamousPlace && gameState.gameStarted) {
-      console.log('[useEffect] Iniciando sequência do modal do lugar famoso:', currentFamousPlace);
 
       // 1. Mostra modal centralizado
       setIsModalCentered(true);
@@ -562,7 +525,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
       // 2. Após 2 segundos, move para o canto
       const moveToCornerTimer = setTimeout(() => {
-        console.log('[Modal] Movendo para o canto após 2 segundos');
         setIsModalCentered(false);
         setModalTimeProgress(0);
         clearInterval(progressInterval);
@@ -570,7 +532,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
       // 3. Após 2.3 segundos (tempo da animação), inicia o timer
       const startTimerTimer = setTimeout(() => {
-        console.log('[Modal] Iniciando timer após transição');
         setIsTimerPaused(false);
       }, 2300);
 
@@ -618,7 +579,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
         // Iniciar música quando o jogo começa
         backgroundMusicRef.current.volume = gameState.volume * 0.3; // Volume mais baixo para música de fundo
         backgroundMusicRef.current.play().catch((error) => {
-          console.log('Erro ao tocar música de fundo:', error);
         });
       } else if (gameState.gameOver || gameState.isMuted) {
         // Parar música quando o jogo termina ou está mutado
@@ -657,10 +617,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   // Função para avançar rodada e trocar lugar famoso
   const handleNextRoundWithFamousPlaceReset = useCallback((geoJsonData: any) => {
-    console.log('[handleNextRoundWithFamousPlaceReset] chamada. currentFamousPlace:', currentFamousPlace);
     if (currentMode === 'famous_places') {
       // Para lugares famosos, marcar como pendente e trocar o lugar
-      console.log('[handleNextRoundWithFamousPlaceReset] marcando próxima rodada como pendente');
       setPendingNextRound(true);
       setPendingGeoJsonData(geoJsonData);
       selectNextFamousPlace();
@@ -676,12 +634,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
   useEffect(() => {
     if (pendingNextRound && pendingGeoJsonData && currentFamousPlace) {
-      console.log('[useEffect] Lugar famoso mudou, executando próxima rodada');
       setPendingNextRound(false);
       setPendingGeoJsonData(null);
       // Aguardar um frame para garantir que o estado foi atualizado
       requestAnimationFrame(() => {
-        console.log('[useEffect] Executando handleNextRound após frame');
         handleNextRound(pendingGeoJsonData);
       });
     }
@@ -708,10 +664,8 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           console.error('Erro ao carregar game_music.mp3:', e);
         }}
         onLoadStart={() => {
-          console.log('Iniciando carregamento de game_music.mp3');
         }}
         onCanPlay={() => {
-          console.log('game_music.mp3 carregado com sucesso');
         }}
       />
 
@@ -952,7 +906,6 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               updateGameState={updateGameState}
               externalCurrentNeighborhood={gameState.currentNeighborhood}
               onNeighborhoodChanged={(neighborhood) => {
-                console.log('[Map] Bairro alterado no NeighborhoodManager:', neighborhood);
                 // O estado já está sincronizado, apenas log para debug
               }}
               onStateChange={(state) => {
@@ -981,13 +934,10 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
               }}
               onFeedback={(feedback) => {
                 // Processar feedback do NeighborhoodManager
-                console.log('[Map] Feedback recebido do NeighborhoodManager:', feedback);
               }}
               onRoundComplete={() => {
                 // Rodada completada - verificar se deve mostrar game over
-                console.log('[Map] Rodada completada no modo bairros');
                 if (gameState.gameOver) {
-                  console.log('[Map] Game over detectado - mostrando modal');
                   const startTime = Date.now();
                   const playTime = Math.floor((startTime - (gameState.lastClickTime || startTime)) / 1000);
                   
@@ -1098,6 +1048,9 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           currentMode={currentMode}
           currentFamousPlace={currentFamousPlace || undefined}
           isPaused={isPaused}
+          timeBonus={gameState.timeBonus}
+          roundScore={gameState.roundScore}
+          consecutiveCorrect={gameState.consecutiveCorrect}
         />
       )}
 

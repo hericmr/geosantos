@@ -54,7 +54,6 @@ export const GameAudioManager: React.FC<GameAudioManagerProps> = ({
       successSoundRef.current.currentTime = 0;
       successSoundRef.current.volume = gameState.isMuted ? 0 : Math.min(gameState.volume, 0.7);
       successSoundRef.current.play().catch((error) => {
-        console.log('Erro ao tocar som de sucesso:', error);
       });
     }
   }, [playSuccess, gameState.volume, gameState.isMuted]);
@@ -65,7 +64,6 @@ export const GameAudioManager: React.FC<GameAudioManagerProps> = ({
       errorSoundRef.current.currentTime = 0;
       errorSoundRef.current.volume = gameState.isMuted ? 0 : Math.min(gameState.volume, 0.7);
       errorSoundRef.current.play().catch((error) => {
-        console.log('Erro ao tocar som de erro:', error);
       });
     }
   }, [playError, gameState.volume, gameState.isMuted]);
@@ -76,7 +74,6 @@ export const GameAudioManager: React.FC<GameAudioManagerProps> = ({
       gameStartAudioRef.current.currentTime = 0;
       gameStartAudioRef.current.volume = Math.min(gameState.volume, 0.8);
       gameStartAudioRef.current.play().catch((error) => {
-        console.log('Erro ao tocar música de início:', error);
       });
     }
   }, [showPhaseOneMessage, gameState.volume, gameState.isMuted, gameStartAudioRef]);
