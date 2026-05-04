@@ -45,14 +45,17 @@ export const rankingService = {
   },
 
   async addScore(entry: Omit<RankingEntry, 'id' | 'created_at'>): Promise<boolean> {
-    if (!supabase) return false;
+    if (!supabase) {
+      console.error('Supabase client is null — env vars VITE_SUPABASE_URL / VITE_SUPABASE_KEY ausentes no build');
+      return false;
+    }
 
     const { error } = await supabase
       .from('ranking')
       .insert([entry]);
 
     if (error) {
-      console.error('Erro ao adicionar pontuação:', error);
+      console.error('Supabase insert error:', JSON.stringify(error));
       return false;
     }
 
