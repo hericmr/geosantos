@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { ActionButtons } from './ActionButtons';
+import React, { useEffect, useRef, useState } from 'react';
 import { styles } from './FeedbackPanel.styles';
 import { GameMode } from '../../types/famousPlaces';
-import { PlaceDescription } from './feedback/PlaceDescription';
 import { OdometerDisplay } from './OdometerDisplay';
+import { capitalizeWords } from '../../utils/textUtils';
 import { LatLng } from 'leaflet';
 
 export interface FeedbackPanelProps {
@@ -51,8 +50,18 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   consecutiveCorrect = 0,
 }) => {
   const [distance, setDistance] = useState(0);
-  const [popupPosition, setPopupPosition] = useState({ top: '50%', left: '50%' });
   const isMobile = window.innerWidth <= 768;
+
+  // drain animation for next button
+  const prevProgressRef = useRef(0);
+  const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => {
+    if (feedbackProgress >= 99 && prevProgressRef.current < 50) {
+      setAnimKey(k => k + 1);
+    }
+    prevProgressRef.current = feedbackProgress;
+  }, [feedbackProgress]);
 
   useEffect(() => {
     if (showFeedback && clickedPosition) {
@@ -61,22 +70,15 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
     }
   }, [showFeedback, clickedPosition, arrowPath, calculateDistance]);
 
-  useEffect(() => {
-    if (!clickedPosition) return;
-    if (isMobile) return;
-    // Simple position: prefer bottom-left of click
-    setPopupPosition({ top: '50%', left: '20px' });
-  }, [clickedPosition, isMobile]);
-
   if (gameOver || !showFeedback || !clickedPosition) return null;
 
   const isCorrect = distance === 0;
   const distanceKm = distance / 1000;
   const targetName = currentMode === 'famous_places'
-    ? currentFamousPlace?.name ?? ''
-    : currentNeighborhood;
+    ? (currentFamousPlace?.name ?? '')
+    : capitalizeWords(currentNeighborhood);
 
-  const resultColor = isCorrect ? '#4ade80' : distance < 500 ? '#ffd700' : '#ff6b6b';
+  const popupPosition = { top: '50%', left: '20px' };
 
   return (
     <div
@@ -88,118 +90,204 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         top: isMobile ? 'auto' : '50%',
         left: isMobile ? '50%' : '24px',
         transform: isMobile ? 'translateX(-50%)' : 'translateY(-50%)',
-        width: isMobile ? 'calc(100% - 24px)' : '460px',
-        maxWidth: isMobile ? '520px' : '460px',
-        padding: '22px',
+        width: isMobile ? 'calc(100% - 24px)' : '400px',
+        maxWidth: isMobile ? '480px' : '400px',
+        padding: '20px',
         borderRadius: '14px',
-        gap: '14px',
+        gap: '0',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      {/* Target name */}
+      <style>{`
+        @keyframes drainBar {
+          from { width: 100%; }
+          to   { width: 0%; }
+        }
+      `}</style>
+
+      {/* ── Linha 1: tempo ───────────────────────── */}
       <div style={{
-        fontSize: isMobile ? '1.4rem' : '1.25rem',
+        fontSize: '0.85rem',
         fontFamily: "'LaCartoonerie', sans-serif",
-        color: resultColor,
-        fontWeight: 700,
-        textAlign: 'center',
-        letterSpacing: '0.5px',
+        color: 'rgba(255,255,255,0.55)',
+        marginBottom: '12px',
+        fontWeight: 600,
       }}>
-        {isCorrect ? `✓ ${targetName}!` : `${targetName}`}
+        {isCorrect
+          ? `Em ${clickTime.toFixed(2)} seg você acertou`
+          : `Em ${clickTime.toFixed(2)} seg você clicou`}
       </div>
 
-      {/* Odometer — só aparece quando errou */}
-      {!isCorrect && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <div style={{
-            fontSize: '0.68rem',
-            fontFamily: "'VT323', monospace",
-            color: 'rgba(255,255,255,0.35)',
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-          }}>
-            distância
-          </div>
+      {/* ── Linha 2: odômetro ou acerto ──────────── */}
+      {isCorrect ? (
+        <div style={{
+          fontSize: 'clamp(2rem, 6vw, 2.8rem)',
+          fontFamily: "'LaCartoonerie', sans-serif",
+          color: '#4ade80',
+          fontWeight: 800,
+          marginBottom: '10px',
+          lineHeight: 1,
+        }}>
+          ✓ Na mosca!
+        </div>
+      ) : (
+        <div style={{ marginBottom: '12px' }}>
           <OdometerDisplay valueKm={distanceKm} />
         </div>
       )}
 
-      {/* Descrição / contexto */}
-      <PlaceDescription
-        currentMode={currentMode}
-        currentNeighborhood={currentNeighborhood}
-        currentFamousPlace={currentFamousPlace}
-        displayedDistance={distance}
-        clickTime={clickTime}
-        isCorrectNeighborhood={isCorrect}
-      />
+      {/* ── Linha 3: "De [lugar]" ─────────────────── */}
+      <div style={{
+        fontSize: 'clamp(1rem, 2.8vw, 1.2rem)',
+        fontFamily: "'LaCartoonerie', sans-serif",
+        color: '#ffffff',
+        fontWeight: 700,
+        marginBottom: '14px',
+        lineHeight: 1.3,
+      }}>
+        {isCorrect ? targetName : `De ${targetName}`}
+      </div>
 
-      {/* Streak */}
+      {/* ── Streak ───────────────────────────────── */}
       {consecutiveCorrect >= 2 && (
         <div style={{
-          textAlign: 'center',
-          fontSize: '1rem',
+          fontSize: '0.95rem',
           color: '#ffa500',
           fontFamily: "'LaCartoonerie', sans-serif",
           fontWeight: 600,
+          marginBottom: '10px',
         }}>
           🔥 {consecutiveCorrect} seguidos!
         </div>
       )}
 
-      {/* Stats row */}
-      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-        <div style={{
-          flex: 1,
-          textAlign: 'center',
-          padding: '12px 8px',
-          background: 'var(--bg-primary)',
-          borderRadius: '8px',
-        }}>
+      {/* ── Caixa de stats (cinza) ───────────────── */}
+      <div style={{
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '8px',
+        padding: '12px 16px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '14px',
+      }}>
+        <div style={{ textAlign: 'center' }}>
           <div style={{
-            fontSize: '2.2rem',
+            fontSize: '1.9rem',
             fontFamily: "'VT323', monospace",
-            color: roundScore > 0 ? '#4ade80' : 'var(--text-primary)',
+            color: roundScore > 0 ? '#4ade80' : 'rgba(255,255,255,0.3)',
             lineHeight: 1,
           }}>
             +{roundScore}
           </div>
-          <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '4px', letterSpacing: '1px', textTransform: 'uppercase' }}>
+          <div style={{
+            fontSize: '0.62rem',
+            color: 'rgba(255,255,255,0.35)',
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            marginTop: '3px',
+          }}>
             pontos
           </div>
         </div>
 
         <div style={{
-          flex: 1,
-          textAlign: 'center',
-          padding: '12px 8px',
-          background: timeBonus > 0 ? 'rgba(255,165,0,0.1)' : 'var(--bg-primary)',
-          borderRadius: '8px',
-          border: timeBonus > 0 ? '1px solid rgba(255,165,0,0.3)' : '1px solid transparent',
-        }}>
+          width: '1px',
+          height: '32px',
+          background: 'rgba(255,255,255,0.1)',
+        }} />
+
+        <div style={{ textAlign: 'center' }}>
           <div style={{
-            fontSize: '2.2rem',
+            fontSize: '1.9rem',
             fontFamily: "'VT323', monospace",
-            color: timeBonus > 0 ? '#ffa500' : 'var(--text-secondary)',
+            color: timeBonus > 0 ? '#ffa500' : 'rgba(255,255,255,0.3)',
             lineHeight: 1,
           }}>
             {timeBonus > 0 ? `+${timeBonus}s` : '—'}
           </div>
-          <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', marginTop: '4px', letterSpacing: '1px', textTransform: 'uppercase' }}>
+          <div style={{
+            fontSize: '0.62rem',
+            color: 'rgba(255,255,255,0.35)',
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            marginTop: '3px',
+          }}>
             bônus tempo
           </div>
         </div>
       </div>
 
-      {/* Buttons */}
-      <ActionButtons
-        gameOver={gameOver}
-        onPauseGame={onPauseGame}
-        onNextRound={() => { if (geoJsonData) onNextRound(geoJsonData); }}
-        feedbackProgress={feedbackProgress}
-        currentMode={currentMode}
-        onResumeGame={onResumeGame}
-        isPaused={isPaused}
-      />
+      {/* ── Rodapé: pausar (esq) + Próximo (dir) ─── */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '8px',
+      }}>
+        {/* Botão pausar / retomar */}
+        <button
+          onClick={isPaused ? onResumeGame : onPauseGame}
+          style={{
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '8px',
+            color: 'rgba(255,255,255,0.6)',
+            fontFamily: "'LaCartoonerie', sans-serif",
+            fontSize: '0.85rem',
+            padding: '9px 14px',
+            cursor: 'pointer',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            flexShrink: 0,
+          }}
+        >
+          {isPaused ? '▶ Retomar' : '⏸ Pausar'}
+        </button>
+
+        {/* Botão Próximo — vermelho, com barra de drenagem */}
+        <button
+          onClick={() => { if (geoJsonData) onNextRound(geoJsonData); }}
+          style={{
+            flex: 1,
+            position: 'relative',
+            overflow: 'hidden',
+            background: '#e53e3e',
+            border: 'none',
+            borderRadius: '8px',
+            color: '#fff',
+            fontFamily: "'LaCartoonerie', sans-serif",
+            fontSize: '1.05rem',
+            fontWeight: 700,
+            padding: '11px 20px',
+            cursor: 'pointer',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            boxShadow: '0 4px 14px rgba(229,62,62,0.45)',
+            transition: 'background 0.15s ease',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#c53030')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#e53e3e')}
+        >
+          {/* barra de drenagem */}
+          <div
+            key={animKey}
+            style={{
+              position: 'absolute',
+              top: 0, left: 0, bottom: 0,
+              width: animKey > 0 ? '100%' : '0%',
+              background: 'rgba(0,0,0,0.25)',
+              animation: animKey > 0 ? 'drainBar 3s linear forwards' : 'none',
+              animationPlayState: isPaused ? 'paused' : 'running',
+            }}
+          />
+          <span style={{ position: 'relative', zIndex: 1 }}>
+            Próximo →
+          </span>
+        </button>
+      </div>
     </div>
   );
 };
