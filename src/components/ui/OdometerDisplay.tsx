@@ -14,9 +14,9 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
     el.style.transition = 'none';
 
     const tid = setTimeout(() => {
-      el.style.transition = `transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1)`;
+      el.style.transition = `transform 2.6s cubic-bezier(0.22, 0.61, 0.36, 1)`;
       el.style.transform = `translateY(-${n * CELL_H}px)`;
-    }, delay);
+    }, delay * 4);
 
     return () => clearTimeout(tid);
   }, [n, isNum, delay]);
@@ -31,7 +31,7 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
         justifyContent: 'center',
         fontSize: char === '.' ? `${CELL_H * 0.55}px` : `${CELL_H * 0.42}px`,
         fontFamily: "'VT323', monospace",
-        color: '#4ade80',
+        color: '#e2e8f0',
         padding: '0 2px',
         lineHeight: 1,
         alignSelf: 'flex-end',
@@ -48,7 +48,7 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
       height: `${CELL_H}px`,
       overflow: 'hidden',
       background: 'rgba(0,0,0,0.6)',
-      border: '1px solid rgba(74,222,128,0.2)',
+      border: '1px solid rgba(255,255,255,0.08)',
       borderRadius: '4px',
       position: 'relative',
     }}>
@@ -70,9 +70,8 @@ const OdometerDigit: React.FC<{ char: string; delay: number }> = ({ char, delay 
             justifyContent: 'center',
             fontSize: `${CELL_H * 0.78}px`,
             fontFamily: "'VT323', monospace",
-            color: '#4ade80',
+            color: '#e2e8f0',
             lineHeight: 1,
-            textShadow: '0 0 10px rgba(74,222,128,0.7)',
           }}>
             {i}
           </div>
@@ -95,11 +94,11 @@ export const OdometerDisplay: React.FC<OdometerDisplayProps> = ({ valueKm }) => 
       display: 'inline-flex',
       alignItems: 'flex-end',
       gap: '3px',
-      background: 'linear-gradient(160deg, #0a110a 0%, #060c06 100%)',
+      background: 'linear-gradient(160deg, #0d0f1a 0%, #080a12 100%)',
       padding: '10px 14px',
       borderRadius: '10px',
-      border: '1px solid rgba(74,222,128,0.25)',
-      boxShadow: '0 0 24px rgba(74,222,128,0.12), inset 0 1px 0 rgba(255,255,255,0.04)',
+      border: '1px solid rgba(255,255,255,0.08)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
       position: 'relative',
       overflow: 'hidden',
     }}>
