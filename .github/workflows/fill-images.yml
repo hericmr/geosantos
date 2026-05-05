@@ -1,0 +1,51 @@
+name: Preencher imagens dos lugares famosos
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_from:
+        description: 'Pular os primeiros N lugares (retomar após interrupção)'
+        required: false
+        default: '0'
+      dry_run:
+        description: 'Testar sem alterar nada (true/false)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  fill-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run fill-missing-images script
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CSE_ID: 95909fbaf52984e01
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+          START_FROM: ${{ github.event.inputs.start_from }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: node scripts/fill-missing-images.js
+
+      - name: Commit updated JSON
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/famous_places.json
+          git diff --cached --quiet || git commit -m "chore: adicionar imagens automáticas aos lugares famosos"
+          git push
