@@ -37,7 +37,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.g_app_key }}
           GOOGLE_CSE_ID: 95909fbaf52984e01
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           START_FROM: ${{ github.event.inputs.start_from }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: node scripts/fill-missing-images.js
