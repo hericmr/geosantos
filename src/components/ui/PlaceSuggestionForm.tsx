@@ -122,7 +122,7 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
       top: 0,
       left: 0,
       width: '100vw',
-      height: '100vh',
+      height: '100dvh',
       background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
@@ -135,10 +135,12 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
         maxWidth: 1200,
         width: '100%',
         maxHeight: '90vh',
-        background: 'var(--bg-secondary)',
-        border: '4px solid var(--accent-blue)',
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-xl)',
+        background: 'rgba(13,15,26,0.88)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '16px',
+        boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
         padding: 32,
         fontFamily: "'LaCartoonerie', sans-serif",
         color: 'var(--text-primary)',
@@ -173,9 +175,9 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
                 alignItems: 'center',
                 gap: '8px',
                 padding: '8px 12px',
-                background: 'var(--bg-accent)',
-                border: 'none',
-                borderRadius: '4px',
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: '8px',
                 color: 'var(--text-primary)',
                 cursor: 'pointer',
                 fontFamily: "'LaCartoonerie', sans-serif",
@@ -183,7 +185,6 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
                 fontWeight: 'bold',
                 textTransform: 'uppercase',
                 transition: 'all 0.2s ease',
-                boxShadow: '2px 2px 0 #222'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'var(--accent-blue)';
@@ -234,13 +235,12 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
           </div>
 
           {/* Mapa interativo para selecionar coordenadas */}
-          <div style={{ 
-            width: '100%', 
-            height: 300, 
-            marginBottom: 16, 
-            border: '2px solid var(--text-primary)', 
-            borderRadius: 'var(--radius-md)',
-            boxShadow: 'var(--shadow-md)',
+          <div style={{
+            width: '100%',
+            height: 300,
+            marginBottom: 16,
+            border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: '10px',
             overflow: 'hidden'
           }}>
             <MapContainer
@@ -269,11 +269,10 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
             <input name="address" value={form.address} onChange={handleChange} placeholder="Endereço completo" style={inputStyle} />
             <input name="imageUrl" value={form.imageUrl} onChange={handleChange} placeholder="URL da imagem (opcional)" style={inputStyle} />
             
-            <div style={{ 
-              borderTop: '2px solid var(--accent-blue)', 
-              paddingTop: 20, 
+            <div style={{
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              paddingTop: 20,
               marginTop: 16,
-              borderRadius: 'var(--radius-sm)'
             }}>
               <input name="suggestedBy" value={form.suggestedBy} onChange={handleChange} placeholder="Seu nome" style={inputStyle} required />
               <input name="email" value={form.email} onChange={handleChange} placeholder="Seu email" style={inputStyle} type="email" required />
@@ -378,10 +377,9 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
           display: 'flex',
           flexDirection: 'column',
           gap: 16,
-          background: 'var(--bg-accent)',
-          border: '2px solid var(--accent-orange)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-lg)',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '12px',
           padding: 24,
         }}>
           <h2 style={{
@@ -418,9 +416,9 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
           </div>
 
           <div style={{
-            background: 'var(--bg-secondary)',
-            border: '2px solid var(--accent-green)',
-            borderRadius: 'var(--radius-md)',
+            background: 'rgba(52,211,153,0.07)',
+            border: '1px solid rgba(52,211,153,0.25)',
+            borderRadius: '10px',
             padding: '16px',
             fontSize: '0.9rem',
             fontFamily: "'LaCartoonerie', sans-serif",
@@ -436,9 +434,9 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
           </div>
 
           <div style={{
-            background: 'var(--bg-secondary)',
-            border: '2px solid var(--accent-orange)',
-            borderRadius: 'var(--radius-md)',
+            background: 'rgba(251,146,60,0.07)',
+            border: '1px solid rgba(251,146,60,0.25)',
+            borderRadius: '10px',
             padding: '16px',
             fontSize: '0.9rem',
             fontFamily: "'LaCartoonerie', sans-serif",
@@ -457,14 +455,13 @@ Enviado automaticamente pelo formulário de sugestões do GeoSantos
 const inputStyle: React.CSSProperties = {
   fontFamily: "'LaCartoonerie', sans-serif",
   fontSize: '1rem',
-  border: '2px solid var(--text-primary)',
-  borderRadius: 'var(--radius-md)',
+  border: '1px solid rgba(255,255,255,0.12)',
+  borderRadius: '8px',
   padding: '12px 16px',
-  background: 'var(--bg-primary)',
+  background: 'rgba(255,255,255,0.05)',
   color: 'var(--text-primary)',
-  boxShadow: 'var(--shadow-md)',
   outline: 'none',
-  transition: 'all 0.2s ease',
+  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
   width: '100%',
   boxSizing: 'border-box'
 }; 

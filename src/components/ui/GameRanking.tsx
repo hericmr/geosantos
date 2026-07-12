@@ -89,32 +89,35 @@ export const GameRanking: React.FC<GameRankingProps> = ({
     };
 
     if (variant === 'startScreen') {
+      const sharedStyle: React.CSSProperties = {
+        ...baseStyle,
+        background: 'rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.12)',
+        borderRadius: '16px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        overflow: 'hidden',
+      };
+
       if (isMobile) {
         return {
-          ...baseStyle,
+          ...sharedStyle,
           position: 'relative',
           width: '100%',
           marginBottom: '20px',
-          border: '4px solid var(--accent-yellow)',
-          borderRadius: '12px',
-          background: 'rgba(30, 30, 30, 0.98)',
           maxHeight: '400px',
-          overflow: 'hidden'
         };
       }
       // Desktop
       return {
-        ...baseStyle,
+        ...sharedStyle,
         position: 'fixed',
         bottom: '40px',
         left: '40px',
         zIndex: 2002,
         minWidth: '340px',
         maxWidth: '400px',
-        boxShadow: 'var(--shadow-md)',
-        border: 'none',
-        borderRadius: '4px',
-        background: 'var(--bg-secondary)',
       };
     }
 
@@ -133,20 +136,20 @@ export const GameRanking: React.FC<GameRankingProps> = ({
 
 
       <div className="ranking-container" style={{
-        background: variant === 'startScreen' ? 'transparent' : 'var(--bg-secondary)',
+        background: 'transparent',
         border: 'none',
         borderRadius: variant === 'startScreen' ? '0' : '4px',
-        boxShadow: variant === 'startScreen' ? 'none' : 'var(--shadow-md)',
+        boxShadow: 'none',
         overflow: 'hidden',
         minWidth: isExpanded ? (variant === 'startScreen' ? (isMobile ? '100%' : '340px') : '280px') : (variant === 'startScreen' ? (isMobile ? '100%' : '340px') : '200px'),
         maxWidth: isExpanded ? (variant === 'startScreen' ? (isMobile ? '100%' : '400px') : '320px') : (variant === 'startScreen' ? (isMobile ? '100%' : '400px') : '220px')
       }}>
         {/* Header */}
-        <div 
+        <div
           className="ranking-header"
           onClick={() => setIsExpanded(!isExpanded)}
           style={{
-            background: variant === 'startScreen' ? 'var(--bg-secondary)' : 'var(--accent-blue)',
+            background: variant === 'startScreen' ? 'rgba(255,255,255,0.06)' : 'var(--accent-blue)',
             color: 'var(--text-primary)',
             padding: variant === 'startScreen' ? (isMobile ? '12px 16px' : '16px 24px') : '8px 12px',
             cursor: 'pointer',
@@ -157,10 +160,8 @@ export const GameRanking: React.FC<GameRankingProps> = ({
             fontWeight: 'bold',
             fontSize: variant === 'startScreen' ? (isMobile ? '1.3rem' : '1.7rem') : '1.1rem',
             textShadow: 'none',
-            borderTopLeftRadius: variant === 'startScreen' ? '4px' : '0',
-            borderTopRightRadius: variant === 'startScreen' ? '4px' : '0',
+            borderBottom: variant === 'startScreen' ? '1px solid rgba(255,255,255,0.08)' : 'none',
             letterSpacing: '1px',
-            boxShadow: variant === 'startScreen' ? 'var(--shadow-md)' : 'none',
             border: 'none'
           }}
         >
@@ -187,14 +188,14 @@ export const GameRanking: React.FC<GameRankingProps> = ({
               cursor: 'pointer',
               fontSize: variant === 'startScreen' ? '1.5rem' : '1.2rem',
               padding: '0',
-              width: '28px',
-              height: '28px',
+              width: '44px',
+              height: '44px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'absolute',
-              top: variant === 'startScreen' ? '12px' : '8px',
-              right: variant === 'startScreen' ? '16px' : '8px',
+              top: variant === 'startScreen' ? '4px' : '0px',
+              right: variant === 'startScreen' ? '8px' : '0px',
               zIndex: 10
             }}
             aria-label={variant === 'startScreen' ? "Fechar ranking" : "Expandir/Recolher ranking"}
@@ -206,7 +207,7 @@ export const GameRanking: React.FC<GameRankingProps> = ({
         {/* Content */}
         <div style={{
           padding: variant === 'startScreen' ? '18px 18px 12px 18px' : '8px',
-          background: variant === 'startScreen' ? 'rgba(255,255,255,0.08)' : 'var(--bg-primary)',
+          background: 'transparent',
           maxHeight: isExpanded ? (variant === 'startScreen' ? (isMobile ? '300px' : '520px') : '400px') : (variant === 'startScreen' ? (isMobile ? '200px' : '320px') : '200px'),
           overflowY: 'auto',
           fontSize: variant === 'startScreen' ? (isMobile ? '1rem' : '1.25rem') : '0.9rem',

@@ -92,7 +92,7 @@ export const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         width: isMobile ? 'calc(100% - 24px)' : '400px',
         maxWidth: isMobile ? '480px' : '400px',
         padding: '20px',
-        borderRadius: '14px',
+        borderRadius: '16px',
         gap: '0',
         display: 'flex',
         flexDirection: 'column',

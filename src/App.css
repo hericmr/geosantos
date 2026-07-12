@@ -61,6 +61,7 @@ html, body {
 .App {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -78,11 +79,13 @@ html, body {
   position: relative;
   max-width: 100vw;
   max-height: 100vh;
+  max-height: 100dvh;
 }
 
 @media (max-width: 768px) {
   #game-container {
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
   }
 }

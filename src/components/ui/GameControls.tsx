@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { GameControlsProps } from '../../types/game';
 import { PlayIcon } from './GameIcons';
 import { StartScreen } from './StartScreen';
@@ -6,7 +6,7 @@ import { useGameStats } from '../../hooks/useGameStats';
 import { usePlayerName } from '../../hooks/usePlayerName';
 import { GameMode } from '../../types/famousPlaces';
 
-import { LeaderboardModal } from './LeaderboardModal';
+const LeaderboardModal = lazy(() => import('./LeaderboardModal').then(m => ({ default: m.LeaderboardModal })));
 
 export const GameControls: React.FC<GameControlsProps> = ({
   gameStarted,
@@ -234,12 +234,14 @@ export const GameControls: React.FC<GameControlsProps> = ({
       )}
 
       {/* Modais */}
-      <LeaderboardModal
-        isOpen={showLeaderboard}
-        onClose={() => setShowLeaderboard(false)}
-        currentPlayerScore={score}
-        currentPlayerName={playerName || initializePlayerName()}
-      />
+      <Suspense fallback={null}>
+        <LeaderboardModal
+          isOpen={showLeaderboard}
+          onClose={() => setShowLeaderboard(false)}
+          currentPlayerScore={score}
+          currentPlayerName={playerName || initializePlayerName()}
+        />
+      </Suspense>
     </div>
   );
 }; 

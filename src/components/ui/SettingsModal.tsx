@@ -46,7 +46,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       top: 0,
       left: 0,
       width: '100vw',
-      height: '100vh',
+      height: '100dvh',
       background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
@@ -108,11 +108,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Fechar"
             style={{
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '4px',
+              minWidth: '44px',
+              minHeight: '44px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -150,11 +152,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }}>
               <button
                 onClick={onToggleMute}
+                aria-label={isMuted ? 'Ativar som' : 'Silenciar'}
                 style={{
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  padding: '4px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'

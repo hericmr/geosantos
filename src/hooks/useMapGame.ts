@@ -36,7 +36,8 @@ export const useMapGame = (
   geoJsonData: FeatureCollection | null,
   gameMode: GameMode = 'neighborhoods',
   currentFamousPlace: FamousPlace | null = null,
-  externalPause: boolean = false
+  externalPause: boolean = false,
+  onSelectNextFamousPlace?: () => void
 ) => {
   const clickDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingClickRef = useRef(false);
@@ -97,6 +98,7 @@ export const useMapGame = (
         if (!isAutoAdvancingRef.current) {
           isAutoAdvancingRef.current = true;
           if (geoJsonData) {
+            if (gameMode === 'famous_places') onSelectNextFamousPlace?.();
             startNextRound(geoJsonData);
           } else {
             isAutoAdvancingRef.current = false;

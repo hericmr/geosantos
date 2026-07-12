@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import {
   PlayIcon,
@@ -7,8 +7,9 @@ import {
 import { GameRanking } from './GameRanking';
 import { GameMode } from '../../types/famousPlaces';
 import { BookOpenIcon, PlusIcon } from 'lucide-react';
-import { PlaceSuggestionForm } from './PlaceSuggestionForm';
 import backgroundVideo from '../../assets/images/background.webm';
+
+const PlaceSuggestionForm = lazy(() => import('./PlaceSuggestionForm').then(m => ({ default: m.PlaceSuggestionForm })));
 
 interface StartScreenProps {
   onStartGame: () => void;
@@ -177,7 +178,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
           ref={videoRef}
           autoPlay loop muted playsInline
           style={{
-            width: '100vw', height: '100vh', objectFit: 'cover',
+            width: '100vw', height: '100dvh', objectFit: 'cover',
             position: 'absolute', inset: 0,
             opacity: videoLoaded && !videoError ? 1 : 0,
             transition: 'opacity 0.5s ease', zIndex: 2
@@ -489,7 +490,9 @@ export const StartScreen: React.FC<StartScreenProps> = ({
       </div>
 
       {showSuggestionForm && (
-        <PlaceSuggestionForm onClose={() => setShowSuggestionForm(false)} />
+        <Suspense fallback={null}>
+          <PlaceSuggestionForm onClose={() => setShowSuggestionForm(false)} />
+        </Suspense>
       )}
 
       <style>{`

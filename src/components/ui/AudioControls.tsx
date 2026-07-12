@@ -27,14 +27,17 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
     }}>
       <button
         onClick={onToggleMute}
+        aria-label={isMuted ? 'Ativar som' : 'Silenciar'}
         style={{
           background: 'none',
           border: 'none',
           color: 'white',
           cursor: 'pointer',
-          padding: 'clamp(3px, 1vw, 5px)',
+          minWidth: '44px',
+          minHeight: '44px',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
           touchAction: 'manipulation'
         }}
       >

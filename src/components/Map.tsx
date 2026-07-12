@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, lazy, Suspense } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
@@ -28,14 +28,14 @@ import { NeighborhoodManager } from './game/NeighborhoodManager';
 import { FamousPlacesManager } from './game/FamousPlacesManager';
 import { GameAudioManager } from './game/GameAudioManager';
 import { DistanceDisplay } from './ui/DistanceDisplay';
-import { GameOverModal } from './ui/GameOverModal';
 import { usePlayerName } from '../hooks/usePlayerName';
 import { XIcon } from './ui/GameIcons';
-import { FamousPlaceModal } from './ui/FamousPlaceModal';
 import { useFamousPlaces } from '../hooks/useFamousPlaces';
 import { Home, Landmark } from 'lucide-react';
 import { useCursorStyle } from '../hooks/useCursorStyle';
-import SpriteAnimation from './ui/SpriteAnimation';
+
+const GameOverModal = lazy(() => import('./ui/GameOverModal').then(m => ({ default: m.GameOverModal })));
+const FamousPlaceModal = lazy(() => import('./ui/FamousPlaceModal').then(m => ({ default: m.FamousPlaceModal })));
 
 // Função para verificar se um ponto está dentro de um polígono
 // Implementação do algoritmo "ray casting" para determinar se um ponto está dentro de um polígono
@@ -650,7 +650,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
       margin: 0,
       padding: 0,
       width: '100vw',
-      height: '100vh',
+      height: '100dvh',
       overflow: 'hidden'
     }}>
       <audio ref={audioRef} preload="auto" />
@@ -1066,7 +1066,7 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
           top: 0,
           left: 0,
           width: '100vw',
-          height: '100vh',
+          height: '100dvh',
           background: 'rgba(0, 0, 0, 0.95)',
           display: 'flex',
           flexDirection: 'column',
@@ -1122,43 +1122,45 @@ const Map: React.FC<MapProps> = ({ center, zoom }) => {
 
 
 
-      {/* Modal de Game Over */}
-      <GameOverModal
-        isOpen={showGameOver}
-        onClose={() => {
-          setShowGameOver(false);
-          window.location.reload();
-        }}
-        onPlayAgain={() => {
-          setShowGameOver(false);
-          window.location.reload();
-        }}
-        score={gameState.score}
-        playTime={gameStats.playTime}
-        roundsPlayed={gameStats.roundsPlayed}
-        accuracy={gameStats.accuracy}
-        currentPlayerName={playerName || initializePlayerName()}
-      />
+      <Suspense fallback={null}>
+        {/* Modal de Game Over */}
+        <GameOverModal
+          isOpen={showGameOver}
+          onClose={() => {
+            setShowGameOver(false);
+            window.location.reload();
+          }}
+          onPlayAgain={() => {
+            setShowGameOver(false);
+            window.location.reload();
+          }}
+          score={gameState.score}
+          playTime={gameStats.playTime}
+          roundsPlayed={gameStats.roundsPlayed}
+          accuracy={gameStats.accuracy}
+          currentPlayerName={playerName || initializePlayerName()}
+        />
 
-      {/* Modal do Lugar Famoso */}
-      <FamousPlaceModal
-        open={showFamousPlaceModal}
-        onClose={() => setShowFamousPlaceModal(false)}
-        famousPlace={currentFamousPlace}
-        isCentered={isModalCentered}
-        timeProgress={modalTimeProgress}
-        onPauseGame={handlePauseGame}
-        onResumeGame={handleResumeGame}
-        onNextRound={() => {
-          if (currentMode === 'famous_places' && geoJsonData) {
-            handleNextRoundWithFamousPlaceReset(geoJsonData);
-          }
-        }}
-        isPaused={isPaused}
-        gameOver={gameState.gameOver}
-        feedbackProgress={gameState.feedbackProgress}
-        geoJsonData={geoJsonData}
-      />
+        {/* Modal do Lugar Famoso */}
+        <FamousPlaceModal
+          open={showFamousPlaceModal}
+          onClose={() => setShowFamousPlaceModal(false)}
+          famousPlace={currentFamousPlace}
+          isCentered={isModalCentered}
+          timeProgress={modalTimeProgress}
+          onPauseGame={handlePauseGame}
+          onResumeGame={handleResumeGame}
+          onNextRound={() => {
+            if (currentMode === 'famous_places' && geoJsonData) {
+              handleNextRoundWithFamousPlaceReset(geoJsonData);
+            }
+          }}
+          isPaused={isPaused}
+          gameOver={gameState.gameOver}
+          feedbackProgress={gameState.feedbackProgress}
+          geoJsonData={geoJsonData}
+        />
+      </Suspense>
     </div>
   );
 };

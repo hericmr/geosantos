@@ -125,15 +125,15 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         </button>
         <button
           onClick={onClose}
+          aria-label="Fechar"
           style={{
             position: 'absolute',
-            top: '-8px',
-            right: '-8px',
-            background: 'rgba(13,15,26,0.95)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: '50%',
-            width: '22px',
-            height: '22px',
+            top: '-19px',
+            right: '-19px',
+            width: '44px',
+            height: '44px',
+            background: 'none',
+            border: 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -141,7 +141,18 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             padding: 0
           }}
         >
-          <XIcon size={12} color="var(--text-primary)" />
+          <span style={{
+            background: 'rgba(13,15,26,0.95)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '50%',
+            width: '22px',
+            height: '22px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <XIcon size={12} color="var(--text-primary)" />
+          </span>
         </button>
       </div>
     );
@@ -153,7 +164,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
       top: 0,
       left: 0,
       width: '100vw',
-      height: '100vh',
+      height: '100dvh',
       background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
@@ -232,11 +243,13 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             <button
               onClick={loadRanking}
               disabled={loading}
+              aria-label="Atualizar ranking"
               style={{
                 background: 'none',
                 border: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                padding: '4px',
+                minWidth: '44px',
+                minHeight: '44px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -247,11 +260,13 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             </button>
             <button
               onClick={() => setMinimized(true)}
+              aria-label="Minimizar"
               style={{
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '4px',
+                minWidth: '44px',
+                minHeight: '44px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -265,11 +280,13 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             </button>
             <button
               onClick={onClose}
+              aria-label="Fechar"
               style={{
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '4px',
+                minWidth: '44px',
+                minHeight: '44px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
