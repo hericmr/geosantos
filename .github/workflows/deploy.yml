@@ -16,6 +16,9 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  GODOT_VERSION: '4.7.2'
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -41,6 +44,33 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+
+      # Versión Godot del juego, publicada en /geosantos/jogo/ mientras se desarrolla
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/bin/godot
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_VERSION }}-web
+
+      - name: Install Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.local/bin
+          curl -sL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" ~/.local/bin/godot
+          rm godot.zip
+          python3 scripts/fetch_godot_web_templates.py "$GODOT_VERSION"
+
+      - name: Export Godot (Web)
+        run: |
+          mkdir -p dist/jogo
+          ~/.local/bin/godot --headless --path godot --import
+          ~/.local/bin/godot --headless --path godot --export-release "Web" "$GITHUB_WORKSPACE/dist/jogo/index.html"
+          test -f dist/jogo/index.wasm
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
