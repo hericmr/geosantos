@@ -25,6 +25,9 @@ const MIN_PINCH_DIST := 8.0
 const VELOCITY_WINDOW_US := 100_000
 const MIN_VELOCITY_SPAN_S := 0.05
 
+## Devuelve true si la posición (viewport) está sobre la interfaz; esos toques no van al mapa.
+var is_over_ui: Callable = func(_pos: Vector2) -> bool: return false
+
 ## índice del puntero -> posición actual
 var _points: Dictionary = {}
 var _start_pos := Vector2.ZERO
@@ -79,6 +82,8 @@ func _is_touch_mouse(event: InputEvent) -> bool:
 
 func _on_press(index: int, pos: Vector2, pressed: bool) -> void:
 	if pressed:
+		if is_over_ui.call(pos):
+			return
 		_points[index] = pos
 		if _points.size() == 1:
 			_start_pos = pos

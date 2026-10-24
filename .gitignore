@@ -32,3 +32,4 @@ dist-ssr
 godot/.godot/
 godot/build/
 *.import.tmp
+godot/data/supabase.json

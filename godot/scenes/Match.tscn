@@ -1,14 +1,11 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/Match.gd" id="1"]
 [ext_resource type="Script" path="res://scenes/map/SantosMap.gd" id="2"]
 [ext_resource type="Script" path="res://scenes/map/MapCamera.gd" id="3"]
 [ext_resource type="Script" path="res://scenes/map/MapGestures.gd" id="4"]
-[ext_resource type="Script" path="res://scenes/map/Pin.gd" id="5"]
 [ext_resource type="Script" path="res://ui/SafeArea.gd" id="6"]
-[ext_resource type="Script" path="res://scenes/map/TargetFlag.gd" id="7"]
-[ext_resource type="AudioStream" path="res://assets/audio/success.mp3" id="8"]
-[ext_resource type="AudioStream" path="res://assets/audio/error.mp3" id="9"]
+[ext_resource type="Script" path="res://scenes/map/PlantedFlag.gd" id="7"]
 
 [node name="Match" type="Node2D"]
 script = ExtResource("1")
@@ -27,24 +24,20 @@ antialiased = true
 [node name="TargetFlag" type="AnimatedSprite2D" parent="."]
 z_index = 9
 script = ExtResource("7")
+frames_dir = "res://assets/sprites/flag_correct"
+anchor = Vector2(64.1, 76.4)
 
-[node name="Pin" type="Node2D" parent="."]
-z_index = 10
-script = ExtResource("5")
+[node name="ClickFlag" type="AnimatedSprite2D" parent="."]
+z_index = 11
+script = ExtResource("7")
+frames_dir = "res://assets/sprites/markerclick"
+anchor = Vector2(11.5, 75)
 
 [node name="MapCamera" type="Camera2D" parent="."]
 script = ExtResource("3")
 
 [node name="MapGestures" type="Node" parent="."]
 script = ExtResource("4")
-
-[node name="SuccessSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("8")
-volume_db = -4.0
-
-[node name="ErrorSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("9")
-volume_db = -4.0
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -57,36 +50,50 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("6")
 
-[node name="Layout" type="VBoxContainer" parent="UI/SafeArea"]
+[node name="Layout" type="HBoxContainer" parent="UI/SafeArea"]
 layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="LeftColumn" type="VBoxContainer" parent="UI/SafeArea/Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_constants/separation = 16
 
-[node name="TopBar" type="PanelContainer" parent="UI/SafeArea/Layout"]
+[node name="TopBar" type="PanelContainer" parent="UI/SafeArea/Layout/LeftColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
 
-[node name="TopBox" type="VBoxContainer" parent="UI/SafeArea/Layout/TopBar"]
+[node name="TopBox" type="VBoxContainer" parent="UI/SafeArea/Layout/LeftColumn/TopBar"]
 custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="StatsRow" type="HBoxContainer" parent="UI/SafeArea/Layout/TopBar/TopBox"]
+[node name="StatsRow" type="HBoxContainer" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox"]
 layout_mode = 2
 mouse_filter = 2
+theme_override_constants/separation = 12
 
-[node name="ScoreLabel" type="Label" parent="UI/SafeArea/Layout/TopBar/TopBox/StatsRow"]
+[node name="PauseButton" type="Button" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox/StatsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 56)
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+theme_override_font_sizes/font_size = 26
+text = "II"
+
+[node name="ScoreLabel" type="Label" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox/StatsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
 text = "0 pts"
 
-[node name="StreakLabel" type="Label" parent="UI/SafeArea/Layout/TopBar/TopBox/StatsRow"]
+[node name="StreakLabel" type="Label" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox/StatsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -94,7 +101,7 @@ theme_override_colors/font_color = Color(1, 0.78, 0.3, 1)
 theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 
-[node name="RoundLabel" type="Label" parent="UI/SafeArea/Layout/TopBar/TopBox/StatsRow"]
+[node name="RoundLabel" type="Label" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox/StatsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -102,127 +109,185 @@ theme_override_font_sizes/font_size = 26
 text = "Rodada 1"
 horizontal_alignment = 2
 
-[node name="PromptLabel" type="Label" parent="UI/SafeArea/Layout/TopBar/TopBox"]
+[node name="PromptLabel" type="Label" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.86, 0.95, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 22
 text = "Encontre o bairro"
 horizontal_alignment = 1
 
-[node name="TargetLabel" type="Label" parent="UI/SafeArea/Layout/TopBar/TopBox"]
+[node name="TargetLabel" type="Label" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="CategoryLabel" type="Label" parent="UI/SafeArea/Layout/TopBar/TopBox"]
+[node name="CategoryLabel" type="Label" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.78, 0.3, 1)
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
-[node name="TimeBar" type="ProgressBar" parent="UI/SafeArea/Layout/TopBar/TopBox"]
+[node name="TimeRow" type="HBoxContainer" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="TimeBar" type="ProgressBar" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox/TimeRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
 mouse_filter = 2
 max_value = 15.0
 step = 0.0
 value = 15.0
 show_percentage = false
 
-[node name="TimeLabel" type="Label" parent="UI/SafeArea/Layout/TopBar/TopBox"]
+[node name="TimeLabel" type="Label" parent="UI/SafeArea/Layout/LeftColumn/TopBar/TopBox/TimeRow"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = "15,0 s"
-horizontal_alignment = 1
+horizontal_alignment = 2
 
-[node name="Spacer" type="Control" parent="UI/SafeArea/Layout"]
+[node name="Spacer" type="Control" parent="UI/SafeArea/Layout/LeftColumn"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="ResultCard" type="PanelContainer" parent="UI/SafeArea/Layout"]
+[node name="BottomSlot" type="VBoxContainer" parent="UI/SafeArea/Layout/LeftColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="SideSlot" type="VBoxContainer" parent="UI/SafeArea/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="ResultCard" type="PanelContainer" parent="UI/SafeArea/Layout/SideSlot"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="ResultBox" type="VBoxContainer" parent="UI/SafeArea/Layout/ResultCard"]
+[node name="ResultBox" type="VBoxContainer" parent="UI/SafeArea/Layout/SideSlot/ResultCard"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ResultMessage" type="Label" parent="UI/SafeArea/Layout/ResultCard/ResultBox"]
+[node name="ResultMessage" type="Label" parent="UI/SafeArea/Layout/SideSlot/ResultCard/ResultBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
-horizontal_alignment = 1
-
-[node name="ResultDetail" type="Label" parent="UI/SafeArea/Layout/ResultCard/ResultBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.86, 0.95, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="PointsRow" type="HBoxContainer" parent="UI/SafeArea/Layout/ResultCard/ResultBox"]
+[node name="ResultDetail" type="Label" parent="UI/SafeArea/Layout/SideSlot/ResultCard/ResultBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.86, 0.95, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="PointsRow" type="HBoxContainer" parent="UI/SafeArea/Layout/SideSlot/ResultCard/ResultBox"]
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 28
 
-[node name="ResultPoints" type="Label" parent="UI/SafeArea/Layout/ResultCard/ResultBox/PointsRow"]
+[node name="ResultPoints" type="Label" parent="UI/SafeArea/Layout/SideSlot/ResultCard/ResultBox/PointsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 46
 text = "+0"
 
-[node name="ResultBonus" type="Label" parent="UI/SafeArea/Layout/ResultCard/ResultBox/PointsRow"]
+[node name="ResultBonus" type="Label" parent="UI/SafeArea/Layout/SideSlot/ResultCard/ResultBox/PointsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.9, 0.55, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 30
 text = "+0,0 s"
 
-[node name="PlaceInfo" type="RichTextLabel" parent="UI/SafeArea/Layout/ResultCard/ResultBox"]
+[node name="PlaceInfo" type="RichTextLabel" parent="UI/SafeArea/Layout/SideSlot/ResultCard/ResultBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 180)
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 22
 theme_override_font_sizes/bold_font_size = 22
 bbcode_enabled = true
-fit_content = false
 scroll_active = true
 
-[node name="NextButton" type="Button" parent="UI/SafeArea/Layout/ResultCard/ResultBox"]
+[node name="NextButton" type="Button" parent="UI/SafeArea/Layout/SideSlot/ResultCard/ResultBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 96)
+custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
 text = "Próxima"
 
-[node name="ConfirmButton" type="Button" parent="UI/SafeArea/Layout"]
+[node name="Burst" type="CPUParticles2D" parent="UI"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(440, 104)
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Confirmar"
+emitting = false
+amount = 40
+lifetime = 0.9
+one_shot = true
+explosiveness = 0.95
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 600)
+initial_velocity_min = 220.0
+initial_velocity_max = 480.0
+scale_amount_min = 6.0
+scale_amount_max = 12.0
+color = Color(0.49, 0.81, 0.42, 1)
+hue_variation_min = -0.15
+hue_variation_max = 0.15
 
-[node name="Overlay" type="ColorRect" parent="UI"]
+[node name="TimeUpLabel" type="Label" parent="UI"]
 unique_name_in_owner = true
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -60.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.15, 0.24, 1)
+theme_override_constants/outline_size = 20
+theme_override_font_sizes/font_size = 72
+text = "Tempo esgotado!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PauseMenu" type="Control" parent="UI"]
+unique_name_in_owner = true
+process_mode = 3
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.15, 0.24, 0.72)
 
-[node name="Center" type="CenterContainer" parent="UI/Overlay"]
+[node name="Dim" type="ColorRect" parent="UI/PauseMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.08, 0.13, 0.75)
+
+[node name="Center" type="CenterContainer" parent="UI/PauseMenu"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -230,39 +295,36 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Card" type="PanelContainer" parent="UI/Overlay/Center"]
-custom_minimum_size = Vector2(560, 0)
+[node name="Card" type="PanelContainer" parent="UI/PauseMenu/Center"]
+custom_minimum_size = Vector2(520, 0)
 layout_mode = 2
 
-[node name="Box" type="VBoxContainer" parent="UI/Overlay/Center/Card"]
+[node name="Box" type="VBoxContainer" parent="UI/PauseMenu/Center/Card"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 18
 
-[node name="OverlayTitle" type="Label" parent="UI/Overlay/Center/Card/Box"]
-unique_name_in_owner = true
+[node name="Title" type="Label" parent="UI/PauseMenu/Center/Card/Box"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "GeoSantos"
+theme_override_font_sizes/font_size = 56
+text = "Pausa"
 horizontal_alignment = 1
 
-[node name="OverlayText" type="Label" parent="UI/Overlay/Center/Card/Box"]
+[node name="ResumeButton" type="Button" parent="UI/PauseMenu/Center/Card/Box"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(500, 0)
+custom_minimum_size = Vector2(0, 104)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.86, 0.95, 1)
-theme_override_font_sizes/font_size = 28
-text = "Escolha um modo"
-horizontal_alignment = 1
-autowrap_mode = 3
+text = "Continuar"
 
-[node name="NeighborhoodsButton" type="Button" parent="UI/Overlay/Center/Card/Box"]
+[node name="PauseOptionsButton" type="Button" parent="UI/PauseMenu/Center/Card/Box"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
-text = "Bairros"
+theme_type_variation = &"SecondaryButton"
+text = "Opções"
 
-[node name="PlacesButton" type="Button" parent="UI/Overlay/Center/Card/Box"]
+[node name="QuitButton" type="Button" parent="UI/PauseMenu/Center/Card/Box"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
-text = "Lugares"
+theme_type_variation = &"SecondaryButton"
+text = "Sair para o menu"
