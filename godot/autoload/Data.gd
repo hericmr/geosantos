@@ -9,6 +9,8 @@ var origin_lat: float
 var origin_lon: float
 ## Rect2 en metros que contiene todos los barrios.
 var bounds: Rect2
+## Área jugable: barrios + lugares fuera de la isla (São Vicente, Guarujá, continente).
+var play_bounds: Rect2
 ## [{ name: String, centroid: Vector2, area_m2: float, polygon: PackedVector2Array }]
 var neighborhoods: Array[Dictionary] = []
 ## [{ id, name, category, description, address, image_url, lat, lon, pos: Vector2 }]
@@ -18,6 +20,10 @@ var places: Array[Dictionary] = []
 func _ready() -> void:
 	_load_neighborhoods()
 	_load_places()
+	play_bounds = bounds
+	for p in places:
+		play_bounds = play_bounds.expand(p.pos)
+	play_bounds = play_bounds.grow(300.0)
 
 
 func _read_json(path: String) -> Dictionary:
@@ -56,6 +62,14 @@ func _load_places() -> void:
 	for p: Dictionary in d.get("places", []):
 		p.pos = Vector2(p.pos[0], p.pos[1])
 		places.append(p)
+
+
+## Nombre del barrio que contiene la posición, o "" si cae fuera de todos.
+func neighborhood_at(pos: Vector2) -> String:
+	for n in neighborhoods:
+		if Geometry2D.is_point_in_polygon(pos, n.polygon):
+			return n.name
+	return ""
 
 
 ## Distancia real en metros entre dos puntos lat/lon (haversine).

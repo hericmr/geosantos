@@ -16,6 +16,8 @@ PLACES_SRC = ROOT / "src/data/famous_places.json"
 OUT_DIR = ROOT / "godot/data"
 
 SIMPLIFY_TOLERANCE_M = 3.0
+# Lugares más lejos que esto del centro de Santos tienen coordenadas erróneas.
+MAX_PLACE_DISTANCE_M = 25000.0
 M_PER_DEG_LAT = 110540.0
 M_PER_DEG_LON = 111320.0
 
@@ -151,7 +153,15 @@ def main():
 
     places = []
     for p in places_src:
-        x, y = project(p["longitude"], p["latitude"])
+        lat, lon = p["latitude"], p["longitude"]
+        # Algunos lugares tienen la longitud sin el signo negativo.
+        if lon > 0:
+            lon = -lon
+            print(f"  corregido signo de longitud: {p['name']}")
+        x, y = project(lon, lat)
+        if math.hypot(x, y) > MAX_PLACE_DISTANCE_M:
+            print(f"  descartado (coordenadas fuera de Santos): {p['name']} ({lat}, {lon})")
+            continue
         places.append({
             "id": str(p["id"]),
             "name": p["name"].strip(),
@@ -159,8 +169,8 @@ def main():
             "description": md_to_bbcode(p.get("description") or ""),
             "address": p.get("address") or "",
             "image_url": p.get("imageUrl") or "",
-            "lat": p["latitude"],
-            "lon": p["longitude"],
+            "lat": lat,
+            "lon": lon,
             "pos": [x, y],
         })
 
