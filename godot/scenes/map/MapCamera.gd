@@ -84,9 +84,19 @@ func stop() -> void:
 func fly_to(world_pos: Vector2, target_zoom: float, duration := 0.8) -> Tween:
 	stop()
 	_tween = create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-	_tween.tween_property(self, "position", _clamped(world_pos), duration)
+	_tween.tween_property(self, "position", world_pos, duration)
 	_tween.tween_method(set_zoom_level, zoom.x, clampf(target_zoom, min_zoom, MAX_ZOOM), duration)
 	return _tween
+
+
+## Vuela para que el rectángulo del mundo quede dentro de una zona de la pantalla
+## (por ejemplo, la parte que no tapa la interfaz).
+func fly_to_rect(rect: Rect2, screen_area: Rect2, max_zoom := MAX_ZOOM, duration := 0.8) -> Tween:
+	var z := minf(screen_area.size.x / rect.size.x, screen_area.size.y / rect.size.y) * FIT_MARGIN
+	z = clampf(z, min_zoom, minf(max_zoom, MAX_ZOOM))
+	# El centro del rect debe caer en el centro de la zona, no en el de la pantalla.
+	var offset := (screen_area.get_center() - get_viewport_rect().size / 2.0) / z
+	return fly_to(rect.get_center() - offset, z, duration)
 
 
 func _process(delta: float) -> void:
