@@ -19,6 +19,8 @@ var _screen_scale := 1.0
 
 
 func _ready() -> void:
+	# Pixel art: sin suavizado al ampliar.
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var frames := SpriteFrames.new()
 	frames.set_animation_loop("default", false)
 	frames.set_animation_speed("default", FPS)

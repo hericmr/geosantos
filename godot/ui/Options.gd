@@ -6,6 +6,7 @@ signal closed
 @onready var music_slider: HSlider = %MusicSlider
 @onready var sfx_slider: HSlider = %SfxSlider
 @onready var vibration_check: CheckButton = %VibrationCheck
+@onready var satellite_check: CheckButton = %SatelliteCheck
 @onready var back_button: Button = %BackButton
 
 
@@ -25,6 +26,8 @@ func _ready() -> void:
 		Save.set_value("vibration", on)
 		if on:
 			Sfx.vibrate(60))
+	satellite_check.button_pressed = Save.get_value("satellite")
+	satellite_check.toggled.connect(func(on: bool) -> void: Save.set_value("satellite", on))
 	back_button.pressed.connect(func() -> void:
 		closed.emit()
 		queue_free())

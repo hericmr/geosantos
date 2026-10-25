@@ -7,6 +7,8 @@ const DEFAULTS := {
 	"music_volume": 0.6,
 	"sfx_volume": 0.9,
 	"vibration": true,
+	## imagen de satélite de fondo (se descarga por tiles; se puede apagar para ahorrar datos)
+	"satellite": true,
 	## id del modo -> mejor puntuación
 	"best_scores": {},
 	## puntuaciones que no se pudieron enviar al ranking (se reintentan)

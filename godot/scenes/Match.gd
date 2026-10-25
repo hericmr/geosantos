@@ -99,13 +99,6 @@ func _ready() -> void:
 	_start_match(Game.current_mode)
 
 
-func _notification(what: int) -> void:
-	# Al salir de la app o cambiar de pestaña, se pausa para no perder tiempo.
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
-		if is_node_ready() and state != State.GAME_OVER:
-			_set_paused(true)
-
-
 func _process(delta: float) -> void:
 	if state != State.GUESSING:
 		return
@@ -144,6 +137,8 @@ func _next_round() -> void:
 	result_line.clear_points()
 	map.clear_highlights()
 	result_card.hide()
+	# La pausa solo existe entre una pregunta y otra, con el reloj detenido.
+	_set_pause_available(false)
 
 	target_label.text = target.name
 	category_label.text = target.get("category", "")
@@ -221,8 +216,14 @@ func _game_over() -> void:
 	Transition.go("res://scenes/Results.tscn")
 
 
+## Se oculta sin sacarlo del layout para que la barra superior no salte.
+func _set_pause_available(available: bool) -> void:
+	pause_button.disabled = not available
+	pause_button.modulate.a = 1.0 if available else 0.0
+
+
 func _set_paused(paused: bool) -> void:
-	if state == State.GAME_OVER:
+	if paused and state != State.RESULT:
 		return
 	get_tree().paused = paused
 	pause_menu.visible = paused
@@ -231,6 +232,7 @@ func _set_paused(paused: bool) -> void:
 # --- Resultado de la ronda ---
 
 func _show_result(result: Dictionary) -> void:
+	_set_pause_available(true)
 	var target_point: Vector2 = result.closest
 
 	# Lo que hay que mostrar en el mapa: el barrio o el lugar correcto, y el toque.

@@ -29,3 +29,9 @@ static func world_distance_m(a: Vector2, b: Vector2) -> float:
 	var la := world_to_latlon(a)
 	var lb := world_to_latlon(b)
 	return distance_m(la.x, la.y, lb.x, lb.y)
+
+
+## Vector2(lat, lon) -> posición del mundo (metros).
+static func latlon_to_world(lat: float, lon: float) -> Vector2:
+	var k_lon := M_PER_DEG_LON * cos(deg_to_rad(origin_lat))
+	return Vector2((lon - origin_lon) * k_lon, -(lat - origin_lat) * M_PER_DEG_LAT)
